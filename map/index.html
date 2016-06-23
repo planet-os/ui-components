@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <script src="https://d3js.org/d3.v3.js"></script>
+    <script src="http://cdn.leafletjs.com/leaflet/v1.0.0-rc.1/leaflet.js"></script>
+    <script src="https://cdn.rawgit.com/teralytics/Leaflet.D3SvgOverlay/master/L.D3SvgOverlay.js"></script>
+    <script src="../utils/utils.js"></script>
+    <script src="world-countries.js"></script>
+    <script src="map-component.js"></script>
+    <link rel="stylesheet" href="//cdn.leafletjs.com/leaflet/v1.0.0-rc.1/leaflet.css" />
+    <style>
+    .map {
+        width: 1024px;
+        height: 512px
+    }
+    
+    .map svg {
+        stroke: black;
+    }
+    </style>
+</head>
+
+<body>
+    <div class="map"></div>
+    <script>
+    var geojsonFeature = {
+        "type": "Feature",
+        "properties": {
+            "name": "",
+        },
+        "geometry": {
+            "type": "LineString",
+            "coordinates": [
+                [-170, 80],
+                [170, 80],
+                [170, -80],
+                [-170, -80],
+                [-170, 80]
+            ]
+        }
+    };
+
+    var rasterData = {
+        lon: d3.range(360).map(function(d, i) {
+            return i - 180;
+        }),
+        lat: d3.range(180).map(function(d, i) {
+            return 180 - i - 90;
+        }),
+        values: d3.range(180).map(function(d, i) {
+            return d3.range(360).map(function(dB, iB) {
+                return ~~(Math.random() * 100);
+            });
+        })
+    };
+    rasterData.uniqueValues = utils.flattenAndUniquify(rasterData.values).uniques;
+
+    var mapContainer = document.querySelector('.map');
+    var dataPreviewMap = mapWrapper({
+            el: mapContainer
+        })
+        .init()
+        .renderPolygon(geojsonFeature)
+        .zoomToPolygonBoundingBox(geojsonFeature)
+        // .hideZoomControl()
+        .renderMarker([0, 0])
+        .renderRaster(rasterData)
+
+    dataPreviewMap.events.click.on(function(e) {
+        console.log(e);
+    });
+    </script>
+</body>
+
+</html>
