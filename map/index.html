@@ -72,7 +72,7 @@
         console.log(e);
     });
 
-    d3.json('http://54.197.14.109/sample/Direction%20of%20swell%20waves', function(error, json) {
+    d3.json('//54.197.14.109/sample/Direction%20of%20swell%20waves', function(error, json) {
         console.log(json);
 
         var data = {lat: json.lats, lon: json.lons, values: json.data_values};
