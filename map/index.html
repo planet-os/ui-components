@@ -58,19 +58,28 @@
     rasterData.uniqueValues = utils.flattenAndUniquify(rasterData.values).uniques;
 
     var mapContainer = document.querySelector('.map');
-    var dataPreviewMap = mapWrapper({
+    var map = mapWrapper({
             el: mapContainer
         })
         .init()
-        .renderPolygon(geojsonFeature)
-        .zoomToPolygonBoundingBox(geojsonFeature)
+        // .renderPolygon(geojsonFeature)
+        // .zoomToPolygonBoundingBox(geojsonFeature)
         // .hideZoomControl()
         .renderMarker([0, 0])
-        .renderRaster(rasterData)
+        // .renderRaster(rasterData)
 
-    dataPreviewMap.events.click.on(function(e) {
+    map.events.click.on(function(e) {
         console.log(e);
     });
+
+    d3.json('http://54.197.14.109/sample/Direction%20of%20swell%20waves', function(error, json) {
+        console.log(json);
+
+        var data = {lat: json.lats, lon: json.lons, values: json.data_values};
+        data.uniqueValues = utils.flattenAndUniquify(data.values).uniques;
+
+        map.renderRaster(data)
+    })
     </script>
 </body>
 

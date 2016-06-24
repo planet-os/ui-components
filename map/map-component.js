@@ -83,7 +83,7 @@ var DataGridLayer = L.Layer.extend({
                 point = this._map.latLngToContainerPoint(L.latLng(lat[latIndex], lon[lonIndex]));
                 value = values[latIndex][lonIndex];
 
-                if (value !== null && !isNaN(value) && i % 1 === 0 && j % 1 === 0) {
+                if (value !== -999 && value !== null && !isNaN(value) && i % 1 === 0 && j % 1 === 0) {
                     var info = {
                         centerX: point.x,
                         centerY: point.y,
