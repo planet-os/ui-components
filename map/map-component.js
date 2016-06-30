@@ -76,7 +76,7 @@ var DataGridLayer = L.Layer.extend({
             var firstPointAtCurrentLat = this._map.latLngToContainerPoint(L.latLng(lat[latIndex], lon[westIndex]));
             var firstPointAtNextLat = this._map.latLngToContainerPoint(L.latLng(lat[nextLatIndex], lon[westIndex]));
 
-            var h = Math.max(firstPointAtNextLat.y - firstPointAtCurrentLat.y, 1) + 1;
+            var h = Math.ceil(Math.max(firstPointAtNextLat.y - firstPointAtCurrentLat.y, 1) + 1);
 
             for (var j = westIndex - 1; j < eastIndex; j++) {
                 lonIndex = Math.max(j, 0);
@@ -179,8 +179,8 @@ function getQuantiles(values, buckets) {
 function equalizeBrewerSpectral(values) {
     var brewerSpectral = ["#5e4fa2", "#3288bd", "#66c2a5", "#abdda4", "#e6f598", "#ffffbf", "#fee08b", "#fdae61", "#f46d43", "#d53e4f", "#9e0142"];
     var quantiles = getQuantiles(values, brewerSpectral.length - 1);
-    quantiles.push(Math.max.apply(null, values));
-    quantiles.unshift(Math.min.apply(null, values));
+    quantiles.push(utils.findMax(values));
+    quantiles.unshift(utils.findMin(values));
     return d3.scale.linear().domain(quantiles).range(brewerSpectral);
 }
 

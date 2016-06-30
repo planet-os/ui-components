@@ -1,0 +1,29 @@
+{
+  "name": "piper.js",
+  "version": "0.1.0",
+  "description": "A pipeline pattern for datavis",
+  "keywords": [
+    "chart",
+    "pipeline"
+  ],
+  "homepage": "https://github.com/biovisualize/piper.js",
+  "license": "",
+  "author": {
+    "name": "Christophe Viau"
+  },
+  "main": "dist/pipeline.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/biovisualize/piper.js"
+  },
+  "watch": {
+    "build": "src/*.js"
+  },
+  "scripts": {
+    "build": "make",
+    "watch": "npm-watch"
+  },
+  "devDependencies": {
+    "npm-watch": "^0.1.1"
+  }
+}

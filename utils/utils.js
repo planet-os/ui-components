@@ -139,6 +139,32 @@ var utils = {
 
     bisectionReversed: function(array, x) {
         return utils.bisection(array, x, true);
+    },
+
+    findMax: function(array) {
+        var max = 0,
+            a = array.length,
+            counter;
+
+        for (counter = 0; counter < a; counter++) {
+            if (array[counter] > max) {
+                max = array[counter];
+            }
+        }
+        return max;
+    },
+
+    findMin: function(array) {
+        var min = Infinity,
+            a = array.length,
+            counter;
+
+        for (counter = 0; counter < a; counter++) {
+            if (array[counter] < min) {
+                min = array[counter];
+            }
+        }
+        return min;
     }
 };
 

@@ -1,0 +1,59 @@
+.chart {
+    position: relative;
+    float: left;
+}
+
+.chart .label {
+    font-size: 10px;
+}
+
+.chart .hover-line {
+    background-color: black;
+}
+
+.chart .hover-circle {
+    fill: silver;
+    opacity: 0.5;
+}
+
+.chart .tooltip {
+    font-size: 8px;
+    background-color: white;
+    border: 1px solid silver;
+    opacity: 1;
+    margin-left: 2px;
+    padding: 3px;
+    border-radius: 0px 10px 10px 10px;
+}
+
+.chart .shape {
+    fill: #FBC65A;
+    fill-opacity: 0.3;
+    stroke: #FBC65A;
+    stroke-width: 1px;
+}
+
+.chart {
+    height: 25px;
+}
+
+.chart .grid-line-x {
+    background-color: silver;
+}
+
+.chart .axis-y {
+    border: none;
+}
+
+.chart .domain {
+    fill: none;
+    stroke: black;
+}
+
+.chart .tick line {
+    stroke: black;
+}
+
+.chart .tooltip-line {
+    stroke: silver;
+}
