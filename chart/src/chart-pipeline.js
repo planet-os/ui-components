@@ -1,6 +1,6 @@
 piper.timeseriesLineChart = piper.utils.pipeline(
-    piper.dataTimeFromSeparateArrays,
-    piper.scaleXTime,
+    piper.data,
+    piper.scaleX,
     piper.scaleY,
     piper.axisX,
     piper.axisY,
@@ -9,7 +9,9 @@ piper.timeseriesLineChart = piper.utils.pipeline(
     piper.message,
     piper.axisComponentX,
     piper.axisComponentY,
+    piper.axisXFormatterRotate30,
     piper.axisTitleComponentY,
+    piper.eventsBinder,
     piper.tooltipComponent,
     piper.hoverCircleComponent,
     piper.tooltipLineComponent

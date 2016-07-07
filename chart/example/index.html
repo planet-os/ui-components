@@ -8,40 +8,21 @@
 </head>
 <body>
 
-<div class="chart chart1"></div>
-<div class="chart chart2"></div>
-<div class="chart chart3"></div>
-<div class="tooltip">test</div>
+<div class="chart"></div>
 <script>
 // setInterval(function(d){
 //     render();
 // }, 1000);
 
 function render(){
-    var data = d3.range(~~(Math.random() * 20) + 5).map(function(d, i){ return ~~(Math.random() * 100); });
+    var dateNow = new Date().getTime();
+    var values = d3.range(10).map(function(d, i){ return ~~(Math.random() * 100); });
+    var timestamps = d3.range(10).map(function(d, i){ return dateNow + (i*60*60*1000); });
+    var data = {values: values, timestamps: timestamps};
 
-    var lineChart = piper.utils.pipeline(
-        piper.data,
-        piper.scaleX,
-        piper.scaleY,
-        piper.axisX,
-        piper.axisY,
-        piper.panelComponent,
-        piper.lineShapes,
-        piper.axisComponentX,
-        piper.axisComponentY,
-        piper.axisTitleComponentX,
-        piper.axisTitleComponentY,
-        piper.chartTitleComponent,
-        piper.eventsBinder,
-        piper.tooltipLineComponent,
-        piper.hoverCircleComponent,
-        piper.tooltipComponent
-    );
+    var chartContainer = document.querySelector('.chart');
 
-    var chartContainer = document.querySelector('.chart3');
-
-    var chart = lineChart({
+    var chart = piper.timeseriesLineChart({
             container: chartContainer,
             width: 400,
             height: 200,
@@ -49,24 +30,9 @@ function render(){
             data: data,
             axisTitleX: 'Title X',
             axisTitleY: 'Title Y',
-            chartTitle: 'Chart'
+            chartTitle: 'Chart',
+            axisXFormat: d3.time.format("%H:%M")
         });
-
-    var tooltip = piper.tooltipHTMLWidget(document.querySelector('.tooltip'));
-
-    chart.events.mouseenter.on(function(d){
-        tooltip.show();
-    });
-    chart.events.mouseout.on(function(d){
-        tooltip.hide();
-    });
-    chart.events.mousemove.on(function(d){
-        var chartPosition = chartContainer.getBoundingClientRect();
-        tooltip
-            .setText(d.data.y)
-            .setPosition([d.shapePositionFromContainer[0] + chartPosition.left, d.shapePositionFromContainer[1] + chartPosition.top]);
-    });
-
 }
 
 render();

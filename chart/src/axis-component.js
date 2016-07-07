@@ -65,25 +65,6 @@ piper.axisComponentX = function(_config){
     return {};
 };
 
-piper.singleAxisComponentX = function(_config){
-    var config = {
-        axisX: null,
-        panel: null
-    };
-    piper.utils.override(config, _config);
-
-    var axisX = config.panel.selectAll('g.axis.x.single')
-        .data([0]);
-    axisX.enter().append('g')
-        .attr({
-            'class': 'x axis single'
-        });
-    axisX.transition().call(config.axisX);
-    axisX.exit().remove();
-
-    return {};
-};
-
 piper.axisComponentY = function(_config){
     var config = {
         axisY: null,

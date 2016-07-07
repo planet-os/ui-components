@@ -1,15 +1,14 @@
 piper.axisX = function(_config){
     var config = {
         scaleX: null,
-        axisXFormat: '%H:%M',
-        axisXTimeResolution: 'minutes',
-        axisXTimeSteps: 2
+        axisXFormat: function(d){ return d.toString(); }
     };
     piper.utils.override(config, _config);
 
     var axisX = d3.svg.axis()
         .scale(config.scaleX)
-        .orient('bottom');
+        .orient("bottom")
+        .tickFormat(config.axisXFormat);
 
     return {
         axisX: axisX
