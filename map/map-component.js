@@ -236,7 +236,7 @@ var mapWrapper = function(_config) {
         map = L.map(config.el, {
                 crs: L.CRS.Simple,
                 maxBounds: bounds,
-                maxZoom: 9,
+                maxZoom: 10,
                 minZoom: 0,
                 scrollWheelZoom: false,
                 zoomSnap: 0,
@@ -391,11 +391,6 @@ var mapWrapper = function(_config) {
         return this;
     }
 
-    function setUnit(unit) {
-
-        return this;
-    }
-
     function hideZoomControl(bool) {
         if (bool) {
             map.addControl(map.zoomControl);
@@ -421,7 +416,6 @@ var mapWrapper = function(_config) {
         renderMarker: renderMarker,
         renderPolygon: renderPolygon,
         events: events,
-        setUnit: setUnit,
         renderRaster: renderRaster,
         isVisible: states.isVisible,
         hideZoomControl: hideZoomControl
