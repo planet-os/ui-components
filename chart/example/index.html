@@ -31,7 +31,11 @@ function render(){
             axisTitleX: 'Title X',
             axisTitleY: 'Title Y',
             chartTitle: 'Chart',
-            axisXFormat: d3.time.format("%H:%M")
+            axisXFormat: d3.time.format("%H:%M"),
+            tooltipFormat: function(d){
+                var value = d.data.y;
+                return (value % 1) ? value.toPrecision(3) : value;
+            }
         });
 }
 

@@ -2,7 +2,8 @@ piper.tooltipComponent = function(_config) {
     var config = {
         panel: null,
         dataIsAllNulls: null,
-        events: null
+        events: null,
+        tooltipFormat: function(d){ return d.data.y; }
     };
     piper.utils.override(config, _config);
 
@@ -27,7 +28,7 @@ piper.tooltipComponent = function(_config) {
         tooltipContainer.attr({
                 transform: 'translate(' + d.shapePosition + ')'
             })
-            .select('text').text(d.data.y);
+            .select('text').text(config.tooltipFormat(d));
     });
     config.events.mouseenter.on(function(d) {
         if (config.dataIsAllNulls) {
