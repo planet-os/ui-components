@@ -210,7 +210,7 @@ var mapWrapper = function(_config) {
     var rectMarkRenderer = function(ctx, info) {
         ctx.beginPath();
         ctx.fillStyle = info.colorScale(info.value);
-        ctx.rect(info.centerX - info.width / 2, info.centerY - info.height / 2, info.width, info.height);
+        ctx.rect(info.centerX, info.centerY - info.height / 2, info.width, info.height);
         ctx.fill();
     };
 
@@ -250,6 +250,8 @@ var mapWrapper = function(_config) {
             .fitWorld()
             // .setView([30, 0], 7)
             .on('click', function(e) { events.click({ lat: e.latlng.lat, lon: e.latlng.lng }); })
+            .on('mousedown', function(e) { config.el.classList.add('grab'); })
+            .on('mouseup', function(e) { config.el.classList.remove('grab'); })
             .on('mousemove', function(e) {
                 if (gridData) {
                     var latIndex = utils.bisectionReversed(gridData.lat, e.latlng.lat);
@@ -344,10 +346,15 @@ var mapWrapper = function(_config) {
 
     function renderPolygon(polygon) {
         var onEachFeature = function(feature, layer) {
-            // layer.bindPopup(feature.properties.id);
-
             layer.on({
-                click: function(e) { events.featureClicked({ lat: e.latlng.lat, lon: e.latlng.lng }); },
+                click: function(e) {
+                    events.featureClicked({
+                        id: e.target.feature.properties.id,
+                        lat: e.target._latlng ? e.target._latlng.lat : e.latlng.lat,
+                        lon: e.target._latlng ? e.target._latlng.lng : e.latlng.lng,
+                        layer: e
+                    });
+                },
                 mouseover: function(e, a, b) {
                     events.featureMousEnter({
                         x: e.containerPoint.x,
@@ -369,7 +376,19 @@ var mapWrapper = function(_config) {
             });
         }
 
-        geojsonLayer = L.geoJson(polygon, { onEachFeature: onEachFeature }).addTo(map);
+        geojsonLayer = L.geoJson(polygon, {
+            onEachFeature: onEachFeature,
+            pointToLayer: function(feature, latlng) {
+                return new L.CircleMarker(latlng, {
+                    radius: 4,
+                    fillColor: '#05A5DE',
+                    color: '#1E1E1E',
+                    weight: 1,
+                    opacity: 0.5,
+                    fillOpacity: 0.4
+                });
+            }
+        }).addTo(map);
 
         // map.fitBounds(geojsonLayer.getBounds());
         return this;
