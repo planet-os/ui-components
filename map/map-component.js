@@ -61,24 +61,24 @@ var DataGridLayer = L.Layer.extend({
 
         ctx.globalAlpha = 1;
 
+        var skip = Math.ceil((eastIndex - westIndex - 1) / mapSize.x * 2);
+
         var northWestPoint = this._map.latLngToContainerPoint(L.latLng(lat[northIndex], lon[Math.max(westIndex, 0)]));
-        var northWestPointNextLon = this._map.latLngToContainerPoint(L.latLng(lat[northIndex], lon[Math.min(westIndex + 1, lon.length - 1)]));
-        var nextNorthWestPointNextLat = this._map.latLngToContainerPoint(L.latLng(lat[northIndex + 1], lon[Math.max(westIndex, 0)]));
+        var northWestPointNextLon = this._map.latLngToContainerPoint(L.latLng(lat[northIndex], lon[Math.min(westIndex + skip, lon.length - 1)]));
 
         var w = Math.max(northWestPointNextLon.x - northWestPoint.x, 1) + 2;
-        // var maxH = pointC.y - pointD.y;
 
         var point, value, latIndex, nextLatIndex, lonIndex, nextLongIndex;
-        for (var i = northIndex - 1; i < southIndex; i++) {
+        for (var i = northIndex - 1; i < southIndex; i+=skip) {
             latIndex = Math.max(i, 0);
             nextLatIndex = Math.min(latIndex + 1, lat.length - 1);
 
             var firstPointAtCurrentLat = this._map.latLngToContainerPoint(L.latLng(lat[latIndex], lon[westIndex]));
             var firstPointAtNextLat = this._map.latLngToContainerPoint(L.latLng(lat[nextLatIndex], lon[westIndex]));
 
-            var h = Math.ceil(Math.max(firstPointAtNextLat.y - firstPointAtCurrentLat.y, 1) + 1);
+            var h = Math.ceil(Math.max(firstPointAtNextLat.y - firstPointAtCurrentLat.y, 1) + 2);
 
-            for (var j = westIndex - 1; j < eastIndex; j++) {
+            for (var j = westIndex - 1; j < eastIndex; j+=skip) {
                 lonIndex = Math.max(j, 0);
                 point = this._map.latLngToContainerPoint(L.latLng(lat[latIndex], lon[lonIndex]));
                 value = values[latIndex][lonIndex];
