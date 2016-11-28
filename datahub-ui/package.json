@@ -1,0 +1,27 @@
+{
+  "name": "datahub-ui",
+  "version": "0.1.0",
+  "description": "Reusable components for Planet OS Datahub",
+  "main": "src/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/planet-os/ui-components.git"
+  },
+  "keywords": [
+    "map",
+    "leaflet"
+  ],
+  "author": "Christophe Viau",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/planet-os/ui-components/issues"
+  },
+  "homepage": "https://github.com/planet-os/ui-components#readme",
+  "devDependencies": {
+    "d3": "^4.4.0",
+    "d3-scale-chromatic": "^1.1.0"
+  },
+  "dependencies": {
+    "leaflet": "^1.0.2"
+  }
+}

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.2/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.4.0/d3.js"></script>
+    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+    <script src="../src/datahub-utils.js"></script>
+    <script src="../src/datahub-palette.js"></script>
+    <script src="../src/datahub-data-generator.js"></script>
+    <script src="../src/datahub-map.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.2/leaflet.css" />
+    <style>
+    .map {
+        width: 1024px;
+        height: 512px
+    }
+    
+    .map svg {
+        stroke: black;
+    }
+    </style>
+</head>
+
+<body>
+    <div class="map"></div>
+    <script>
+    /*
+        TODO:
+        - generators: random walk, perlin noise
+    */
+
+    /*
+        upgrades:
+        - d3v4 scales
+        - which scale as rgb, uses custom parser
+        - default imagePath
+        - removed datahubmap util for datahub.utils
+        - datahub.map.rasterMap
+    */
+
+    console.log(datahub);
+
+    var rasterData = datahub.data.generateRaster()
+    var polygon = datahub.data.generateGeojson()
+
+    var mainMap = datahub.map.rasterMap({
+            el: document.querySelector('.map'),
+            colorScale: datahub.palette.equalizedSpectral,
+            // colorScale: colorScales.grayscale,
+            zoom: 1
+        })
+        .init()
+        .renderRaster(rasterData)
+        .addMarker([0, 0])
+        .renderPolygon(polygon)
+        .zoomToPolygonBoundingBox(polygon)
+
+    // mainMap.events.click.on(function(e) {
+    //     console.log(e);
+    // });
+
+    </script>
+</body>
+
+</html>

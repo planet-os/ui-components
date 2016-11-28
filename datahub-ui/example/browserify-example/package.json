@@ -1,0 +1,18 @@
+{
+  "name": "testing",
+  "version": "0.1.0",
+  "description": "testing datahub-ui",
+  "main": "bundle.js",
+  "dependencies": {
+    "d3": "^4.4.0",
+    "d3-scale-chromatic": "^1.1.0",
+    "leaflet": "^1.0.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "browser": "browserify --standalone datahub node_modules/datahub-ui/index.js -o bundle.js",
+    "build": "browserify app.js -o bundle.js"
+  },
+  "author": "",
+  "license": "ISC"
+}
