@@ -8,17 +8,13 @@
     <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
     <script src="../src/datahub-utils.js"></script>
     <script src="../src/datahub-palette.js"></script>
-    <script src="../src/datahub-data-generator.js"></script>
+    <script src="../src/datahub-data.js"></script>
     <script src="../src/datahub-map.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.2/leaflet.css" />
     <style>
     .map {
-        width: 1024px;
+        width: 512px;
         height: 512px
-    }
-    
-    .map svg {
-        stroke: black;
     }
     </style>
 </head>
@@ -42,6 +38,14 @@
 
     console.log(datahub);
 
+    var datasetName = 'noaa_gfs_global_sflux_0.12d'
+    var variableName = 'Temperature_hybrid'
+
+    datahub.data.getPreview(datasetName, variableName, null, function(response){
+        console.log(111, response);
+        mainMap.renderRaster(response.json)
+    });
+
     var rasterData = datahub.data.generateRaster()
     var polygon = datahub.data.generateGeojson()
 
@@ -52,10 +56,10 @@
             zoom: 1
         })
         .init()
-        .renderRaster(rasterData)
-        .addMarker([0, 0])
-        .renderPolygon(polygon)
-        .zoomToPolygonBoundingBox(polygon)
+        // .renderRaster(rasterData)
+        // .addMarker([0, 0])
+        // .renderPolygon(polygon)
+        // .zoomToPolygonBoundingBox(polygon)
 
     // mainMap.events.click.on(function(e) {
     //     console.log(e);
