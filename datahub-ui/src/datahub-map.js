@@ -2,7 +2,7 @@
     if (typeof module === 'object' && module.exports) {
         factory(module.exports, require('leaflet'), require('./datahub-utils.js').utils)
     } else {
-        root.colorScales = factory((root.datahub = root.datahub || {}), root.L, root.datahub.utils)
+        factory((root.datahub = root.datahub || {}), root.L, root.datahub.utils)
     }
 }(this, function(exports, L, utils) {
 

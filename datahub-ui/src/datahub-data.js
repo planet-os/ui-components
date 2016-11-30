@@ -2,7 +2,7 @@
     if (typeof module === 'object' && module.exports) {
         factory(module.exports, require('d3'), require('./datahub-utils.js').utils)
     } else {
-        root.colorScales = factory((root.datahub = root.datahub || {}), root.d3, root.datahub.utils)
+        factory((root.datahub = root.datahub || {}), root.d3, root.datahub.utils)
     }
 }(this, function(exports, d3, utils) {
 

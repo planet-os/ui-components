@@ -10,17 +10,23 @@
     <script src="../src/datahub-palette.js"></script>
     <script src="../src/datahub-data.js"></script>
     <script src="../src/datahub-map.js"></script>
+    <script src="../src/datahub-chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.2/leaflet.css" />
     <style>
-    .map {
+    .map, .chart {
         width: 512px;
         height: 512px
+    }
+
+    .chart .shape {
+        stroke: red;
     }
     </style>
 </head>
 
 <body>
     <div class="map"></div>
+    <div class="chart"></div>
     <script>
     /*
         TODO:
@@ -36,7 +42,21 @@
         - datahub.map.rasterMap
     */
 
-    console.log(datahub);
+    console.log(datahub)
+
+    var dateNow = new Date().getTime()
+
+    datahub.chart.timeseriesLineChart({
+            container: document.querySelector('.chart'),
+            width: 500,
+            height: 300,
+            margin: { top: 50, right: 70, bottom: 90, left: 60 },
+            data: {
+                values: [1, 2, 3],
+                timestamps: [new Date(dateNow), new Date(dateNow + 86400), new Date(dateNow + 86400*2)]
+            },
+            axisTitleY: 'Unit'
+        });
 
     var datasetName = 'noaa_gfs_global_sflux_0.12d'
     var variableName = 'Temperature_hybrid'

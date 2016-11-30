@@ -1,10 +1,10 @@
 (function(root, factory) {
     if (typeof module === 'object' && module.exports) {
-        factory(module.exports);
+        factory(module.exports)
     } else {
-        root.colorScales = factory((root.datahub = root.datahub || {}));
+        factory((root.datahub = root.datahub || {}))
     }
-}(this, function(exports, utils) {
+}(this, function(exports) {
 
     var merge = function(obj1, obj2) {
         for (var p in obj2) {
@@ -88,6 +88,10 @@
                 listener(value)
             }
             return listener
+        }
+        property.clear = function(listenerToRemove) {
+            listeners = []
+            return this
         }
         property.off = function(listenerToRemove) {
             if (listeners) {
@@ -180,6 +184,26 @@
         })
     }
 
+    var pipeline = function() {
+        var fns = arguments
+        var that = this
+        return function(config) {
+            for (var i = 0; i < fns.length; i++) {
+                var cache = fns[i].call(this, config)
+                config = that.mergeAll(config, cache)
+            }
+            return config
+        }
+    }
+
+    var override = function(_objA, _objB) {
+        for (var x in _objB) {
+            if (x in _objA) {
+                _objA[x] = _objB[x]
+            }
+        }
+    }
+
     exports.utils = {
         merge: merge,
         mergeAll: mergeAll,
@@ -193,7 +217,9 @@
         bisectionReversed: bisectionReversed,
         findMax: findMax,
         findMin: findMin,
-        parseRGB: parseRGB
+        parseRGB: parseRGB,
+        pipeline: pipeline,
+        override: override
     }
 
 }))

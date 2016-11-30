@@ -1,8 +1,8 @@
 (function(root, factory) {
     if (typeof module === 'object' && module.exports) {
-        factory(module.exports, require('d3'), require('d3-scale-chromatic'));
+        factory(module.exports, require('d3'), require('d3-scale-chromatic'))
     } else {
-        root.colorScales = factory((root.datahub = root.datahub || {}), root.d3, root.d3);
+        factory((root.datahub = root.datahub || {}), root.d3, root.d3)
     }
 }(this, function(exports, d3, colorBrewer) {
 
