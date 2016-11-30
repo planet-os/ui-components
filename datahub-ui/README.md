@@ -30,6 +30,9 @@ npm run build
   * selectorMap
   * rasterMap
 
+* datahub.chart
+  * timeseriesLineChart
+
 * datahub.data
   * generateRaster
   * generateGeojson
