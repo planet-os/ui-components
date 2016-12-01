@@ -366,6 +366,26 @@
             imagePath: _config.imagePath || 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.2/images/'
         }
 
+        var mapConfig = {
+            maxBounds: [
+                [-90, -180],
+                [90, 180]
+            ],
+            maxZoom: 13,
+            minZoom: 0,
+            scrollWheelZoom: false,
+            zoomSnap: 0.1,
+            // zoomDelta: 1,
+            attributionControl: false,
+            fadeAnimation: false,
+            tileLayer: {
+                noWrap: true,
+                continuousWorld: false
+            }
+        }
+
+        utils.merge(mapConfig, _config.mapConfig)
+
         var events = {
             click: utils.reactiveProperty(),
             mousemove: utils.reactiveProperty(),
@@ -384,30 +404,9 @@
         var map, gridLayer, geojsonLayer, tooltipLayer, marker, gridData, cachedBBoxPolygon
 
         function init() {
-
             L.Icon.Default.imagePath = config.imagePath
-            var bounds = [
-                [-90, -180],
-                [90, 180]
-            ]
 
-            map = L.map(config.el, {
-                    // crs: L.CRS.Simple,
-                    crs: L.CRS.EPSG3857,
-                    maxBounds: bounds,
-                    maxZoom: 13,
-                    minZoom: 0,
-                    scrollWheelZoom: false,
-                    zoomSnap: 0.1,
-                    // zoomDelta: 1,
-                    attributionControl: false,
-                    fadeAnimation: false,
-                    tileLayer: {
-                        noWrap: true,
-                        continuousWorld: false
-                    }
-                })
-                .fitWorld()
+            map = L.map(config.el, mapConfig)
                 .on('click', function(e) { events.click({ lat: e.latlng.lat, lon: e.latlng.lng }); })
                 .on('mousedown', function(e) { config.el.classList.add('grab'); })
                 .on('mouseup', function(e) { config.el.classList.remove('grab'); })
@@ -456,6 +455,10 @@
                 })
                 .on('mouseover', events.mouseenter)
                 .on('mouseout', events.mouseleave)
+
+            if(!(_config.mapConfig && _config.mapConfig.zoom)) {
+                map.fitWorld()
+            }
 
             map.createPane('labels')
 
@@ -641,7 +644,8 @@
             isVisible: states.isVisible,
             hideZoomControl: hideZoomControl,
             _getMap: function() {
-                return map; }
+                return map
+            }
         }
     }
 

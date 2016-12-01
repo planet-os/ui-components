@@ -166,7 +166,7 @@
             .selectAll('svg')
             .data([0])
         var rootEnter = root.enter().append('svg')
-            .attr('class', 'piper-chart')
+            .attr('class', 'datahub-chart')
         var panel = rootEnter.append('g')
             .attr('class', 'panel')
             .merge(root)
@@ -462,7 +462,7 @@
             .data(config.dataConverted)
         shapes.enter().append('path')
             .attr('class', function(d, i) {
-                return 'line shape shape-' + i
+                return 'line shape color-' + i
             })
             .style('fill', 'none')
             .merge(shapes)
@@ -597,6 +597,33 @@
         return {}
     }
 
+    var legendElements = function(config) {
+        var elements = d3.select(config.container)
+            .selectAll('.element')
+            .data(config.elements)
+        var elementsEnter = elements.enter().append('div')
+            .attr('class', 'element')
+        elementsEnter.append('div')
+            .attr('class', function(d) {
+                return 'color-band ' + d.colorClass
+            })
+        elementsEnter.append('div')
+            .attr('class', 'label')
+            .merge(elements)
+            .text(function(d) {
+                return d.label
+            })
+        elementsEnter.append('div')
+            .attr('class', 'unit')
+            .merge(elements)
+            .text(function(d) {
+                return d.value + ' ' + d.unit
+            })
+        elements.exit().remove()
+
+        return {}
+    }
+
     var timeseriesLineChart = utils.pipeline(
         mergeData,
         sortData,
@@ -643,9 +670,14 @@
         // tooltipLineComponent
     )
 
+    var legend = utils.pipeline(
+        legendElements
+    )
+
     exports.chart = {
         timeseriesLineChart: timeseriesLineChart,
-        timeseriesMultilineChart: timeseriesMultilineChart
+        timeseriesMultilineChart: timeseriesMultilineChart,
+        legend: legend
     }
 
 }))

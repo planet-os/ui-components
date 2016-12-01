@@ -19,22 +19,61 @@
         height: 512px
     }
     
-    .chart .shape-0 {
+    .datahub-chart .color-0 {
         stroke: red;
     }
-
-    .chart .shape-1 {
+    
+    .datahub-chart .color-1 {
         stroke: orange;
     }
-
-    .chart .shape-2 {
+    
+    .datahub-chart .color-2 {
         stroke: lime;
+    }
+    
+    .legend {
+        display: flex;
+        margin-top: 20px;
+    }
+    
+    .legend .element {
+        display: flex;
+        margin: 0 4px;
+        white-space: nowrap;
+    }
+    
+    .legend .element div {
+        height: 100%;
+        display: flex;
+    }
+    
+    .legend .color-band {
+        min-width: 4px;
+        max-width: 4px;
+    }
+    
+    .legend .label,
+    .legend .unit {
+        padding: 0 4px;
+    }
+
+    .legend .color-0 {
+        background-color: red;
+    }
+
+    .legend .color-1 {
+        background-color: orange;
+    }
+
+    .legend .color-2 {
+        background-color: lime;
     }
     </style>
 </head>
 
 <body>
     <div class="map"></div>
+    <div class="legend"></div>
     <div class="chart"></div>
     <script>
     /*
@@ -51,7 +90,28 @@
         - removed datahubmap util for datahub.utils
         - datahub.map.rasterMap
         - flattenAndUniquify -> arrayStats
+        - zoom is in mapConfig.zoom
     */
+
+    datahub.chart.legend({
+        container: document.querySelector('.legend'),
+        elements: [{
+            label: 'Vaisala @ 40M',
+            colorClass: 'color-0',
+            value: 2.2,
+            unit: 'm/s'
+        }, {
+            label: 'National Weather Service',
+            colorClass: 'color-1',
+            value: 2.1,
+            unit: 'm/s'
+        }, {
+            label: 'NOAA GFS',
+            colorClass: 'color-2',
+            value: 2.0,
+            unit: 'm/s'
+        }]
+    });
 
     var timeSeries = datahub.data.generateTimeSeries(40, 3)
     datahub.chart.timeseriesMultilineChart({
@@ -83,9 +143,9 @@
             el: document.querySelector('.map'),
             colorScale: datahub.palette.equalizedSpectral,
             // colorScale: colorScales.grayscale,
-            zoom: 1
         })
         .init()
+
     // .renderRaster(rasterData)
     // .addMarker([0, 0])
     // .renderPolygon(polygon)
