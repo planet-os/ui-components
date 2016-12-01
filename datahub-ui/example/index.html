@@ -13,13 +13,22 @@
     <script src="../src/datahub-chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.2/leaflet.css" />
     <style>
-    .map, .chart {
+    .map,
+    .chart {
         width: 512px;
         height: 512px
     }
-
-    .chart .shape {
+    
+    .chart .shape-0 {
         stroke: red;
+    }
+
+    .chart .shape-1 {
+        stroke: orange;
+    }
+
+    .chart .shape-2 {
+        stroke: lime;
     }
     </style>
 </head>
@@ -30,7 +39,8 @@
     <script>
     /*
         TODO:
-        - generators: random walk, perlin noise
+        - multiline tooltip
+        - generators: perlin noise
     */
 
     /*
@@ -40,23 +50,23 @@
         - default imagePath
         - removed datahubmap util for datahub.utils
         - datahub.map.rasterMap
+        - flattenAndUniquify -> arrayStats
     */
 
-    console.log(datahub)
-
-    var dateNow = new Date().getTime()
-
-    datahub.chart.timeseriesLineChart({
-            container: document.querySelector('.chart'),
-            width: 500,
-            height: 300,
-            margin: { top: 50, right: 70, bottom: 90, left: 60 },
-            data: {
-                values: [1, 2, 3],
-                timestamps: [new Date(dateNow), new Date(dateNow + 86400), new Date(dateNow + 86400*2)]
-            },
-            axisTitleY: 'Unit'
-        });
+    var timeSeries = datahub.data.generateTimeSeries(40, 3)
+    datahub.chart.timeseriesMultilineChart({
+        container: document.querySelector('.chart'),
+        width: 500,
+        height: 300,
+        margin: {
+            top: 50,
+            right: 70,
+            bottom: 90,
+            left: 60
+        },
+        data: timeSeries,
+        axisTitleY: 'Unit'
+    });
 
     var datasetName = 'noaa_gfs_global_sflux_0.12d'
     var variableName = 'Temperature_hybrid'
@@ -76,15 +86,14 @@
             zoom: 1
         })
         .init()
-        // .renderRaster(rasterData)
-        // .addMarker([0, 0])
-        // .renderPolygon(polygon)
-        // .zoomToPolygonBoundingBox(polygon)
+    // .renderRaster(rasterData)
+    // .addMarker([0, 0])
+    // .renderPolygon(polygon)
+    // .zoomToPolygonBoundingBox(polygon)
 
     // mainMap.events.click.on(function(e) {
     //     console.log(e);
     // });
-
     </script>
 </body>
 

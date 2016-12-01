@@ -38,14 +38,39 @@
         }
     }
 
-    var data = function(config) {
+    var mergeData = function(config) {
         var dataConverted = config.data.timestamps.map(function(d, i) {
             return {
                 x: d,
                 y: config.data.values[i]
             }
         })
-        dataConverted.sort(function(_a, _b) {
+
+        return {
+            dataConverted: dataConverted
+        }
+    }
+
+    var mergeData2D = function(config) {
+        var flattened = []
+        var dataConverted = config.data.values.map(function(d, i) {
+            flattened = flattened.concat(d)
+            return config.data.timestamps.map(function(dB, iB) {
+                return {
+                    x: dB,
+                    y: d[iB]
+                }
+            })
+        })
+
+        return {
+            dataConverted: dataConverted,
+            flattenedData: flattened
+        }
+    }
+
+    var sortData = function(config) {
+        config.dataConverted.sort(function(_a, _b) {
             var a = _a.x.getTime()
             var b = _b.x.getTime()
             if (a < b) {
@@ -56,21 +81,24 @@
                 return 0
             }
         })
-        var allNulls = !dataConverted.filter(function(d) {
-            return d.y != null
-        }).length
+
+        return {}
+    }
+
+    var detectDataAllNulls = function(config) {
+        var allNulls = !config.flattenedData.filter(function(d) {
+                return d.y != null
+            })
+            .length
 
         return {
-            dataConverted: dataConverted,
             dataIsAllNulls: allNulls
         }
     }
 
     var scaleX = function(config) {
         var chartWidth = config.width - config.margin.left - config.margin.right
-        var dataX = config.dataConverted.map(function(d) {
-            return d.x
-        })
+        var dataX = config.data.timestamps
         var scaleX = d3.scaleTime().domain(d3.extent(dataX)).range([0, chartWidth])
 
         return {
@@ -81,10 +109,7 @@
 
     var scaleY = function(config) {
         var chartHeight = config.height - config.margin.top - config.margin.bottom
-        var dataY = config.dataConverted.map(function(d) {
-            return d.y
-        })
-        var extent = d3.extent(dataY)
+        var extent = d3.extent(config.flattenedData)
         var domain
         if (extent[1] === extent[0]) {
             domain = [extent[0] - 0.1, extent[1] + 1]
@@ -434,9 +459,11 @@
             })
 
         var shapes = panel.shapePanel.selectAll('path.line')
-            .data([config.dataConverted])
+            .data(config.dataConverted)
         shapes.enter().append('path')
-            .attr('class', 'line shape')
+            .attr('class', function(d, i) {
+                return 'line shape shape-' + i
+            })
             .style('fill', 'none')
             .merge(shapes)
             .attr('d', line)
@@ -571,7 +598,9 @@
     }
 
     var timeseriesLineChart = utils.pipeline(
-        data,
+        mergeData,
+        sortData,
+        detectDataAllNulls,
         axesFormatAutoconfig,
         scaleX,
         scaleY,
@@ -592,8 +621,31 @@
         tooltipLineComponent
     )
 
+    var timeseriesMultilineChart = utils.pipeline(
+        mergeData2D,
+        axesFormatAutoconfig,
+        scaleX,
+        scaleY,
+        axisX,
+        axisY,
+        panelComponent,
+        lineShapes,
+        lineCutShapes,
+        message,
+        axisComponentX,
+        axisTitleComponentX,
+        axisComponentY,
+        axisXFormatterRotate30,
+        axisTitleComponentY
+        // eventsBinder,
+        // tooltipComponent,
+        // hoverCircleComponent,
+        // tooltipLineComponent
+    )
+
     exports.chart = {
-        timeseriesLineChart: timeseriesLineChart
+        timeseriesLineChart: timeseriesLineChart,
+        timeseriesMultilineChart: timeseriesMultilineChart
     }
 
 }))

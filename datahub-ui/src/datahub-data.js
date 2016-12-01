@@ -1,10 +1,10 @@
 (function(root, factory) {
     if (typeof module === 'object' && module.exports) {
-        factory(module.exports, require('d3'), require('./datahub-utils.js').utils)
+        factory(module.exports, require('./datahub-utils.js').utils)
     } else {
-        factory((root.datahub = root.datahub || {}), root.d3, root.datahub.utils)
+        factory((root.datahub = root.datahub || {}), root.datahub.utils)
     }
-}(this, function(exports, d3, utils) {
+}(this, function(exports, utils) {
 
     var apiConfig = {
         currentBaseURI: 'http://data.planetos.com/',
@@ -35,21 +35,50 @@
 
     var generateRaster = function() {
         var rasterData = {
-            lon: d3.range(360).map(function(d, i) {
+            lon: generateArray(360, function(d, i) {
                 return i - 180
             }),
-            lat: d3.range(180).map(function(d, i) {
+            lat: generateArray(180, function(d, i) {
                 return 180 - i - 90
             }),
-            values: d3.range(180).map(function(d, i) {
-                return d3.range(360).map(function(dB, iB) {
+            values: generateArray(180, function(d, i) {
+                return generateArray(360, function(dB, iB) {
                     return ~~(Math.random() * 100)
                 })
             })
         }
-        rasterData.uniqueValues = utils.flattenAndUniquify(rasterData.values).uniques
+        rasterData.uniqueValues = utils.arrayUniques(rasterData.values)
 
         return rasterData
+    }
+
+    var generateArray = function(n, _generationFn) {
+        var generationFn = _generationFn || function(x, i) {
+            return 0
+        }
+
+        return Array.apply(null, Array(n)).map(generationFn)
+    }
+
+    var generateTimeSeries = function(n, _layerCount) {
+        var layerCount = _layerCount || 1
+        var value = ~~(Math.random() * 100)
+        var array2D = generateArray(layerCount, function() {
+            return generateArray(n, function(d) {
+                value += Math.random() * 2 - 1
+                return value
+            })
+        })
+
+        var dateNow = new Date().getTime()
+        var timestamps = generateArray(n, function(d, i) {
+            return new Date(dateNow + 86400 * i)
+        })
+
+        return {
+            values: array2D,
+            timestamps: timestamps
+        }
     }
 
     var getJSON = function(url, cb) {
@@ -157,7 +186,7 @@
                 })
             })
 
-            json.uniqueValues = utils.flattenAndUniquify(json.values).uniques.sort()
+            json.uniqueValues = utils.arrayUniques(json.values).sort()
             var datahubLink = apiConfig.currentBaseURI + '/datasets/' + datasetName + '?variable=' + variableName
 
             cb({ json: json, uri: uri, datahubLink: datahubLink })
@@ -276,6 +305,7 @@
     exports.data = {
         generateRaster: generateRaster,
         generateGeojson: generateGeojson,
+        generateTimeSeries: generateTimeSeries,
         getDatasetDetails: getDatasetDetails,
         getVariables: getVariables,
         getTimestamps: getTimestamps,

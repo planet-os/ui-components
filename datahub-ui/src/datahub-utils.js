@@ -103,7 +103,7 @@
         return property
     }
 
-    var flattenAndUniquify = function(data, _accessor) {
+    var arrayStats = function(data, _accessor) {
         var flattened = []
         var uniques = []
         var values, value, i, j, min = Number.MAX_VALUE,
@@ -129,7 +129,20 @@
         uniques = Object.keys(u).map(function(d, i) {
             return +d
         })
-        return { flattened: flattened, uniques: uniques, max: max, min: min }
+        return {
+            flattened: flattened, 
+            uniques: uniques, 
+            max: max, 
+            min: min
+        }
+    }
+
+    var arrayUniques = function(data, accessor) {
+        return arrayStats(data, accessor).uniques
+    }
+
+    var arrayFlatten = function(data, accessor) {
+        return arrayStats(data, accessor).flattened
     }
 
     var bisection = function(array, x, isReversed) {
@@ -212,7 +225,9 @@
         once: once,
         throttle: throttle,
         reactiveProperty: reactiveProperty,
-        flattenAndUniquify: flattenAndUniquify,
+        arrayStats: arrayStats,
+        arrayUniques: arrayUniques,
+        arrayFlatten: arrayFlatten,
         bisection: bisection,
         bisectionReversed: bisectionReversed,
         findMax: findMax,
