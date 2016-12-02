@@ -107,6 +107,19 @@
         }
     }
 
+    var sliderScaleX = function(config) {
+        var sliderWidth = config.width - config.margin.left - config.margin.right
+        var extent = config.timeRange.map(function(d) {
+            return new Date(d)
+        })
+        var scaleX = d3.scaleTime().domain(extent).range([0, sliderWidth])
+
+        return {
+            scaleX: scaleX,
+            sliderWidth: sliderWidth
+        }
+    }
+
     var scaleY = function(config) {
         var chartHeight = config.height - config.margin.top - config.margin.bottom
         var extent = d3.extent(config.flattenedData)
@@ -143,6 +156,20 @@
         }
     }
 
+    var sliderAxisX = function(config) {
+        var sliderHeight = config.height - config.margin.top - config.margin.bottom
+
+        var axisXFormat = config.axisXFormat || d3.utcFormat('%b')
+        var axisX = d3.axisBottom().scale(config.scaleX)
+            .tickFormat(axisXFormat)
+            .tickSize(sliderHeight - 12)
+
+        return {
+            axisX: axisX,
+            sliderHeight: sliderHeight
+        }
+    }
+
     var axisY = function(config) {
         var axisYFormat = config.axisYFormat || d3.format('.2s')
         var height = config.scaleY.range()[0]
@@ -157,11 +184,6 @@
     }
 
     var panelComponent = function(config) {
-        events = {
-            mousemove: utils.reactiveProperty(),
-            mouseenter: utils.reactiveProperty(),
-            mouseout: utils.reactiveProperty()
-        }
         var root = d3.select(config.container)
             .selectAll('svg')
             .data([0])
@@ -191,6 +213,21 @@
             .merge(axisX)
             .transition()
             .attr('transform', 'translate(' + [0, config.chartHeight] + ')')
+            .call(config.axisX)
+        axisX.exit().remove()
+
+        return {}
+    }
+
+    var sliderAxisComponentX = function(config) {
+        var axisX = config.panel.selectAll('g.axis.x')
+            .data([0])
+        axisX.enter().append('g')
+            .attr('class', 'x axis')
+            .attr('transform', 'translate(' + [0, config.margin.top] + ')')
+            .merge(axisX)
+            .transition()
+            .attr('transform', 'translate(' + [0, config.margin.top] + ')')
             .call(config.axisX)
         axisX.exit().remove()
 
@@ -501,6 +538,11 @@
     var events = {}
 
     var eventsBinder = function(config) {
+        events = {
+            mousemove: utils.reactiveProperty(),
+            mouseenter: utils.reactiveProperty(),
+            mouseout: utils.reactiveProperty()
+        }
         var dataConvertedX = config.dataConverted.map(function(d) {
             return d.x.getTime()
         })
@@ -624,6 +666,43 @@
         return {}
     }
 
+    var timeSlider = function(config) {
+        events = {
+            brush: utils.reactiveProperty()
+        }
+        var brushX = d3.brushX()
+            .extent([
+                [0, 0],
+                [config.sliderWidth, config.sliderHeight - 12]
+            ])
+            .handleSize(10)
+            .on('brush', function() {
+                var brushPixelExtent = d3.event.selection
+                var brushExtent = {
+                    start: config.scaleX.invert(brushPixelExtent[0]),
+                    end: config.scaleX.invert(brushPixelExtent[1])
+                }
+
+                events.brush({
+                    brushExtent: brushExtent
+                })
+            })
+
+        var brush = config.panel.selectAll('g.brush')
+            .data([0])
+        brush.enter().append('g')
+            .attr('class', 'brush')
+            .attr('transform', 'translate(' + [0, config.margin.top] + ')')
+            .merge(brush)
+            .attr('transform', 'translate(' + [0, config.margin.top] + ')')
+            .call(brushX)
+        brush.exit().remove()
+
+        return {
+            events: events
+        }
+    }
+
     var timeseriesLineChart = utils.pipeline(
         mergeData,
         sortData,
@@ -674,10 +753,20 @@
         legendElements
     )
 
+    var timeSlider = utils.pipeline(
+        sliderScaleX,
+        sliderAxisX,
+        panelComponent,
+        sliderAxisComponentX,
+        timeSlider
+    )
+
     exports.chart = {
         timeseriesLineChart: timeseriesLineChart,
         timeseriesMultilineChart: timeseriesMultilineChart,
-        legend: legend
+        legend: legend,
+        timeSlider: timeSlider,
+        events: events
     }
 
 }))

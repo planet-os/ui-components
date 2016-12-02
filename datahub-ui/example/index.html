@@ -13,10 +13,14 @@
     <script src="../src/datahub-chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.2/leaflet.css" />
     <style>
-    .map,
-    .chart {
+    .map {
         width: 512px;
         height: 512px
+    }
+
+    .chart {
+        width: 512px;
+        height: 300px
     }
     
     .datahub-chart .color-0 {
@@ -56,15 +60,15 @@
     .legend .unit {
         padding: 0 4px;
     }
-
+    
     .legend .color-0 {
         background-color: red;
     }
-
+    
     .legend .color-1 {
         background-color: orange;
     }
-
+    
     .legend .color-2 {
         background-color: lime;
     }
@@ -75,12 +79,8 @@
     <div class="map"></div>
     <div class="legend"></div>
     <div class="chart"></div>
+    <div class="time-slider"></div>
     <script>
-    /*
-        TODO:
-        - multiline tooltip
-        - generators: perlin noise
-    */
 
     /*
         upgrades:
@@ -92,6 +92,21 @@
         - flattenAndUniquify -> arrayStats
         - zoom is in mapConfig.zoom
     */
+
+    var timeSlider = datahub.chart.timeSlider({
+        container: document.querySelector('.time-slider'),
+        timeRange: ['2016-01-01', '2017-01-01'],
+        width: 500,
+        height: 40,
+        margin: {
+            top: 0,
+            right: 70,
+            bottom: 0,
+            left: 60
+        }
+    })
+
+    timeSlider.events.brush.on(function(d){ console.log(d) })
 
     datahub.chart.legend({
         container: document.querySelector('.legend'),
@@ -111,7 +126,7 @@
             value: 2.0,
             unit: 'm/s'
         }]
-    });
+    })
 
     var timeSeries = datahub.data.generateTimeSeries(40, 3)
     datahub.chart.timeseriesMultilineChart({
@@ -126,15 +141,15 @@
         },
         data: timeSeries,
         axisTitleY: 'Unit'
-    });
+    })
 
     var datasetName = 'noaa_gfs_global_sflux_0.12d'
     var variableName = 'Temperature_hybrid'
 
-    datahub.data.getPreview(datasetName, variableName, null, function(response){
-        console.log(111, response);
+    datahub.data.getPreview(datasetName, variableName, null, function(response) {
+        console.log(response)
         mainMap.renderRaster(response.json)
-    });
+    })
 
     var rasterData = datahub.data.generateRaster()
     var polygon = datahub.data.generateGeojson()
@@ -152,8 +167,8 @@
     // .zoomToPolygonBoundingBox(polygon)
 
     // mainMap.events.click.on(function(e) {
-    //     console.log(e);
-    // });
+    //     console.log(e)
+    // })
     </script>
 </body>
 
