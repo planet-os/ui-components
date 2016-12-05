@@ -32,6 +32,11 @@ npm run build
 
 * datahub.chart
   * timeseriesLineChart
+  * timeseriesMultilineChart
+  * legend
+  * timeSlider
+  * buttonGroup
+  * events
 
 * datahub.data
   * generateRaster
@@ -59,12 +64,17 @@ npm run build
   * once
   * throttle
   * reactiveProperty
-  * flattenAndUniquify
+  * arrayStats
+  * arrayUniques
+  * arrayFlatten
   * bisection
   * bisectionReversed
   * findMax
   * findMin
   * parseRGB
+  * pipeline
+  * override
+
 
 ## To do
 * Unit tests
