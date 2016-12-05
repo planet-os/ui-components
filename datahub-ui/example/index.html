@@ -12,66 +12,24 @@
     <script src="../src/datahub-map.js"></script>
     <script src="../src/datahub-chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.2/leaflet.css" />
+    <link rel="stylesheet" href="../style/components.css" />
     <style>
     .map {
         width: 512px;
-        height: 512px
+        height: 512px;
     }
-
+    
     .chart {
         width: 512px;
-        height: 300px
+        height: 300px;
     }
-    
-    .datahub-chart .color-0 {
-        stroke: red;
+
+    .vertical-buttons {
+        height: 200px;
+        width: 60px;
     }
-    
-    .datahub-chart .color-1 {
-        stroke: orange;
-    }
-    
-    .datahub-chart .color-2 {
-        stroke: lime;
-    }
-    
-    .legend {
-        display: flex;
-        margin-top: 20px;
-    }
-    
-    .legend .element {
-        display: flex;
-        margin: 0 4px;
-        white-space: nowrap;
-    }
-    
-    .legend .element div {
-        height: 100%;
-        display: flex;
-    }
-    
-    .legend .color-band {
-        min-width: 4px;
-        max-width: 4px;
-    }
-    
-    .legend .label,
-    .legend .unit {
-        padding: 0 4px;
-    }
-    
-    .legend .color-0 {
-        background-color: red;
-    }
-    
-    .legend .color-1 {
-        background-color: orange;
-    }
-    
-    .legend .color-2 {
-        background-color: lime;
-    }
+
+
     </style>
 </head>
 
@@ -80,8 +38,9 @@
     <div class="legend"></div>
     <div class="chart"></div>
     <div class="time-slider"></div>
+    <div class="vertical-buttons"></div>
     <script>
-
+    /**/
     /*
         upgrades:
         - d3v4 scales
@@ -91,10 +50,27 @@
         - datahub.map.rasterMap
         - flattenAndUniquify -> arrayStats
         - zoom is in mapConfig.zoom
+        - el and container -> parent
     */
 
+    var heightSelector = datahub.chart.buttonGroup({
+        parent: document.querySelector('.vertical-buttons'),
+        elements: ['All', 200, 180, 160, 140, 120, 100, 80, 60, 50, 40],
+        defaultElement: 'All',
+        margin: {
+            top: 0,
+            right: 0,
+            bottom: 0,
+            left: 0
+        }
+    })
+
+    heightSelector.events.buttonClick.on(function(d) {
+        console.log(d)
+    })
+
     var timeSlider = datahub.chart.timeSlider({
-        container: document.querySelector('.time-slider'),
+        parent: document.querySelector('.time-slider'),
         timeRange: ['2016-01-01', '2017-01-01'],
         width: 500,
         height: 40,
@@ -106,10 +82,12 @@
         }
     })
 
-    timeSlider.events.brush.on(function(d){ console.log(d) })
+    timeSlider.events.brush.on(function(d) {
+        console.log(d)
+    })
 
     datahub.chart.legend({
-        container: document.querySelector('.legend'),
+        parent: document.querySelector('.legend'),
         elements: [{
             label: 'Vaisala @ 40M',
             colorClass: 'color-0',
@@ -130,7 +108,7 @@
 
     var timeSeries = datahub.data.generateTimeSeries(40, 3)
     datahub.chart.timeseriesMultilineChart({
-        container: document.querySelector('.chart'),
+        parent: document.querySelector('.chart'),
         width: 500,
         height: 300,
         margin: {
@@ -155,7 +133,7 @@
     var polygon = datahub.data.generateGeojson()
 
     var mainMap = datahub.map.rasterMap({
-            el: document.querySelector('.map'),
+            parent: document.querySelector('.map'),
             colorScale: datahub.palette.equalizedSpectral,
             // colorScale: colorScales.grayscale,
         })

@@ -60,25 +60,42 @@
         return Array.apply(null, Array(n)).map(generationFn)
     }
 
-    var generateTimeSeries = function(n, _layerCount) {
+    var generateTimeSeries = function(n, _layerCount, _timeStart, _timeIncrement, _step) {
         var layerCount = _layerCount || 1
         var value = ~~(Math.random() * 100)
         var array2D = generateArray(layerCount, function() {
             return generateArray(n, function(d) {
                 value += Math.random() * 2 - 1
+                value = Math.max(value, 0)
                 return value
             })
         })
 
         var dateNow = new Date().getTime()
-        var timestamps = generateArray(n, function(d, i) {
-            return new Date(dateNow + 86400 * i)
-        })
+
+        var timestamps = generateTimestamps(_timeStart, n, _timeIncrement, _step)
 
         return {
             values: array2D,
             timestamps: timestamps
         }
+    }
+
+    function capitalize(string) {
+        return string.charAt(0).toUpperCase() + string.slice(1)
+    }
+
+    var generateTimestamps = function(_timeStart, _n, _timeIncrement, _step) {
+        var timeIncrement = _timeIncrement || 'hour'
+        var intervalFuncName = 'time' + capitalize(timeIncrement) || 'timeHour'
+        var step = _step || 3
+        var n = _n || 36
+        var intervalFunc = d3[intervalFuncName]
+        var intervalRangeFunc = d3[intervalFuncName + 's']
+        var dateStart = _timeStart ? new Date(_timeStart) : new Date()
+        var dateEnd = intervalFunc.offset(dateStart, n)
+
+        return intervalRangeFunc(dateStart, dateEnd, step)
     }
 
     var getJSON = function(url, cb) {

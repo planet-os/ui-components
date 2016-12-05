@@ -176,7 +176,7 @@
     var selectorMap = function(config) {
 
         var selectionMap = rasterMap.map({
-                el: config.el,
+                container: config.container,
                 imagePath: config.imagePath || 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.2/images/'
             })
             .init()
@@ -359,8 +359,11 @@
 
     var rasterMap = function(_config) {
 
+        var containerNode = L.DomUtil.create('div', 'datahub-map')
+        var container = _config.parent.appendChild(containerNode)
+
         var config = {
-            el: _config.el,
+            container: container,
             colorScale: _config.colorScale,
             basemapName: _config.basemapName || 'basemapLight',
             imagePath: _config.imagePath || 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.2/images/'
@@ -406,10 +409,10 @@
         function init() {
             L.Icon.Default.imagePath = config.imagePath
 
-            map = L.map(config.el, mapConfig)
+            map = L.map(config.container, mapConfig)
                 .on('click', function(e) { events.click({ lat: e.latlng.lat, lon: e.latlng.lng }); })
-                .on('mousedown', function(e) { config.el.classList.add('grab'); })
-                .on('mouseup', function(e) { config.el.classList.remove('grab'); })
+                .on('mousedown', function(e) { config.container.classList.add('grab'); })
+                .on('mouseup', function(e) { config.container.classList.remove('grab'); })
                 .on('mousemove', function(e) {
                     if (gridData) {
                         var latIndex = utils.bisectionReversed(gridData.lat, e.latlng.lat)
@@ -501,13 +504,13 @@
         }
 
         function show() {
-            config.el.style.display = 'block'
+            config.container.style.display = 'block'
             states.isVisible = true
             return this
         }
 
         function hide() {
-            config.el.style.display = 'none'
+            config.container.style.display = 'none'
             states.isVisible = false
             return this
         }

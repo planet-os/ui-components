@@ -1,0 +1,75 @@
+.datahub-map {
+    width: 100%;
+    height: 100%;
+}
+
+.datahub-chart .color-0 {
+    stroke: red;
+}
+
+.datahub-chart .color-1 {
+    stroke: orange;
+}
+
+.datahub-chart .color-2 {
+    stroke: lime;
+}
+
+.datahub-legend {
+    display: flex;
+    margin-top: 20px;
+}
+
+.datahub-legend .element {
+    display: flex;
+    white-space: nowrap;
+}
+
+.datahub-legend .element div {
+    height: 100%;
+    display: flex;
+}
+
+.datahub-legend .color-band {
+    min-width: 4px;
+    max-width: 4px;
+}
+
+.datahub-legend .label,
+.datahub-legend .unit {
+    padding: 0 4px;
+}
+
+.datahub-legend .color-0 {
+    background-color: red;
+}
+
+.datahub-legend .color-1 {
+    background-color: orange;
+}
+
+.datahub-legend .color-2 {
+    background-color: lime;
+}
+
+.datahub-button-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.datahub-button-group .element {
+    align-items: center;
+    justify-content: center;
+}
+
+.datahub-button-group .element:hover {
+    background-color: #eee;
+}
+
+.datahub-button-group .element.active {
+    background-color: silver;
+}
+
+.hidden {
+    visibility: hidden;
+}

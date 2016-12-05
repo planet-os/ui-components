@@ -6,6 +6,8 @@
     }
 }(this, function(exports, d3, utils) {
 
+    var events = {}
+
     var axesFormatAutoconfig = function(_config) {
         var timeFormat = d3.utcFormat('%b %e, %Y at %H:%M UTC')
 
@@ -35,6 +37,30 @@
             tooltipFormat: function(d) {
                 return fixedFloat(d.data.y)
             }
+        }
+    }
+
+    var chartDefaultConfig = function(config) {
+        if (!config.className) {
+            config.className = 'datahub-chart'
+        }
+    }
+
+    var legendDefaultConfig = function(config) {
+        if (!config.className) {
+            config.className = 'datahub-legend'
+        }
+    }
+
+    var timeSliderDefaultConfig = function(config) {
+        if (!config.className) {
+            config.className = 'datahub-time-slider'
+        }
+    }
+
+    var buttonGroupDefaultConfig = function(config) {
+        if (!config.className) {
+            config.className = 'datahub-button-group'
         }
     }
 
@@ -183,9 +209,24 @@
         }
     }
 
+    var container = function(config) {
+        var container = d3.select(config.parent)
+            .selectAll('div.' + config.className)
+            .data([0])
+        var containerUpdate = container.enter().append('div')
+            .attr('class', config.className)
+            .merge(container)
+            .attr('width', config.width)
+            .attr('height', config.height)
+        container.exit().remove()
+
+        return {
+            container: containerUpdate
+        }
+    }
+
     var panelComponent = function(config) {
-        var root = d3.select(config.container)
-            .selectAll('svg')
+        var root = config.container.selectAll('svg')
             .data([0])
         var rootEnter = root.enter().append('svg')
             .attr('class', 'datahub-chart')
@@ -212,6 +253,7 @@
             .attr('transform', 'translate(' + [0, config.chartHeight] + ')')
             .merge(axisX)
             .transition()
+            .duration(0)
             .attr('transform', 'translate(' + [0, config.chartHeight] + ')')
             .call(config.axisX)
         axisX.exit().remove()
@@ -499,10 +541,17 @@
             .data(config.dataConverted)
         shapes.enter().append('path')
             .attr('class', function(d, i) {
-                return 'line shape color-' + i
+                var className = 'line shape color-' + i
+                if(config.metadata) {
+                    className = className + ' ' + config.metadata[i].key
+                }
+                return className
             })
             .style('fill', 'none')
             .merge(shapes)
+            .classed('hidden', function(d, i){
+                return config.metadata && config.metadata[i].isHidden
+            })
             .attr('d', line)
         shapes.exit().remove()
 
@@ -535,14 +584,11 @@
         return {}
     }
 
-    var events = {}
-
     var eventsBinder = function(config) {
-        events = {
-            mousemove: utils.reactiveProperty(),
-            mouseenter: utils.reactiveProperty(),
-            mouseout: utils.reactiveProperty()
-        }
+        events.mousemove = utils.reactiveProperty()
+        events.mouseenter = utils.reactiveProperty()
+        events.mouseout = utils.reactiveProperty()
+
         var dataConvertedX = config.dataConverted.map(function(d) {
             return d.x.getTime()
         })
@@ -567,9 +613,9 @@
             })
             .on('mousemove', function(d, i) {
                 var mouse = d3.mouse(this)
-                var mouseFromContainer = d3.mouse(config.container)
+                var mouseFromContainer = d3.mouse(config.container.node())
                 var panelBBox = this.getBoundingClientRect()
-                var containerBBox = config.container.getBoundingClientRect()
+                var containerBBox = config.container.node().getBoundingClientRect()
                 var absoluteOffsetLeft = containerBBox.left
                 var absoluteOffsetTop = containerBBox.top
                 var dateAtCursor = config.scaleX.invert(mouse[0] - deltaX / 2)
@@ -640,8 +686,7 @@
     }
 
     var legendElements = function(config) {
-        var elements = d3.select(config.container)
-            .selectAll('.element')
+        var elements = config.container.selectAll('.element')
             .data(config.elements)
         var elementsEnter = elements.enter().append('div')
             .attr('class', 'element')
@@ -666,10 +711,43 @@
         return {}
     }
 
-    var timeSlider = function(config) {
-        events = {
-            brush: utils.reactiveProperty()
+    var buttonGroupElements = function(config) {
+        events.buttonClick = utils.reactiveProperty()
+
+        var elements = config.container.selectAll('.element')
+            .data(config.elements)
+        var elementsAll = elements.enter().append('div')
+            .attr('class', 'element')
+            .classed('active', function(d) {
+                return d === config.defaultElement
+            })
+            .on('click', function(d) {
+                var that = this
+                var isUnselection = false
+                elementsAll.classed('active', function() {
+                    isAlreadyActive = this.classList.contains('active')
+                    isTarget = (that === this)
+                    if(isTarget && isAlreadyActive) {
+                       isUnselection = true 
+                    }
+                    return !isAlreadyActive && isTarget
+                })
+                events.buttonClick(isUnselection ? null : d)
+            })
+            .merge(elements)
+            .text(function(d) {
+                return d
+            })
+        elements.exit().remove()
+
+        return {
+            events: events
         }
+    }
+
+    var timeSlider = function(config) {
+        events.brush = utils.reactiveProperty()
+
         var brushX = d3.brushX()
             .extent([
                 [0, 0],
@@ -690,13 +768,18 @@
 
         var brush = config.panel.selectAll('g.brush')
             .data([0])
-        brush.enter().append('g')
+        var brushMerged = brush.enter().append('g')
             .attr('class', 'brush')
             .attr('transform', 'translate(' + [0, config.margin.top] + ')')
             .merge(brush)
             .attr('transform', 'translate(' + [0, config.margin.top] + ')')
             .call(brushX)
+            .call(brushX.move, config.scaleX.range())
         brush.exit().remove()
+
+        if(config.initialTimeRange) {
+            // brush.call(brushX.move, config.scaleX.range())
+        }
 
         return {
             events: events
@@ -728,12 +811,14 @@
     )
 
     var timeseriesMultilineChart = utils.pipeline(
+        chartDefaultConfig,
         mergeData2D,
         axesFormatAutoconfig,
         scaleX,
         scaleY,
         axisX,
         axisY,
+        container,
         panelComponent,
         lineShapes,
         lineCutShapes,
@@ -750,15 +835,25 @@
     )
 
     var legend = utils.pipeline(
+        legendDefaultConfig,
+        container,
         legendElements
     )
 
     var timeSlider = utils.pipeline(
+        timeSliderDefaultConfig,
         sliderScaleX,
         sliderAxisX,
+        container,
         panelComponent,
         sliderAxisComponentX,
         timeSlider
+    )
+
+    var buttonGroup = utils.pipeline(
+        buttonGroupDefaultConfig,
+        container,
+        buttonGroupElements
     )
 
     exports.chart = {
@@ -766,6 +861,7 @@
         timeseriesMultilineChart: timeseriesMultilineChart,
         legend: legend,
         timeSlider: timeSlider,
+        buttonGroup: buttonGroup,
         events: events
     }
 
