@@ -8,9 +8,9 @@
 }(this, function(exports, utils, d3) {
 
     var apiConfig = {
-        currentBaseURI: 'http://data.planetos.com/',
-        baseURI: 'http://api.planetos.com/v1a/',
-        datasetsEndpoint: 'http://api.planetos.com/v1/datasets/',
+        currentBaseURI: 'https://data.planetos.com/',
+        baseURI: 'https://api.planetos.com/v1a/',
+        datasetsEndpoint: 'https://api.planetos.com/v1/datasets/',
         apiKey: '0f58fe2540fa4cf19a4aa68f290fd148'
     }
 
