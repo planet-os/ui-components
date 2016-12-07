@@ -175,9 +175,8 @@
 
     var selectorMap = function(config) {
 
-        var selectionMap = rasterMap.map({
-                container: config.container,
-                imagePath: config.imagePath || 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.2/images/'
+        var selectionMap = rasterMap({
+                parent: config.parent
             })
             .init()
 
@@ -357,6 +356,7 @@
     }
 
 
+
     var rasterMap = function(_config) {
 
         var containerNode = L.DomUtil.create('div', 'datahub-map')
@@ -366,7 +366,9 @@
             container: container,
             colorScale: _config.colorScale,
             basemapName: _config.basemapName || 'basemapLight',
-            imagePath: _config.imagePath || 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.2/images/'
+            imagePath: _config.imagePath || 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.2/images/',
+            showLabels: !(_config.showLabels === false),
+            showTooltip: !(_config.showTooltip === false)
         }
 
         var mapConfig = {
@@ -437,7 +439,7 @@
                             value = gridData.values[latIndex][lonIndex]
                         }
 
-                        if (value !== null && value !== -999) {
+                        if (value !== null && value !== -999 && config.showTooltip) {
                             var formattedValue = L.Util.formatNum(value, 2)
 
                             tooltipLayer
@@ -459,7 +461,7 @@
                 .on('mouseover', events.mouseenter)
                 .on('mouseout', events.mouseleave)
 
-            if(!(_config.mapConfig && _config.mapConfig.zoom)) {
+            if (!(_config.mapConfig && _config.mapConfig.zoom)) {
                 map.fitWorld()
             }
 
@@ -480,7 +482,9 @@
             })
 
             basemaps[config.basemapName].addTo(map)
-            basemaps.labelLight.addTo(map)
+            if (config.showLabels) {
+                basemaps.labelLight.addTo(map)
+            }
 
             gridLayer = dataGridLayer()
                 .addTo(map)

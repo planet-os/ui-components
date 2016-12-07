@@ -1,10 +1,11 @@
 (function(root, factory) {
     if (typeof module === 'object' && module.exports) {
-        factory(module.exports, require('./datahub-utils.js').utils)
+        console.log(111);
+        factory(module.exports, require('./datahub-utils.js').utils, require('d3'))
     } else {
-        factory((root.datahub = root.datahub || {}), root.datahub.utils)
+        factory((root.datahub = root.datahub || {}), root.datahub.utils, root.d3)
     }
-}(this, function(exports, utils) {
+}(this, function(exports, utils, d3) {
 
     var apiConfig = {
         currentBaseURI: 'http://data.planetos.com/',
@@ -31,6 +32,39 @@
                 ]
             }
         }
+    }
+
+    var generateGeojsonPoints = function() {
+        var points = generateArray(50, function(d, i) {
+            return {
+                coordinates: [Math.random() * 360 - 180, Math.random() * 180 - 90],
+                id: 'random-point-' + i
+            }
+        })
+
+        return pointsToFeatures(points)
+    }
+
+    var pointsToFeatures = function(points) {
+
+        return {
+            "type": "FeatureCollection",
+            "features": points.map(function(d) {
+                return {
+                    "type": "Feature",
+                    "geometry": { "type": "Point", "coordinates": d.coordinates },
+                    "properties": { id: d.id }
+                }
+            })
+        }
+    }
+
+    var getWorldVector = function(cb){
+        var geojsonUrl = 'https://cdn.rawgit.com/johan/world.geo.json/master/countries.geo.json'
+
+        getJSON(geojsonUrl, function(error, json) {
+            cb(json);
+        })
     }
 
     var generateRaster = function() {
@@ -331,7 +365,10 @@
         getStationVariables: getStationVariables,
         getImage: getImage,
         getJSON: getJSON,
-        apiConfig: apiConfig
+        apiConfig: apiConfig,
+        pointsToFeatures: pointsToFeatures,
+        generateGeojsonPoints: generateGeojsonPoints,
+        getWorldVector: getWorldVector
     }
 
 }))

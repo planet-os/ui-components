@@ -4,6 +4,7 @@
 <head>
     <meta charset="utf-8">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.2/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.7/leaflet.draw.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.4.0/d3.js"></script>
     <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
     <script src="../src/datahub-utils.js"></script>
@@ -12,33 +13,124 @@
     <script src="../src/datahub-map.js"></script>
     <script src="../src/datahub-chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.2/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.7/leaflet.draw.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flexboxgrid/6.3.1/flexboxgrid.min.css" />
     <link rel="stylesheet" href="../style/components.css" />
     <style>
+
+    body {
+        font-family: Tahoma, sans-serif;
+    }
+
+    div {
+        /*border: 1px solid silver;*/
+    }
+    
     .map {
         width: 512px;
         height: 512px;
+        margin: 0 auto;
+    }
+    
+    .map-group {
+        width: 550px;
+        margin: 0 auto;
+    }
+    
+    .map-group .map {
+        width: 256px;
+        height: 256px;
+    }
+    
+    .map-group .map:not(:last-child) {
+        margin-right: 10px;
     }
     
     .chart {
         width: 512px;
         height: 300px;
+        margin: 0 auto;
     }
-
+    
     .vertical-buttons {
         height: 200px;
         width: 60px;
+        margin: 0 auto;
     }
-
-
+    
+    .widget {
+        max-width: 64em;
+        margin: 0 auto 60px auto;
+        border-top: 1px solid silver;
+        padding-top: 20px; 
+    }
     </style>
 </head>
 
 <body>
-    <div class="map"></div>
-    <div class="legend"></div>
-    <div class="chart"></div>
-    <div class="time-slider"></div>
-    <div class="vertical-buttons"></div>
+    <div class="row widget">
+        <div class="col-xs-12 col-md-7">
+            <div class="row map-group">
+                <div class="map map-light"></div>
+                <div class="map map-dark"></div>
+            </div>
+        </div>
+        <div class="col-xs-12 col-md-5">
+            <div class="description">A map can have a light or dark basemap.</div>
+        </div>
+    </div>
+    <div class="row widget">
+        <div class="col-xs-12 col-md-7">
+            <div class="row map-group">
+                <div class="map map-grayscale"></div>
+                <div class="map map-rainbow"></div>
+            </div>
+        </div>
+        <div class="col-xs-12 col-md-5">
+            <div class="description">A map can load raster data. Multiple palettes are available, like a simple linear grayscale and a rainbow palette using histogram equalization.</div>
+        </div>
+    </div>
+    <div class="row widget">
+        <div class="col-xs-12 col-md-7">
+            <div class="map map-raster"></div>
+        </div>
+        <div class="col-xs-12 col-md-5">
+            <div class="description">A map can zoom and pan raster efficiently. A tooltip shows value under the cursor.</div>
+        </div>
+    </div>
+    <div class="row widget">
+        <div class="col-xs-12 col-md-7">
+            <div class="map map-vector"></div>
+        </div>
+        <div class="col-xs-12 col-md-5">
+            <div class="description">A map can load vector data, points and polygons.</div>
+        </div>
+    </div>
+    <div class="row widget">
+        <div class="col-xs-12 col-md-7">
+            <div class="map map-selector"></div>
+        </div>
+        <div class="col-xs-12 col-md-5">
+            <div class="description">A vector map supports markers and rectangle selection. Clicking on the selection deletes it.</div>
+        </div>
+    </div>
+    <div class="row widget">
+        <div class="col-xs-12 col-md-7">
+            <div class="multiline-chart"></div>
+        </div>
+        <div class="col-xs-12 col-md-5">
+            <div class="description">A timeseries chart can have multiple lines.</div>
+        </div>
+    </div>
+    <div class="row widget">
+        <div class="col-xs-12 col-md-7">
+            <div class="time-slider"></div>
+            <div class="slider-chart"></div>
+        </div>
+        <div class="col-xs-12 col-md-5">
+            <div class="description">A time slider is used to zoom in a timeseries.</div>
+        </div>
+    </div>
     <script>
     /**/
     /*
@@ -53,67 +145,90 @@
         - el and container -> parent
     */
 
-    var heightSelector = datahub.chart.buttonGroup({
-        parent: document.querySelector('.vertical-buttons'),
-        elements: ['All', 200, 180, 160, 140, 120, 100, 80, 60, 50, 40],
-        defaultElement: 'All',
-        margin: {
-            top: 0,
-            right: 0,
-            bottom: 0,
-            left: 0
-        }
+    datahub.map.rasterMap({
+            parent: document.querySelector('.map-light'),
+            showLabels: false,
+            mapConfig: {
+                zoomControl: false
+            },
+            showTooltip: false
+        })
+        .init()
+
+    datahub.map.rasterMap({
+            parent: document.querySelector('.map-dark'),
+            basemapName: 'basemapDark',
+            showLabels: false,
+            mapConfig: {
+                zoomControl: false
+            },
+            showTooltip: false
+        })
+        .init()
+
+
+    var datasetName = 'noaa_gfs_global_sflux_0.12d'
+    var variableName = 'Temperature_hybrid'
+    datahub.data.getPreview(datasetName, variableName, null, function(response) {
+        rasterMap.renderRaster(response.json)
+        rasterMapGrayscale.renderRaster(response.json)
+        rasterMapBig.renderRaster(response.json)
     })
 
-    heightSelector.events.buttonClick.on(function(d) {
-        console.log(d)
+    var rasterMap = datahub.map.rasterMap({
+            parent: document.querySelector('.map-grayscale'),
+            colorScale: datahub.palette.grayscale,
+            showLabels: false,
+            mapConfig: {
+                zoomControl: false
+            },
+            showTooltip: false
+        })
+        .init()
+
+    var rasterMapGrayscale = datahub.map.rasterMap({
+            parent: document.querySelector('.map-rainbow'),
+            colorScale: datahub.palette.equalizedSpectral,
+            showLabels: false,
+            mapConfig: {
+                zoomControl: false
+            },
+            showTooltip: false
+        })
+        .init()
+
+    var rasterMapBig = datahub.map.rasterMap({
+            parent: document.querySelector('.map-raster'),
+            colorScale: datahub.palette.equalizedSpectral
+        })
+        .init()
+
+    datahub.data.getWorldVector(function(geojson) {
+        vectorMap.renderPolygon(geojson)
     })
 
-    var timeSlider = datahub.chart.timeSlider({
-        parent: document.querySelector('.time-slider'),
-        timeRange: ['2016-01-01', '2017-01-01'],
-        width: 500,
-        height: 40,
-        margin: {
-            top: 0,
-            right: 70,
-            bottom: 0,
-            left: 60
-        }
+    var pointsGeojson = datahub.data.generateGeojsonPoints()
+
+    var vectorMap = datahub.map.rasterMap({
+            parent: document.querySelector('.map-vector')
+        })
+        .init()
+        .renderPolygon(pointsGeojson)
+
+    datahub.map.selectorMap({
+        parent: document.querySelector('.map-selector')
     })
 
-    timeSlider.events.brush.on(function(d) {
-        console.log(d)
-    })
 
-    datahub.chart.legend({
-        parent: document.querySelector('.legend'),
-        elements: [{
-            label: 'Vaisala @ 40M',
-            colorClass: 'color-0',
-            value: 2.2,
-            unit: 'm/s'
-        }, {
-            label: 'National Weather Service',
-            colorClass: 'color-1',
-            value: 2.1,
-            unit: 'm/s'
-        }, {
-            label: 'NOAA GFS',
-            colorClass: 'color-2',
-            value: 2.0,
-            unit: 'm/s'
-        }]
-    })
-
-    var timeSeries = datahub.data.generateTimeSeries(40, 3)
+    var timeSeries = datahub.data.generateTimeSeries(400, 3)
+    var container = document.querySelector('.multiline-chart')
     datahub.chart.timeseriesMultilineChart({
-        parent: document.querySelector('.chart'),
-        width: 500,
+        parent: container,
+        width: container.clientWidth,
         height: 300,
         margin: {
             top: 50,
-            right: 70,
+            right: 40,
             bottom: 90,
             left: 60
         },
@@ -121,32 +236,94 @@
         axisTitleY: 'Unit'
     })
 
-    var datasetName = 'noaa_gfs_global_sflux_0.12d'
-    var variableName = 'Temperature_hybrid'
 
-    datahub.data.getPreview(datasetName, variableName, null, function(response) {
-        console.log(response)
-        mainMap.renderRaster(response.json)
+    var sliderChartContainer = document.querySelector('.slider-chart')
+
+    function renderMainChart(timeSeries) {
+        datahub.chart.timeseriesMultilineChart({
+            parent: sliderChartContainer,
+            width: sliderChartContainer.clientWidth,
+            height: 300,
+            margin: {
+                top: 50,
+                right: 40,
+                bottom: 60,
+                left: 60
+            },
+            data: timeSeries,
+            axisTitleY: 'Unit'
+        })
+    }
+
+    var timeSeries = datahub.data.generateTimeSeries(365, 6, '2016-01-01', 'day', 1)
+
+    var timeSliderContainer = document.querySelector('.time-slider')
+    var timeSlider = datahub.chart.timeSlider({
+        parent: timeSliderContainer,
+        timeRange: ['2016-01-01', '2017-01-01'],
+        initialTimeRange: ['2016-01-01', '2017-01-01'],
+        width: timeSliderContainer.clientWidth,
+        height: 40,
+        margin: {
+            top: 4,
+            right: 60,
+            bottom: 4,
+            left: 60
+        }
     })
 
-    var rasterData = datahub.data.generateRaster()
-    var polygon = datahub.data.generateGeojson()
+    timeSlider.events.brush.on(function(d) {
+        var startIndex = datahub.utils.bisection(timeSeries.timestamps, d.brushExtent.start)
+        var endIndex = datahub.utils.bisection(timeSeries.timestamps, d.brushExtent.end)
+        var timeseriesSlice = {
+            values: timeSeries.values.map(function(d, i) {
+                return d.slice(startIndex, endIndex)
+            }),
+            timestamps: timeSeries.timestamps.slice(startIndex, endIndex)
+        }
 
-    var mainMap = datahub.map.rasterMap({
-            parent: document.querySelector('.map'),
-            colorScale: datahub.palette.equalizedSpectral,
-            // colorScale: colorScales.grayscale,
-        })
-        .init()
+        renderMainChart(timeseriesSlice)
+    })
 
-    // .renderRaster(rasterData)
-    // .addMarker([0, 0])
-    // .renderPolygon(polygon)
-    // .zoomToPolygonBoundingBox(polygon)
 
-    // mainMap.events.click.on(function(e) {
-    //     console.log(e)
+    // var heightSelector = datahub.chart.buttonGroup({
+    //     parent: document.querySelector('.vertical-buttons'),
+    //     elements: ['All', 200, 180, 160, 140, 120, 100, 80, 60, 50, 40],
+    //     defaultElement: 'All',
+    //     margin: {
+    //         top: 0,
+    //         right: 0,
+    //         bottom: 0,
+    //         left: 0
+    //     }
     // })
+
+    // heightSelector.events.buttonClick.on(function(d) {
+    //     console.log(d)
+    // })
+
+
+
+    // datahub.chart.legend({
+    //     parent: document.querySelector('.legend'),
+    //     elements: [{
+    //         label: 'Vaisala @ 40M',
+    //         colorClass: 'color-0',
+    //         value: 2.2,
+    //         unit: 'm/s'
+    //     }, {
+    //         label: 'National Weather Service',
+    //         colorClass: 'color-1',
+    //         value: 2.1,
+    //         unit: 'm/s'
+    //     }, {
+    //         label: 'NOAA GFS',
+    //         colorClass: 'color-2',
+    //         value: 2.0,
+    //         unit: 'm/s'
+    //     }]
+    // })
+
     </script>
 </body>
 
