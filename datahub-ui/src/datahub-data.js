@@ -11,7 +11,13 @@
         currentBaseURI: 'https://data.planetos.com/',
         baseURI: 'https://api.planetos.com/v1a/',
         datasetsEndpoint: 'https://api.planetos.com/v1/datasets/',
-        apiKey: '0f58fe2540fa4cf19a4aa68f290fd148'
+        apiKey: null
+    }
+
+    var setApiKey = function(apiKey){
+        apiConfig.apiKey = apiKey
+
+        return this
     }
 
     var generateGeojson = function() {
@@ -151,7 +157,17 @@
         xhr.send()
     }
 
+    function verifyApiKey(apiKey){
+        if(apiKey) {
+            return true
+        }
+        else {
+            throw 'You need to set an API key using `datahub.data.setApiKey(API_KEY)`. You can get yours at http://data.planetos.com/';
+        }
+    }
+
     var getDatasetDetails = function(datasetName, cb) {
+        verifyApiKey(apiConfig.apiKey)
         var datasetDetailsURL = apiConfig.baseURI + '/datasets/' + datasetName + '?apikey=' + apiConfig.apiKey
 
         console.log('get dataset details', datasetDetailsURL)
@@ -173,6 +189,7 @@
     }
 
     var getVariables = function(datasetName, defaultVariable, cb) {
+        verifyApiKey(apiConfig.apiKey)
         var uri = apiConfig.baseURI + '/datasets/' + datasetName + '/variables' + '?apikey=' + apiConfig.apiKey
         console.log('query variables', uri)
 
@@ -194,6 +211,7 @@
     }
 
     var getTimestamps = function(datasetName, variableName, cb) {
+        verifyApiKey(apiConfig.apiKey)
         var uri = apiConfig.baseURI + '/datasets/' + datasetName + '/variables/' + encodeURIComponent(variableName) + '/timestamps?apikey=' + apiConfig.apiKey
         console.log('query timestamps', uri)
 
@@ -213,6 +231,7 @@
     }
 
     var getPreview = function(datasetName, variableName, timestamp, cb) {
+        verifyApiKey(apiConfig.apiKey)
         var uri = apiConfig.baseURI + '/datasets/' + datasetName + '/variables/' + encodeURIComponent(variableName)
         if (timestamp) {
             uri += '/timestamps/' + timestamp
@@ -247,6 +266,7 @@
     }
 
     var getStations = function getStations(datasetName, cb) {
+        verifyApiKey(apiConfig.apiKey)
         var uri = apiConfig.datasetsEndpoint + datasetName + '/stations' + '?apikey=' + apiConfig.apiKey
 
         console.log('get stations', uri)
@@ -275,6 +295,7 @@
     }
 
     var getStationVariables = function(datasetName, stationID, variableName, isAscending, cb) {
+        verifyApiKey(apiConfig.apiKey)
         var pointCount = 500
         var uri = apiConfig.datasetsEndpoint + datasetName + '/stations/' + stationID + '?apikey=' + apiConfig.apiKey + '&verbose=true&count=' + pointCount
         if (!isAscending) {
@@ -335,6 +356,7 @@
     }
 
     var getImage = function(datasetName, variableName, timestamp, width, cb) {
+        verifyApiKey(apiConfig.apiKey)
         var uri = apiConfig.baseURI + '/datasets/' + datasetName + '/variables/' + encodeURIComponent(variableName)
         if (timestamp) {
             uri += '/timestamps/' + timestamp
@@ -368,7 +390,8 @@
         apiConfig: apiConfig,
         pointsToFeatures: pointsToFeatures,
         generateGeojsonPoints: generateGeojsonPoints,
-        getWorldVector: getWorldVector
+        getWorldVector: getWorldVector,
+        setApiKey: setApiKey
     }
 
 }))
