@@ -64,6 +64,12 @@
         }
     }
 
+    var numberWidgetDefaultConfig = function(config) {
+        if (!config.className) {
+            config.className = 'datahub-number'
+        }
+    }
+
     var mergeData = function(config) {
         var dataConverted = config.data.timestamps.map(function(d, i) {
             return {
@@ -219,6 +225,7 @@
             .attr('width', config.width)
             .attr('height', config.height)
         container.exit().remove()
+        console.log(config.parent);
 
         return {
             container: containerUpdate
@@ -786,6 +793,21 @@
         }
     }
 
+    var numberWidget = function(config) {
+        var elements = config.container.selectAll('div')
+            .data(['title', 'value', 'info'])
+        elements.enter().append('div')
+            .attr('class', function(d){ return d; })
+            .merge(elements)
+            .html(function(d) {
+                return config[d]
+            })
+            .attr('display', function(d){ return config[d] ? null : 'none'; })
+        elements.exit().remove()
+
+        return {}
+    }
+
     var timeseriesLineChart = utils.pipeline(
         mergeData,
         sortData,
@@ -856,13 +878,20 @@
         buttonGroupElements
     )
 
+    var number = utils.pipeline(
+        numberWidgetDefaultConfig,
+        container,
+        numberWidget
+    )
+
     exports.chart = {
         timeseriesLineChart: timeseriesLineChart,
         timeseriesMultilineChart: timeseriesMultilineChart,
         legend: legend,
         timeSlider: timeSlider,
         buttonGroup: buttonGroup,
-        events: events
+        events: events,
+        number: number
     }
 
 }))
