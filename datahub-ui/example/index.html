@@ -12,6 +12,7 @@
     <script src="../src/datahub-data.js"></script>
     <script src="../src/datahub-map.js"></script>
     <script src="../src/datahub-chart.js"></script>
+    <script src="../src/datahub-widgets.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.2/leaflet.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.7/leaflet.draw.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flexboxgrid/6.3.1/flexboxgrid.min.css" />
@@ -282,7 +283,7 @@
     var timeSeries = datahub.data.generateTimeSeries(365, 6, '2016-01-01', 'day', 1)
 
     var timeSliderContainer = document.querySelector('.time-slider')
-    var timeSlider = datahub.chart.timeSlider({
+    var timeSlider = datahub.widget.timeSlider({
         parent: timeSliderContainer,
         timeRange: ['2016-01-01', '2017-01-01'],
         initialTimeRange: ['2016-01-01', '2017-01-01'],
@@ -309,26 +310,26 @@
         renderMainChart(timeseriesSlice)
     })
 
-    datahub.chart.number({
+    datahub.widget.number({
         parent: document.querySelector('.number-widget.big'),
         title: 'NET PRODUCTION',
         value: '236,43GWh',
         info: 'Plan: 231,64GWh'
     })
 
-    datahub.chart.number({
+    datahub.widget.number({
         parent: document.querySelector('.number-widget.medium'),
         value: '236,43GWh',
         info: 'Net Production'
     })
 
-    datahub.chart.number({
+    datahub.widget.number({
         parent: document.querySelector('.number-widget.small'),
         value: '16,00%',
         info: 'MTD Actual'
     })
 
-    datahub.chart.table({
+    datahub.widget.table({
         parent: document.querySelector('.table-widget'),
         elements: [
             ['Spain', 1, 2],
@@ -356,7 +357,7 @@
 
 
 
-    // var heightSelector = datahub.chart.buttonGroup({
+    // var heightSelector = datahub.widget.buttonGroup({
     //     parent: document.querySelector('.vertical-buttons'),
     //     elements: ['All', 200, 180, 160, 140, 120, 100, 80, 60, 50, 40],
     //     defaultElement: 'All',
@@ -374,7 +375,7 @@
 
 
 
-    // datahub.chart.legend({
+    // datahub.widget.legend({
     //     parent: document.querySelector('.legend'),
     //     elements: [{
     //         label: 'Vaisala @ 40M',
