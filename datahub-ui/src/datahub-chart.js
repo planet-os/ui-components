@@ -40,36 +40,6 @@
         }
     }
 
-    var chartDefaultConfig = function(config) {
-        if (!config.className) {
-            config.className = 'datahub-chart'
-        }
-    }
-
-    var legendDefaultConfig = function(config) {
-        if (!config.className) {
-            config.className = 'datahub-legend'
-        }
-    }
-
-    var timeSliderDefaultConfig = function(config) {
-        if (!config.className) {
-            config.className = 'datahub-time-slider'
-        }
-    }
-
-    var buttonGroupDefaultConfig = function(config) {
-        if (!config.className) {
-            config.className = 'datahub-button-group'
-        }
-    }
-
-    var numberWidgetDefaultConfig = function(config) {
-        if (!config.className) {
-            config.className = 'datahub-number'
-        }
-    }
-
     var mergeData = function(config) {
         var dataConverted = config.data.timestamps.map(function(d, i) {
             return {
@@ -217,23 +187,24 @@
 
     var container = function(config) {
         var container = d3.select(config.parent)
-            .selectAll('div.' + config.className)
+            .selectAll('div.container')
             .data([0])
         var containerUpdate = container.enter().append('div')
-            .attr('class', config.className)
+            .attr('class', 'container')
             .merge(container)
             .attr('width', config.width)
             .attr('height', config.height)
         container.exit().remove()
-        console.log(config.parent);
 
         return {
             container: containerUpdate
         }
     }
 
-    var panelComponent = function(config) {
-        var root = config.container.selectAll('svg')
+    var svgContainer = function(config) {
+        var widgetContainer = container(config).container
+
+        var root = widgetContainer.selectAll('svg')
             .data([0])
         var rootEnter = root.enter().append('svg')
             .attr('class', 'datahub-chart')
@@ -248,12 +219,12 @@
 
         return {
             root: root,
-            panel: panel
+            container: panel
         }
     }
 
     var axisComponentX = function(config) {
-        var axisX = config.panel.selectAll('g.axis.x')
+        var axisX = config.container.selectAll('g.axis.x')
             .data([0])
         axisX.enter().append('g')
             .attr('class', 'x axis')
@@ -269,7 +240,7 @@
     }
 
     var sliderAxisComponentX = function(config) {
-        var axisX = config.panel.selectAll('g.axis.x')
+        var axisX = config.container.selectAll('g.axis.x')
             .data([0])
         axisX.enter().append('g')
             .attr('class', 'x axis')
@@ -285,7 +256,7 @@
 
     var axisComponentY = function(config) {
         var padding = config.axisYPadding || 0
-        var axisY = config.panel.selectAll('g.axis.y')
+        var axisY = config.container.selectAll('g.axis.y')
             .data([0])
         axisY.enter().append('g')
             .attr('class', 'y axis')
@@ -299,7 +270,7 @@
     }
 
     var axisTitleComponentX = function(config) {
-        var axisTitleXComponent = config.panel.selectAll('text.axis-title.x')
+        var axisTitleXComponent = config.container.selectAll('text.axis-title.x')
             .data([0])
         var axisX = axisTitleXComponent.enter().append('text')
             .attr('class', 'x axis-title')
@@ -316,7 +287,7 @@
     }
 
     var axisTitleComponentY = function(config) {
-        var axisTitleY = config.panel.selectAll('text.axis-title.y')
+        var axisTitleY = config.container.selectAll('text.axis-title.y')
             .data([0])
         var axisY = axisTitleY.enter().append('text')
             .attr('class', 'y axis-title')
@@ -330,7 +301,7 @@
     }
 
     var chartTitleComponent = function(config) {
-        var axisTitleX = config.panel.selectAll('text.chart-title')
+        var axisTitleX = config.container.selectAll('text.chart-title')
             .data([0])
         axisTitleX.enter().append('text')
             .attr('class', 'chart-title')
@@ -387,7 +358,7 @@
         var axisTitleXFormat = config.axisTitleXFormat || function(d) {
             return d
         }
-        var tooltipContainer = config.panel.selectAll('g.hover-tooltip')
+        var tooltipContainer = config.container.selectAll('g.hover-tooltip')
             .data([0])
         var tooltipEnter = tooltipContainer.enter().append('g')
             .classed('hover-tooltip', true)
@@ -430,7 +401,7 @@
     }
 
     var hoverCircleComponent = function(config) {
-        var circleContainer = config.panel.selectAll('circle.hover-circle')
+        var circleContainer = config.container.selectAll('circle.hover-circle')
             .data([0])
         circleContainer.enter().append('circle')
             .classed('hover-circle', true)
@@ -461,7 +432,7 @@
     }
 
     var tooltipLineComponent = function(config) {
-        var lineGroup = config.panel.selectAll('g.line-container')
+        var lineGroup = config.container.selectAll('g.line-container')
             .data([0])
         lineGroup.enter().append('g')
             .attr('class', 'line-container')
@@ -500,7 +471,7 @@
     }
 
     var shapePanel = function(config) {
-        var shapePanel = config.panel.selectAll('g.shapes')
+        var shapePanel = config.container.selectAll('g.shapes')
             .data([0])
         var panel = shapePanel.enter().append('g')
             .attr('class', 'shapes')
@@ -549,14 +520,14 @@
         shapes.enter().append('path')
             .attr('class', function(d, i) {
                 var className = 'line shape color-' + i
-                if(config.metadata) {
+                if (config.metadata) {
                     className = className + ' ' + config.metadata[i].key
                 }
                 return className
             })
             .style('fill', 'none')
             .merge(shapes)
-            .classed('hidden', function(d, i){
+            .classed('hidden', function(d, i) {
                 return config.metadata && config.metadata[i].isHidden
             })
             .attr('d', line)
@@ -600,7 +571,7 @@
             return d.x.getTime()
         })
         var deltaX = config.scaleX(dataConvertedX[1]) - config.scaleX(dataConvertedX[0])
-        var eventPanelContainer = config.panel.selectAll('g.event-panel-container')
+        var eventPanelContainer = config.container.selectAll('g.event-panel-container')
             .data([0])
         eventPanelContainer.enter().append('g')
             .attr('class', 'event-panel-container')
@@ -661,7 +632,7 @@
     }
 
     var axisXFormatterTime = function(config) {
-        config.panel.select('g.axis.x').selectAll('.tick text')
+        config.container.select('g.axis.x').selectAll('.tick text')
             .text(function(d) {
                 return d3.timeFormat('%a')(d)
             })
@@ -670,7 +641,7 @@
     }
 
     var axisXFormatterTimeHour = function(config) {
-        config.panel.select('g.axis.x').selectAll('.tick text')
+        config.container.select('g.axis.x').selectAll('.tick text')
             .text(function(d) {
                 return d3.timeFormat('%x')(d)
             })
@@ -679,7 +650,7 @@
     }
 
     var axisXFormatterRotate30 = function(config) {
-        config.panel.select('g.axis.x').selectAll('.tick text')
+        config.container.select('g.axis.x').selectAll('.tick text')
             .style('transform', 'rotate(30deg)')
             .style('text-anchor', 'start')
 
@@ -734,8 +705,8 @@
                 elementsAll.classed('active', function() {
                     isAlreadyActive = this.classList.contains('active')
                     isTarget = (that === this)
-                    if(isTarget && isAlreadyActive) {
-                       isUnselection = true 
+                    if (isTarget && isAlreadyActive) {
+                        isUnselection = true
                     }
                     return !isAlreadyActive && isTarget
                 })
@@ -753,6 +724,8 @@
     }
 
     var timeSlider = function(config) {
+        config.container.attr('class', 'datahub-slider')
+
         events.brush = utils.reactiveProperty()
 
         var brushX = d3.brushX()
@@ -773,7 +746,7 @@
                 })
             })
 
-        var brush = config.panel.selectAll('g.brush')
+        var brush = config.container.selectAll('g.brush')
             .data([0])
         var brushMerged = brush.enter().append('g')
             .attr('class', 'brush')
@@ -784,7 +757,7 @@
             .call(brushX.move, config.scaleX.range())
         brush.exit().remove()
 
-        if(config.initialTimeRange) {
+        if (config.initialTimeRange) {
             // brush.call(brushX.move, config.scaleX.range())
         }
 
@@ -794,54 +767,122 @@
     }
 
     var numberWidget = function(config) {
+        config.container.attr('class', 'datahub-number')
+
         var elements = config.container.selectAll('div')
             .data(['title', 'value', 'info'])
         elements.enter().append('div')
-            .attr('class', function(d){ return d; })
+            .attr('class', function(d) {
+                return d
+            })
             .merge(elements)
             .html(function(d) {
                 return config[d]
             })
-            .attr('display', function(d){ return config[d] ? null : 'none'; })
+            .attr('display', function(d) {
+                return config[d] ? null : 'none';
+            })
         elements.exit().remove()
 
         return {}
     }
 
-    var timeseriesLineChart = utils.pipeline(
-        mergeData,
-        sortData,
-        detectDataAllNulls,
-        axesFormatAutoconfig,
-        scaleX,
-        scaleY,
-        axisX,
-        axisY,
-        panelComponent,
-        lineShapes,
-        lineCutShapes,
-        message,
-        axisComponentX,
-        axisTitleComponentX,
-        axisComponentY,
-        axisXFormatterRotate30,
-        axisTitleComponentY,
-        eventsBinder,
-        tooltipComponent,
-        hoverCircleComponent,
-        tooltipLineComponent
-    )
+    var table = function(config) {
+        config.container.attr('class', 'datahub-table')
+
+        var headerRow = config.container.selectAll('div.header-row')
+            .data([0])
+        var headerRowAll = headerRow.enter().append('div')
+            .attr('class', 'header-row')
+            .merge(headerRow)
+        headerRow.exit().remove()
+
+        var headerElements = headerRowAll.selectAll('div.header-cell')
+            .data(config.metadata)
+        var allHeaderELements = headerElements.enter().append('div')
+            .on('click', function(d, i) {
+                var that = this
+                var isAscending = false
+                allHeaderELements.classed('ascending', function(d) {
+                    var match = that === this
+                    if (match) {
+                        isAscending = this.classList.contains('ascending')
+                        match = !isAscending
+                    }
+                    return match
+                })
+
+                var sortedData = sortData(config.elements, d.key, isAscending)
+                renderElements(sortedData)
+            })
+            .merge(headerElements)
+            .attr('class', function(d) {
+                return 'header-cell ' + d.key
+            })
+            .classed('sortable', function(d) {
+                return d.sortable
+            })
+            .html(function(d) {
+                var label = d.label
+                if (!label) {
+                    return
+                }
+                if (d.units) {
+                    label += ' (' + d.units + ')'
+                }
+                return label || ''
+            })
+        headerElements.exit().remove()
+
+        function sortData(data, sortBy, isAscending) {
+            var sortKey = config.metadata.map(function(d) {
+                    return d.key
+                })
+                .indexOf(sortBy)
+            var sortedData = JSON.parse(JSON.stringify(data))
+                .sort(function(a, b) {
+                    if (a[sortKey] < b[sortKey]) return isAscending ? 1 : -1
+                    if (a[sortKey] > b[sortKey]) return isAscending ? -1 : 1;
+                    return 0;
+                })
+            return sortedData
+        }
+
+        function renderElements(data) {
+            var elements = config.container.selectAll('div.row')
+                .data(data)
+            var elementsEnter = elements.enter().append('div')
+            var allElements = elementsEnter.merge(elements)
+                .attr('class', 'row')
+                .attr('display', function(d) {
+                    return config[d] ? null : 'none'
+                })
+            var cells = allElements.selectAll('div.cell')
+                .data(function(d) {
+                    return d
+                })
+            cells.enter().append('div')
+                .attr('class', 'cell')
+                .merge(cells)
+                .html(function(d) {
+                    return d
+                })
+            elements.exit().remove()
+        }
+        var sortedData = sortData(config.elements, config.metadata[0].key, true)
+        renderElements(sortedData)
+
+        return {}
+    }
 
     var timeseriesMultilineChart = utils.pipeline(
-        chartDefaultConfig,
         mergeData2D,
         axesFormatAutoconfig,
         scaleX,
         scaleY,
         axisX,
         axisY,
-        container,
-        panelComponent,
+        svgContainer,
         lineShapes,
         lineCutShapes,
         message,
@@ -857,41 +898,41 @@
     )
 
     var legend = utils.pipeline(
-        legendDefaultConfig,
         container,
         legendElements
     )
 
     var timeSlider = utils.pipeline(
-        timeSliderDefaultConfig,
         sliderScaleX,
         sliderAxisX,
-        container,
-        panelComponent,
+        svgContainer,
         sliderAxisComponentX,
         timeSlider
     )
 
     var buttonGroup = utils.pipeline(
-        buttonGroupDefaultConfig,
         container,
         buttonGroupElements
     )
 
     var number = utils.pipeline(
-        numberWidgetDefaultConfig,
         container,
         numberWidget
     )
 
+    var table = utils.pipeline(
+        container,
+        table
+    )
+
     exports.chart = {
-        timeseriesLineChart: timeseriesLineChart,
         timeseriesMultilineChart: timeseriesMultilineChart,
         legend: legend,
         timeSlider: timeSlider,
         buttonGroup: buttonGroup,
         events: events,
-        number: number
+        number: number,
+        table: table
     }
 
 }))

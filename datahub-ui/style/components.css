@@ -94,3 +94,31 @@
 .small .datahub-number, .small .datahub-number .value  {
     font-size: 18px;
 }
+
+.datahub-table {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+}
+
+.datahub-table .header-row,
+.datahub-table .row {
+    display: flex;
+}
+
+.datahub-table .header-cell,
+.datahub-table .cell {
+    flex: 1;
+}
+
+.datahub-table .header-cell.sortable {
+    cursor: pointer;
+}
+
+.datahub-table .header-cell.sortable:before {
+    content: '▼';
+}
+
+.datahub-table .header-cell.sortable.ascending:before {
+    content: '▲';
+}
