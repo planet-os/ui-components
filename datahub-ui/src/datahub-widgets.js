@@ -148,9 +148,7 @@
     }
 
     var buttonGroupElements = function(config) {
-        var events = {
-            click: utils.reactiveProperty()
-        }
+        var events = d3.dispatch('click')
 
         var elements = config.container.selectAll('.element')
             .data(config.elements)
@@ -170,7 +168,7 @@
                     }
                     return !isAlreadyActive && isTarget
                 })
-                events.buttonClick(isUnselection ? null : d)
+                events.call('click', null, { selected: isUnselection ? null : d })
             })
             .merge(elements)
             .text(function(d) {
@@ -186,9 +184,7 @@
     var timeSlider = function(config) {
         config.container.attr('class', 'datahub-slider')
 
-        var events = {
-            brush: utils.reactiveProperty()
-        }
+        var events = d3.dispatch('brush')
 
         var brushX = d3.brushX()
             .extent([
@@ -203,7 +199,7 @@
                     end: config.scaleX.invert(brushPixelExtent[1])
                 }
 
-                events.brush({
+                events.call('brush', null, {
                     brushExtent: brushExtent
                 })
             })

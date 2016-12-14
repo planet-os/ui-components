@@ -153,6 +153,16 @@
             <div class="description">A table can be sorted.</div>
         </div>
     </div>
+    <div class="row widget">
+        <div class="col-xs-12 col-md-7">
+            <div class="row">
+                <div class="button-group big col-xs"></div>
+            </div>
+        </div>
+        <div class="col-xs-12 col-md-5">
+            <div class="description">A group of buttons.</div>
+        </div>
+    </div>
     <script>
     /**/
     /*
@@ -261,7 +271,6 @@
         axisTitleY: 'Unit'
     })
 
-
     var sliderChartContainer = document.querySelector('.slider-chart')
 
     function renderMainChart(timeSeries) {
@@ -297,7 +306,7 @@
         }
     })
 
-    timeSlider.events.brush.on(function(d) {
+    timeSlider.events.on('brush', function(d) {
         var startIndex = datahub.utils.bisection(timeSeries.timestamps, d.brushExtent.start)
         var endIndex = datahub.utils.bisection(timeSeries.timestamps, d.brushExtent.end)
         var timeseriesSlice = {
@@ -309,6 +318,8 @@
 
         renderMainChart(timeseriesSlice)
     })
+
+    renderMainChart(timeSeries)
 
     datahub.widget.number({
         parent: document.querySelector('.number-widget.big'),
@@ -355,23 +366,21 @@
         }]
     })
 
+    var heightSelector = datahub.widget.buttonGroup({
+        parent: document.querySelector('.button-group'),
+        elements: ['All', 200, 180, 160, 140, 120, 100, 80, 60, 50, 40],
+        defaultElement: 'All',
+        margin: {
+            top: 0,
+            right: 0,
+            bottom: 0,
+            left: 0
+        }
+    })
 
-
-    // var heightSelector = datahub.widget.buttonGroup({
-    //     parent: document.querySelector('.vertical-buttons'),
-    //     elements: ['All', 200, 180, 160, 140, 120, 100, 80, 60, 50, 40],
-    //     defaultElement: 'All',
-    //     margin: {
-    //         top: 0,
-    //         right: 0,
-    //         bottom: 0,
-    //         left: 0
-    //     }
-    // })
-
-    // heightSelector.events.buttonClick.on(function(d) {
-    //     console.log(d)
-    // })
+    heightSelector.events.on('click', function(d) {
+        console.log(d)
+    })
 
 
 

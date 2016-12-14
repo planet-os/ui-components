@@ -180,12 +180,8 @@
             })
             .init()
 
-        selectionMap.events.mapCloseClick = utils.reactiveProperty()
-        selectionMap.events.rectangleDraw = utils.reactiveProperty()
-        selectionMap.events.rectangleClick = utils.reactiveProperty()
-        selectionMap.events.markerClick = utils.reactiveProperty()
-        selectionMap.events.markerDraw = utils.reactiveProperty()
-        selectionMap.events.geojsonClick = utils.reactiveProperty()
+        var events = d3.dispatch('mapCloseClick', 'rectangleDraw', 'rectangleClick', 'markerClick', 
+            'markerDraw', 'geojsonClick')
 
         var internalMap = selectionMap._getMap()
         internalMap.zoomControl.setPosition('bottomright')
@@ -196,7 +192,7 @@
                 var container = L.DomUtil.create('a', 'map-close leaflet-bar leaflet-control leaflet-control-custom')
 
                 container.onclick = (function(e) {
-                    selectionMap.events.mapCloseClick(e)
+                    events.call('mapCloseClick', this, e)
                 })
                 return container
             }
@@ -243,10 +239,10 @@
                     .on('click', function(e) {
                         removeAllPolygons()
                         zoomToBoundingBox()
-                        selectionMap.events.rectangleClick(e)
+                        events.call('rectangleClick', this, e)
                     }, this)
 
-                selectionMap.events.rectangleDraw(layer.getBounds())
+                events.call('rectangleDraw', this, layer.getBounds())
 
                 zoomToBoundingBox()
             }
@@ -255,7 +251,7 @@
                 var latLng = layer.getLatLng()
                 addMarker(latLng)
 
-                selectionMap.events.markerDraw(latLng)
+                events.call('markerDraw', this, latLng)
             }
 
         }, this)
@@ -267,7 +263,7 @@
                 .on('click', function(e) {
                     removeAllPolygons()
                     zoomToBoundingBox()
-                    selectionMap.events.markerClick(e)
+                    events.call('markerClick', this, e)
                 }, this)
                 .addTo(drawnItems)
 
@@ -312,7 +308,9 @@
             removeAllPolygons()
 
             var poly = getPolyFromCoordinates(coords)
-            addGeojson(poly, selectionMap.events.rectangleClick)
+            addGeojson(poly, function(){ 
+                events.call('rectangleClick', this, arguments)
+            })
 
             zoomToBoundingBox()
             return this
@@ -326,7 +324,7 @@
                 var geojsonLayer = L.GeoJSON.geometryToLayer(geojson[1])
                     .on('click', function(e) {
                         drawnItems.removeLayer(this)
-                        selectionMap.events.geojsonClick(geojson)
+                        events.call('geojsonClick', this, geojson)
 
                         zoomToBoundingBox()
                     }, this)
@@ -391,16 +389,8 @@
 
         utils.merge(mapConfig, _config.mapConfig)
 
-        var events = {
-            click: utils.reactiveProperty(),
-            mousemove: utils.reactiveProperty(),
-            mouseenter: utils.reactiveProperty(),
-            mouseleave: utils.reactiveProperty(),
-            featureClicked: utils.reactiveProperty(),
-            featureMousEnter: utils.reactiveProperty(),
-            featureMousLeave: utils.reactiveProperty(),
-            markerClicked: utils.reactiveProperty()
-        }
+        var events = d3.dispatch('click', 'mousemove', 'mouseenter', 'mouseleave', 
+            'featureClicked', 'featureMousEnter', 'featureMousLeave', 'markerClicked')
 
         var states = {
             isVisible: true
@@ -412,7 +402,7 @@
             L.Icon.Default.imagePath = config.imagePath
 
             map = L.map(config.container, mapConfig)
-                .on('click', function(e) { events.click({ lat: e.latlng.lat, lon: e.latlng.lng }); })
+                .on('click', function(e) { events.call('click', this, { lat: e.latlng.lat, lon: e.latlng.lng }) })
                 .on('mousedown', function(e) { config.container.classList.add('grab'); })
                 .on('mouseup', function(e) { config.container.classList.remove('grab'); })
                 .on('mousemove', function(e) {
@@ -449,7 +439,7 @@
                             tooltipLayer.closeTooltip()
                         }
 
-                        events.mousemove({
+                        events.call('mousemove', this, {
                             x: e.containerPoint.x,
                             y: e.containerPoint.y,
                             value: value,
@@ -458,8 +448,12 @@
                         })
                     }
                 })
-                .on('mouseover', events.mouseenter)
-                .on('mouseout', events.mouseleave)
+                .on('mouseover', function(e){
+                    events.call('mouseenter', this, arguments)
+                })
+                .on('mouseout', function(e){
+                    events.call('mouseleave', this, arguments)
+                })
 
             if (!(_config.mapConfig && _config.mapConfig.zoom)) {
                 map.fitWorld()
@@ -541,7 +535,7 @@
             var onEachFeature = function(feature, layer) {
                 layer.on({
                     click: function(e) {
-                        events.featureClicked({
+                        events.call('featureClicked', this, {
                             id: e.target.feature.properties.id,
                             lat: e.target._latlng ? e.target._latlng.lat : e.latlng.lat,
                             lon: e.target._latlng ? e.target._latlng.lng : e.latlng.lng,
@@ -549,7 +543,7 @@
                         })
                     },
                     mouseover: function(e, a, b) {
-                        events.featureMousEnter({
+                        events.call('featureMousEnter', this, {
                             x: e.containerPoint.x,
                             y: e.containerPoint.y,
                             lat: e.latlng.lat,
@@ -558,7 +552,7 @@
                         })
                     },
                     mouseout: function(e) {
-                        events.featureMousLeave({
+                        events.call('featureMousLeave', this, {
                             x: e.containerPoint.x,
                             y: e.containerPoint.y,
                             lat: e.latlng.lat,
@@ -594,7 +588,9 @@
                     draggable: true,
                     opacity: 1
                 })
-                .on('click', events.markerClicked)
+                .on('click', function(e){
+                    events.call('markerClicked', this, arguments)
+                })
                 .addTo(map)
 
             return this
@@ -646,10 +642,10 @@
             removeMarker: removeMarker,
             renderPolygon: renderPolygon,
             renderImage: renderImage,
-            events: events,
             renderRaster: renderRaster,
             isVisible: states.isVisible,
             hideZoomControl: hideZoomControl,
+            events: events,
             _getMap: function() {
                 return map
             }
