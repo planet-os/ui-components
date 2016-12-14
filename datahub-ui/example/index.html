@@ -17,11 +17,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flexboxgrid/6.3.1/flexboxgrid.min.css" />
     <link rel="stylesheet" href="../style/components.css" />
     <style>
-
     body {
         font-family: Tahoma, sans-serif;
     }
-
+    
     div {
         /*border: 1px solid silver;*/
     }
@@ -62,7 +61,7 @@
         max-width: 64em;
         margin: 0 auto 60px auto;
         border-top: 1px solid silver;
-        padding-top: 20px; 
+        padding-top: 20px;
     }
     </style>
 </head>
@@ -131,10 +130,32 @@
             <div class="description">A time slider is used to zoom in a timeseries.</div>
         </div>
     </div>
+    <div class="row widget">
+        <div class="col-xs-12 col-md-7">
+            <div class="row">
+                <div class="number-widget big col-xs"></div>
+                <div class="number-widget medium col-xs"></div>
+                <div class="number-widget small col-xs"></div>
+            </div>
+        </div>
+        <div class="col-xs-12 col-md-5">
+            <div class="description">A number widget comes in 3 sizes. It can have a title, a value and some info.</div>
+        </div>
+    </div>
+    <div class="row widget">
+        <div class="col-xs-12 col-md-7">
+            <div class="row">
+                <div class="table-widget big col-xs"></div>
+            </div>
+        </div>
+        <div class="col-xs-12 col-md-5">
+            <div class="description">A table can be sorted.</div>
+        </div>
+    </div>
     <script>
     /**/
     /*
-        upgrades:
+        changelog:
         - d3v4 scales
         - which scale as rgb, uses custom parser
         - default imagePath
@@ -143,7 +164,10 @@
         - flattenAndUniquify -> arrayStats
         - zoom is in mapConfig.zoom
         - el and container -> parent
+        - datahub.data.setApiKey
     */
+
+    datahub.data.setApiKey('0f58fe2540fa4cf19a4aa68f290fd148')
 
     datahub.map.rasterMap({
             parent: document.querySelector('.map-light'),
@@ -285,6 +309,52 @@
         renderMainChart(timeseriesSlice)
     })
 
+    datahub.chart.number({
+        parent: document.querySelector('.number-widget.big'),
+        title: 'NET PRODUCTION',
+        value: '236,43GWh',
+        info: 'Plan: 231,64GWh'
+    })
+
+    datahub.chart.number({
+        parent: document.querySelector('.number-widget.medium'),
+        value: '236,43GWh',
+        info: 'Net Production'
+    })
+
+    datahub.chart.number({
+        parent: document.querySelector('.number-widget.small'),
+        value: '16,00%',
+        info: 'MTD Actual'
+    })
+
+    datahub.chart.table({
+        parent: document.querySelector('.table-widget'),
+        elements: [
+            ['Spain', 1, 2],
+            ['Germany', 7, 8],
+            ['United Kingdom', 1, 2],
+            ['Poland', 7, 8],
+            ['Netherlands', 1, 2],
+            ['Italy', 7, 8],
+        ],
+        metadata: [{
+            key: 'country',
+            label: 'Country',
+            sortable: true
+        }, {
+            key: 'production',
+            label: 'production',
+            units: 'MWh',
+            sortable: true
+        }, {
+            key: 'revenues',
+            label: 'Revenues',
+            units: 'M€'
+        }]
+    })
+
+
 
     // var heightSelector = datahub.chart.buttonGroup({
     //     parent: document.querySelector('.vertical-buttons'),
@@ -323,7 +393,6 @@
     //         unit: 'm/s'
     //     }]
     // })
-
     </script>
 </body>
 
