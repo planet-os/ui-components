@@ -1,0 +1,55 @@
+/*
+very-dark-gray: #182228
+dark-grey: #233541
+dark: #2E3F4B
+light-grey: #5f6773
+very-light-grey: #adb7c5
+orange: #F6A623
+yellow: #F8E81C
+green: #5ECF52
+sky-blue: #05BDFF
+*/
+
+body {
+    background-color: #182228;
+    color: #adb7c5;
+    font-family: 'Roboto', sans-serif;
+}
+
+.section {
+    border-top: 3px solid #5f6773;
+    background-color: #233541;
+}
+
+.datahub-chart text {
+    fill: #adb7c5;
+}
+
+.datahub-chart line {
+    stroke: #5f6773;
+}
+
+.datahub-chart .axis.x path,
+.datahub-chart .axis.x line {
+    stroke: white;
+}
+
+.datahub-chart .axis.y path {
+    display: none;
+}
+
+.datahub-table {
+    color: white;
+}
+
+.datahub-table .header-row {
+    background-color: #5f6773;
+}
+
+.datahub-table .table-row:nth-child(even) {
+    background-color: #2E3F4B;
+}
+
+.datahub-number .value {
+    color: white;
+}

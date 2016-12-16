@@ -150,6 +150,7 @@
             .ticks(Math.max(~~(height / 30), 2))
             .tickPadding(10)
             .tickFormat(config.axisYFormat)
+            .tickSize(-config.chartWidth)
 
         return {
             axisY: axisY
@@ -404,12 +405,12 @@
         axisX,
         axisY,
         svgContainer,
+        axisComponentY,
         lineShapes,
         lineCutShapes,
         message,
         axisComponentX,
         axisTitleComponentX,
-        axisComponentY,
         axisXFormatterRotate30,
         axisTitleComponentY
     )

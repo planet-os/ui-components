@@ -363,7 +363,7 @@
         var config = {
             container: container,
             colorScale: _config.colorScale,
-            basemapName: _config.basemapName || 'basemapLight',
+            basemapName: _config.basemapName || 'basemapDark',
             imagePath: _config.imagePath || 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.2/images/',
             showLabels: !(_config.showLabels === false),
             showTooltip: !(_config.showTooltip === false)

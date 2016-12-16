@@ -307,11 +307,11 @@
         }
 
         function renderElements(data) {
-            var elements = config.container.selectAll('div.row')
+            var elements = config.container.selectAll('div.table-row')
                 .data(data)
             var elementsEnter = elements.enter().append('div')
             var allElements = elementsEnter.merge(elements)
-                .attr('class', 'row')
+                .attr('class', 'table-row')
                 .attr('display', function(d) {
                     return config[d] ? null : 'none'
                 })
@@ -362,6 +362,8 @@
     )
 
     exports.widget = {
+        container: container, 
+        svgContainer: svgContainer,
         legend: legend,
         timeSlider: timeSlider,
         buttonGroup: buttonGroup,

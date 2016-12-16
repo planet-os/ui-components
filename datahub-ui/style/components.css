@@ -102,13 +102,14 @@
 }
 
 .datahub-table .header-row,
-.datahub-table .row {
+.datahub-table .table-row {
     display: flex;
 }
 
 .datahub-table .header-cell,
 .datahub-table .cell {
     flex: 1;
+    padding: 4px 6px;
 }
 
 .datahub-table .header-cell.sortable {
@@ -117,8 +118,22 @@
 
 .datahub-table .header-cell.sortable:before {
     content: '▼';
+    font-size: 0.5em;
+    padding-right: 6px;
 }
 
 .datahub-table .header-cell.sortable.ascending:before {
     content: '▲';
+    font-size: 0.5em;
+    padding-right: 6px;
+}
+
+.datahub-number-group {
+    display: flex; 
+}
+
+.datahub-number-group .element-container {
+    padding-left: 20px; 
+    padding-right: 20px; 
+    flex: 1;
 }

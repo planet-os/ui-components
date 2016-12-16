@@ -13,15 +13,14 @@
     <script src="../src/datahub-map.js"></script>
     <script src="../src/datahub-chart.js"></script>
     <script src="../src/datahub-widgets.js"></script>
+    <script src="../src/datahub-layout.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.2/leaflet.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.7/leaflet.draw.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flexboxgrid/6.3.1/flexboxgrid.min.css" />
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
     <link rel="stylesheet" href="../style/components.css" />
+    <link rel="stylesheet" href="../style/dark-theme.css" />
     <style>
-    body {
-        font-family: Tahoma, sans-serif;
-    }
-    
     div {
         /*border: 1px solid silver;*/
     }
@@ -58,17 +57,16 @@
         margin: 0 auto;
     }
     
-    .widget {
+    .section {
         max-width: 64em;
-        margin: 0 auto 60px auto;
-        border-top: 1px solid silver;
-        padding-top: 20px;
+        margin: 0 auto 20px auto;
+        padding: 20px;
     }
     </style>
 </head>
 
 <body>
-    <div class="row widget">
+    <div class="row section">
         <div class="col-xs-12 col-md-7">
             <div class="row map-group">
                 <div class="map map-light"></div>
@@ -79,7 +77,7 @@
             <div class="description">A map can have a light or dark basemap.</div>
         </div>
     </div>
-    <div class="row widget">
+    <div class="row section">
         <div class="col-xs-12 col-md-7">
             <div class="row map-group">
                 <div class="map map-grayscale"></div>
@@ -90,7 +88,7 @@
             <div class="description">A map can load raster data. Multiple palettes are available, like a simple linear grayscale and a rainbow palette using histogram equalization.</div>
         </div>
     </div>
-    <div class="row widget">
+    <div class="row section">
         <div class="col-xs-12 col-md-7">
             <div class="map map-raster"></div>
         </div>
@@ -98,7 +96,7 @@
             <div class="description">A map can zoom and pan raster efficiently. A tooltip shows value under the cursor.</div>
         </div>
     </div>
-    <div class="row widget">
+    <div class="row section">
         <div class="col-xs-12 col-md-7">
             <div class="map map-vector"></div>
         </div>
@@ -106,7 +104,7 @@
             <div class="description">A map can load vector data, points and polygons.</div>
         </div>
     </div>
-    <div class="row widget">
+    <div class="row section">
         <div class="col-xs-12 col-md-7">
             <div class="map map-selector"></div>
         </div>
@@ -114,7 +112,7 @@
             <div class="description">A vector map supports markers and rectangle selection. Clicking on the selection deletes it.</div>
         </div>
     </div>
-    <div class="row widget">
+    <div class="row section">
         <div class="col-xs-12 col-md-7">
             <div class="multiline-chart"></div>
         </div>
@@ -122,7 +120,7 @@
             <div class="description">A timeseries chart can have multiple lines.</div>
         </div>
     </div>
-    <div class="row widget">
+    <div class="row section">
         <div class="col-xs-12 col-md-7">
             <div class="time-slider"></div>
             <div class="slider-chart"></div>
@@ -131,7 +129,7 @@
             <div class="description">A time slider is used to zoom in a timeseries.</div>
         </div>
     </div>
-    <div class="row widget">
+    <div class="row section">
         <div class="col-xs-12 col-md-7">
             <div class="row">
                 <div class="number-widget big col-xs"></div>
@@ -143,24 +141,34 @@
             <div class="description">A number widget comes in 3 sizes. It can have a title, a value and some info.</div>
         </div>
     </div>
-    <div class="row widget">
+    <div class="row section">
         <div class="col-xs-12 col-md-7">
             <div class="row">
-                <div class="table-widget big col-xs"></div>
+                <div class="table-widget col-xs"></div>
             </div>
         </div>
         <div class="col-xs-12 col-md-5">
             <div class="description">A table can be sorted.</div>
         </div>
     </div>
-    <div class="row widget">
+    <div class="row section">
         <div class="col-xs-12 col-md-7">
             <div class="row">
-                <div class="button-group big col-xs"></div>
+                <div class="button-group col-xs"></div>
             </div>
         </div>
         <div class="col-xs-12 col-md-5">
-            <div class="description">A group of buttons.</div>
+            <div class="description">A group of buttons can be stacked vertically.</div>
+        </div>
+    </div>
+    <div class="row section">
+        <div class="col-xs-12 col-md-7">
+            <div class="row">
+                <div class="number-group small col-xs"></div>
+            </div>
+        </div>
+        <div class="col-xs-12 col-md-5">
+            <div class="description">Number widgets can be grouped.</div>
         </div>
     </div>
     <script>
@@ -192,7 +200,7 @@
 
     datahub.map.rasterMap({
             parent: document.querySelector('.map-dark'),
-            basemapName: 'basemapDark',
+            basemapName: 'basemapLight',
             showLabels: false,
             mapConfig: {
                 zoomControl: false
@@ -356,7 +364,7 @@
             sortable: true
         }, {
             key: 'production',
-            label: 'production',
+            label: 'Production',
             units: 'MWh',
             sortable: true
         }, {
@@ -380,6 +388,22 @@
 
     heightSelector.events.on('click', function(d) {
         console.log(d)
+    })
+
+    datahub.layout.numberGroup({
+        parent: document.querySelector('.number-group'),
+        elements: [{
+            value: '236,43GWh',
+            info: 'Net Production'
+        },
+        {
+            value: '236,43GWh',
+            info: 'Plan: 231,64GWh'
+        },
+        {
+            value: '16,00%',
+            info: 'MTD Actual'
+        }]
     })
 
 

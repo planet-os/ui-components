@@ -1,28 +1,27 @@
 (function(root, factory) {
     if (typeof module === 'object' && module.exports) {
-        factory(module.exports, require('d3'), require('./datahub-utils.js').utils)
+        factory(module.exports, require('d3'), require('./datahub-utils.js').utils, require('./datahub-widget.js'))
     } else {
-        factory((root.datahub = root.datahub || {}), root.d3, root.datahub.utils)
+        factory((root.datahub = root.datahub || {}), root.d3, root.datahub.utils, root.datahub.widget)
     }
-}(this, function(exports, d3, utils) {
+}(this, function(exports, d3, utils, widget) {
 
     var events = {}
 
-    var numberGroup = function(config) {
-        config.container.attr('class', 'datahub-number')
+    var numbers = function(config) {
+        config.container.attr('class', 'datahub-number-group')
+
+
 
         var elements = config.container.selectAll('div')
-            .data(['title', 'value', 'info'])
+            .data(config.elements)
         elements.enter().append('div')
-            .attr('class', function(d) {
-                return d
-            })
+            .attr('class', 'element-container')
             .merge(elements)
-            .html(function(d) {
-                return config[d]
-            })
-            .attr('display', function(d) {
-                return config[d] ? null : 'none';
+            .each(function(d) {
+                var config = JSON.parse(JSON.stringify(d))
+                config.parent = this
+                widget.number(config)
             })
         elements.exit().remove()
 
@@ -30,13 +29,13 @@
     }
 
     var numberGroup = utils.pipeline(
-        container,
-        table
+        widget.container,
+        numbers
     )
 
 
     exports.layout = {
-        numberGroup
+        numberGroup: numberGroup
     }
 
 }))
