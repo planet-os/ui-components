@@ -62,6 +62,10 @@
         margin: 0 auto 20px auto;
         padding: 20px;
     }
+    
+    .button-group.vertical {
+        max-width: 64px;
+    }
     </style>
 </head>
 
@@ -144,6 +148,16 @@
     <div class="row section">
         <div class="col-xs-12 col-md-7">
             <div class="row">
+                <div class="number-group small col-xs"></div>
+            </div>
+        </div>
+        <div class="col-xs-12 col-md-5">
+            <div class="description">Number widgets can be grouped.</div>
+        </div>
+    </div>
+    <div class="row section">
+        <div class="col-xs-12 col-md-7">
+            <div class="row">
                 <div class="table-widget col-xs"></div>
             </div>
         </div>
@@ -154,21 +168,33 @@
     <div class="row section">
         <div class="col-xs-12 col-md-7">
             <div class="row">
-                <div class="button-group col-xs"></div>
+                <div class="button-group vertical col-xs"></div>
+                <div class="button-group horizontal col-xs"></div>
+                <div class="button-group exclusive col-xs"></div>
             </div>
         </div>
         <div class="col-xs-12 col-md-5">
-            <div class="description">A group of buttons can be stacked vertically.</div>
+            <div class="description">A group of buttons can be stacked vertically or horizontally. It can also be exclusive, forcing only one button to be selected.</div>
         </div>
     </div>
     <div class="row section">
         <div class="col-xs-12 col-md-7">
             <div class="row">
-                <div class="number-group small col-xs"></div>
+                <div class="legend col-xs"></div>
             </div>
         </div>
         <div class="col-xs-12 col-md-5">
-            <div class="description">Number widgets can be grouped.</div>
+            <div class="description">A group of buttons accepts html labels and can be styled as a legend. Legend element can be toggled on or off.</div>
+        </div>
+    </div>
+    <div class="row section">
+        <div class="col-xs-12 col-md-7">
+            <div class="row">
+                <div class="alert-message col-xs"></div>
+            </div>
+        </div>
+        <div class="col-xs-12 col-md-5">
+            <div class="description">An alert message has a colored band with icon and a message.</div>
         </div>
     </div>
     <script>
@@ -348,6 +374,22 @@
         info: 'MTD Actual'
     })
 
+    datahub.layout.numberGroup({
+        parent: document.querySelector('.number-group'),
+        elements: [{
+            value: '236,43GWh',
+            info: 'Net Production'
+        },
+        {
+            value: '236,43GWh',
+            info: 'Plan: 231,64GWh'
+        },
+        {
+            value: '16,00%',
+            info: 'MTD Actual'
+        }]
+    })
+
     datahub.widget.table({
         parent: document.querySelector('.table-widget'),
         elements: [
@@ -375,58 +417,96 @@
     })
 
     var heightSelector = datahub.widget.buttonGroup({
-        parent: document.querySelector('.button-group'),
-        elements: ['All', 200, 180, 160, 140, 120, 100, 80, 60, 50, 40],
-        defaultElement: 'All',
-        margin: {
-            top: 0,
-            right: 0,
-            bottom: 0,
-            left: 0
-        }
+        parent: document.querySelector('.button-group.vertical'),
+        elements: [{
+            label: 'All',
+            key: 'all'
+        }, {
+            label: '200',
+            key: '200'
+        }, {
+            label: '180',
+            key: '180'
+        }, {
+            label: '160',
+            key: '160'
+        }],
+        defaultElement: 'all',
+        isExclusive: true
     })
 
     heightSelector.events.on('click', function(d) {
         console.log(d)
     })
 
-    datahub.layout.numberGroup({
-        parent: document.querySelector('.number-group'),
+    datahub.widget.buttonGroup({
+        parent: document.querySelector('.button-group.horizontal'),
         elements: [{
-            value: '236,43GWh',
-            info: 'Net Production'
-        },
-        {
-            value: '236,43GWh',
-            info: 'Plan: 231,64GWh'
-        },
-        {
-            value: '16,00%',
-            info: 'MTD Actual'
-        }]
+            label: 'All',
+            key: 'all'
+        }, {
+            label: '200',
+            key: '200'
+        }, {
+            label: '180',
+            key: '180'
+        }, {
+            label: '160',
+            key: '160'
+        }],
+        defaultElement: 'all'
     })
 
+    datahub.widget.buttonGroup({
+        parent: document.querySelector('.button-group.exclusive'),
+        elements: [{
+            label: 'All',
+            key: 'all'
+        }, {
+            label: '200',
+            key: '200'
+        }, {
+            label: '180',
+            key: '180'
+        }, {
+            label: '160',
+            key: '160'
+        }],
+        defaultElement: 'all',
+        isExclusive: true
+    })
 
+    datahub.widget.buttonGroup({
+        parent: document.querySelector('.legend'),
+        elements: [{
+            label: 'Legend element 1 <span class="units">(MWh)</span>',
+            key: 'element1',
+            colorClass: 'color-1'
+        }, {
+            label: 'Legend element 2 <span class="units">(MWh)</span>',
+            key: 'element2',
+            colorClass: 'color-2'
+        }],
+        defaultElement: 'element1'
+    })
 
-    // datahub.widget.legend({
-    //     parent: document.querySelector('.legend'),
-    //     elements: [{
-    //         label: 'Vaisala @ 40M',
-    //         colorClass: 'color-0',
-    //         value: 2.2,
-    //         unit: 'm/s'
-    //     }, {
-    //         label: 'National Weather Service',
-    //         colorClass: 'color-1',
-    //         value: 2.1,
-    //         unit: 'm/s'
-    //     }, {
-    //         label: 'NOAA GFS',
-    //         colorClass: 'color-2',
-    //         value: 2.0,
-    //         unit: 'm/s'
-    //     }]
-    // })
+    datahub.widget.alertMessage({
+        parent: document.querySelector('.alert-message'),
+        level: 'low',
+        message: 'Alert message, low'
+    })
+
+    datahub.widget.alertMessage({
+        parent: document.querySelector('.alert-message'),
+        level: 'medium',
+        message: 'Alert message, medium'
+    })
+
+    datahub.widget.alertMessage({
+        parent: document.querySelector('.alert-message'),
+        level: 'high',
+        message: 'Alert message, high'
+    })
     </script>
 </body>
 

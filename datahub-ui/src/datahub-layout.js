@@ -6,12 +6,8 @@
     }
 }(this, function(exports, d3, utils, widget) {
 
-    var events = {}
-
     var numbers = function(config) {
         config.container.attr('class', 'datahub-number-group')
-
-
 
         var elements = config.container.selectAll('div')
             .data(config.elements)
@@ -32,7 +28,6 @@
         widget.container,
         numbers
     )
-
 
     exports.layout = {
         numberGroup: numberGroup

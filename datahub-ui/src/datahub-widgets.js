@@ -121,42 +121,40 @@
         }
     }
 
-    var legendElements = function(config) {
-        var elements = config.container.selectAll('.element')
-            .data(config.elements)
-        var elementsEnter = elements.enter().append('div')
-            .attr('class', 'element')
-        elementsEnter.append('div')
-            .attr('class', function(d) {
-                return 'color-band ' + d.colorClass
-            })
-        elementsEnter.append('div')
-            .attr('class', 'label')
-            .merge(elements)
-            .text(function(d) {
-                return d.label
-            })
-        elementsEnter.append('div')
-            .attr('class', 'unit')
-            .merge(elements)
-            .text(function(d) {
-                return d.value + ' ' + d.unit
-            })
-        elements.exit().remove()
+    // var legendElements = function(config) {
+    //     var elements = config.container.selectAll('.element')
+    //         .data(config.elements)
+    //     var elementsEnter = elements.enter().append('div')
+    //         .attr('class', 'element')
+    //     elementsEnter.append('div')
+    //         .attr('class', function(d) {
+    //             return 'color-band ' + d.colorClass
+    //         })
+    //     elementsEnter.append('div')
+    //         .attr('class', 'label')
+    //         .merge(elements)
+    //         .text(function(d) {
+    //             return d.label
+    //         })
+    //     elementsEnter.append('div')
+    //         .attr('class', 'unit')
+    //         .merge(elements)
+    //         .text(function(d) {
+    //             return d.value + ' ' + d.unit
+    //         })
+    //     elements.exit().remove()
 
-        return {}
-    }
+    //     return {}
+    // }
 
     var buttonGroupElements = function(config) {
+        config.container.attr('class', 'datahub-button-group')
+
         var events = d3.dispatch('click')
 
         var elements = config.container.selectAll('.element')
             .data(config.elements)
         var elementsAll = elements.enter().append('div')
-            .attr('class', 'element')
-            .classed('active', function(d) {
-                return d === config.defaultElement
-            })
             .on('click', function(d) {
                 var that = this
                 var isUnselection = false
@@ -166,13 +164,24 @@
                     if (isTarget && isAlreadyActive) {
                         isUnselection = true
                     }
-                    return !isAlreadyActive && isTarget
+                    if(config.isExclusive) {
+                        return !isAlreadyActive && isTarget
+                    }
+                    else {
+                        return isTarget ? !isAlreadyActive : isAlreadyActive
+                    }
                 })
                 events.call('click', null, { selected: isUnselection ? null : d })
             })
             .merge(elements)
-            .text(function(d) {
-                return d
+            .attr('class', function(d) {
+                return 'element ' + (d.colorClass || '')
+            })
+            .classed('active', function(d) {
+                return d.key === config.defaultElement
+            })
+            .html(function(d) {
+                return d.label
             })
         elements.exit().remove()
 
@@ -333,10 +342,26 @@
         return {}
     }
 
-    var legend = utils.pipeline(
-        container,
-        legendElements
-    )
+    var alert = function(config) {
+        config.container.attr('class', 'datahub-alert-message')
+
+        var elements = config.container.selectAll('div')
+            .data([0])
+        var elementsEnter = elements.enter()
+
+        elementsEnter.append('div')
+            .attr('class', 'alert-band ' + config.level)
+        elementsEnter.append('div')
+            .attr('class', 'alert-message')
+            .merge(elements)
+            .html(function(d) {
+                return config.message
+            })
+
+        elements.exit().remove()
+
+        return {}
+    }
 
     var timeSlider = utils.pipeline(
         sliderScaleX,
@@ -361,14 +386,19 @@
         table
     )
 
+    var alertMessage = utils.pipeline(
+        container,
+        alert
+    )
+
     exports.widget = {
-        container: container, 
+        container: container,
         svgContainer: svgContainer,
-        legend: legend,
         timeSlider: timeSlider,
         buttonGroup: buttonGroup,
         number: number,
-        table: table
+        table: table,
+        alertMessage: alertMessage
     }
 
 }))
