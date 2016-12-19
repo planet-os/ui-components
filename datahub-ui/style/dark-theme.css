@@ -1,0 +1,100 @@
+/*
+very-dark-gray: #182228
+dark-grey: #233541
+grey: #2E3F4B
+light-grey: #5f6773
+very-light-grey: #adb7c5
+orange: #F6A623
+yellow: #F8E81C
+green: #5ECF52
+sky-blue: #05BDFF
+*/
+
+body {
+    background-color: #182228;
+    color: #adb7c5;
+    font-family: 'Roboto', sans-serif;
+}
+
+.section {
+    border-top: 3px solid #5f6773;
+    background-color: #233541;
+}
+
+.datahub-chart text {
+    fill: #adb7c5;
+}
+
+.datahub-chart line {
+    stroke: #5f6773;
+}
+
+.datahub-chart .axis.x path,
+.datahub-chart .axis.x line {
+    stroke: white;
+}
+
+.datahub-chart .axis.y path {
+    display: none;
+}
+
+.datahub-table {
+    color: white;
+}
+
+.datahub-table .header-row {
+    background-color: #5f6773;
+}
+
+.datahub-table .table-row:nth-child(even) {
+    background-color: #2E3F4B;
+}
+
+.datahub-number .value {
+    color: white;
+}
+
+.datahub-button-group .element {
+    background-color: #5f6773;
+}
+
+.datahub-button-group .element:hover {
+    background-color: #5f6773;
+    color: black;
+    cursor: pointer;
+}
+
+.datahub-button-group .element.active {
+    background-color: #adb7c5;
+    color: black;
+}
+
+.legend .datahub-button-group .element {
+    margin-right: 12px;
+    background-color: transparent;
+    color: #adb7c5;
+}
+
+.legend .datahub-button-group .element:hover {
+    color: #adb7c5;
+}
+
+.legend .datahub-button-group .element.active:hover {
+    color: #5f6773;
+}
+
+.legend .datahub-button-group .element.active {
+    color: #5f6773;
+}
+
+.legend .datahub-button-group .units {
+    font-size: 0.6em;
+}
+
+.legend .datahub-button-group .element.color-1 {
+    border-left: 16px solid #F8E81C;
+}
+
+.legend .datahub-button-group .element.color-2 {
+    border-left: 16px solid #5ECF52;
+}

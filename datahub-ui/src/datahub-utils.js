@@ -64,45 +64,6 @@
         }
     }
 
-    var reactiveProperty = function(value) {
-        var listeners
-
-        function property(newValue) {
-            if (arguments.length === 1) {
-                value = newValue
-                if (listeners) {
-                    for (var i = 0; i < listeners.length; i++) {
-                        listeners[i](value)
-                    }
-                }
-                return this
-            }
-            return value
-        }
-        property.on = function(listener) {
-            if (!listeners) {
-                listeners = []
-            }
-            listeners.push(listener)
-            if (typeof value !== "undefined" && value !== null) {
-                listener(value)
-            }
-            return listener
-        }
-        property.clear = function(listenerToRemove) {
-            listeners = []
-            return this
-        }
-        property.off = function(listenerToRemove) {
-            if (listeners) {
-                listeners = listeners.filter(function(listener) {
-                    return listener !== listenerToRemove
-                })
-            }
-        }
-        return property
-    }
-
     var arrayStats = function(data, _accessor) {
         var flattened = []
         var uniques = []
@@ -224,7 +185,6 @@
         appendHtmlToNode: appendHtmlToNode,
         once: once,
         throttle: throttle,
-        reactiveProperty: reactiveProperty,
         arrayStats: arrayStats,
         arrayUniques: arrayUniques,
         arrayFlatten: arrayFlatten,

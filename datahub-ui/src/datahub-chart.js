@@ -6,8 +6,6 @@
     }
 }(this, function(exports, d3, utils) {
 
-    var events = {}
-
     var axesFormatAutoconfig = function(_config) {
         var timeFormat = d3.utcFormat('%b %e, %Y at %H:%M UTC')
 
@@ -37,30 +35,6 @@
             tooltipFormat: function(d) {
                 return fixedFloat(d.data.y)
             }
-        }
-    }
-
-    var chartDefaultConfig = function(config) {
-        if (!config.className) {
-            config.className = 'datahub-chart'
-        }
-    }
-
-    var legendDefaultConfig = function(config) {
-        if (!config.className) {
-            config.className = 'datahub-legend'
-        }
-    }
-
-    var timeSliderDefaultConfig = function(config) {
-        if (!config.className) {
-            config.className = 'datahub-time-slider'
-        }
-    }
-
-    var buttonGroupDefaultConfig = function(config) {
-        if (!config.className) {
-            config.className = 'datahub-button-group'
         }
     }
 
@@ -133,19 +107,6 @@
         }
     }
 
-    var sliderScaleX = function(config) {
-        var sliderWidth = config.width - config.margin.left - config.margin.right
-        var extent = config.timeRange.map(function(d) {
-            return new Date(d)
-        })
-        var scaleX = d3.scaleTime().domain(extent).range([0, sliderWidth])
-
-        return {
-            scaleX: scaleX,
-            sliderWidth: sliderWidth
-        }
-    }
-
     var scaleY = function(config) {
         var chartHeight = config.height - config.margin.top - config.margin.bottom
         var extent = d3.extent(config.flattenedData)
@@ -182,20 +143,6 @@
         }
     }
 
-    var sliderAxisX = function(config) {
-        var sliderHeight = config.height - config.margin.top - config.margin.bottom
-
-        var axisXFormat = config.axisXFormat || d3.utcFormat('%b')
-        var axisX = d3.axisBottom().scale(config.scaleX)
-            .tickFormat(axisXFormat)
-            .tickSize(sliderHeight - 12)
-
-        return {
-            axisX: axisX,
-            sliderHeight: sliderHeight
-        }
-    }
-
     var axisY = function(config) {
         var axisYFormat = config.axisYFormat || d3.format('.2s')
         var height = config.scaleY.range()[0]
@@ -203,6 +150,7 @@
             .ticks(Math.max(~~(height / 30), 2))
             .tickPadding(10)
             .tickFormat(config.axisYFormat)
+            .tickSize(-config.chartWidth)
 
         return {
             axisY: axisY
@@ -211,10 +159,10 @@
 
     var container = function(config) {
         var container = d3.select(config.parent)
-            .selectAll('div.' + config.className)
+            .selectAll('div.container')
             .data([0])
         var containerUpdate = container.enter().append('div')
-            .attr('class', config.className)
+            .attr('class', 'container')
             .merge(container)
             .attr('width', config.width)
             .attr('height', config.height)
@@ -225,8 +173,10 @@
         }
     }
 
-    var panelComponent = function(config) {
-        var root = config.container.selectAll('svg')
+    var svgContainer = function(config) {
+        var widgetContainer = container(config).container
+
+        var root = widgetContainer.selectAll('svg')
             .data([0])
         var rootEnter = root.enter().append('svg')
             .attr('class', 'datahub-chart')
@@ -241,12 +191,12 @@
 
         return {
             root: root,
-            panel: panel
+            container: panel
         }
     }
 
     var axisComponentX = function(config) {
-        var axisX = config.panel.selectAll('g.axis.x')
+        var axisX = config.container.selectAll('g.axis.x')
             .data([0])
         axisX.enter().append('g')
             .attr('class', 'x axis')
@@ -261,24 +211,9 @@
         return {}
     }
 
-    var sliderAxisComponentX = function(config) {
-        var axisX = config.panel.selectAll('g.axis.x')
-            .data([0])
-        axisX.enter().append('g')
-            .attr('class', 'x axis')
-            .attr('transform', 'translate(' + [0, config.margin.top] + ')')
-            .merge(axisX)
-            .transition()
-            .attr('transform', 'translate(' + [0, config.margin.top] + ')')
-            .call(config.axisX)
-        axisX.exit().remove()
-
-        return {}
-    }
-
     var axisComponentY = function(config) {
         var padding = config.axisYPadding || 0
-        var axisY = config.panel.selectAll('g.axis.y')
+        var axisY = config.container.selectAll('g.axis.y')
             .data([0])
         axisY.enter().append('g')
             .attr('class', 'y axis')
@@ -292,7 +227,7 @@
     }
 
     var axisTitleComponentX = function(config) {
-        var axisTitleXComponent = config.panel.selectAll('text.axis-title.x')
+        var axisTitleXComponent = config.container.selectAll('text.axis-title.x')
             .data([0])
         var axisX = axisTitleXComponent.enter().append('text')
             .attr('class', 'x axis-title')
@@ -309,7 +244,7 @@
     }
 
     var axisTitleComponentY = function(config) {
-        var axisTitleY = config.panel.selectAll('text.axis-title.y')
+        var axisTitleY = config.container.selectAll('text.axis-title.y')
             .data([0])
         var axisY = axisTitleY.enter().append('text')
             .attr('class', 'y axis-title')
@@ -323,7 +258,7 @@
     }
 
     var chartTitleComponent = function(config) {
-        var axisTitleX = config.panel.selectAll('text.chart-title')
+        var axisTitleX = config.container.selectAll('text.chart-title')
             .data([0])
         axisTitleX.enter().append('text')
             .attr('class', 'chart-title')
@@ -338,162 +273,8 @@
         return {}
     }
 
-    var tooltipHTMLWidget = function(tooltipNode) {
-        var root = d3.select(tooltipNode)
-            .style('position', 'absolute')
-            .style('pointer-events', 'none')
-            .style('display', 'none')
-        var setText = function(html) {
-            root.html(html)
-            return this
-        }
-        var position = function(pos) {
-            root.style('left', pos[0] + 'px')
-                .style('top', pos[1] + 'px')
-            return this
-        }
-        var show = function() {
-            root.style('display', 'block')
-            return this
-        }
-        var hide = function() {
-            root.style('display', 'none')
-            return this
-        }
-        var getRootNode = function() {
-            return root.node()
-        }
-
-        return {
-            setText: setText,
-            setPosition: position,
-            show: show,
-            hide: hide,
-            getRootNode: getRootNode
-        }
-    }
-
-    var tooltipComponent = function(config) {
-        var tooltipFormat = config.tooltipFormat || function(d) {
-            return d.data.y
-        }
-        var axisTitleXFormat = config.axisTitleXFormat || function(d) {
-            return d
-        }
-        var tooltipContainer = config.panel.selectAll('g.hover-tooltip')
-            .data([0])
-        var tooltipEnter = tooltipContainer.enter().append('g')
-            .classed('hover-tooltip', true)
-            .style('pointer-events', 'none')
-            .style('display', 'none')
-        var tooltip = tooltipEnter.merge(tooltipContainer)
-        var tooltipContent = tooltipEnter.append('text')
-            .merge(tooltipContainer)
-
-        tooltipContainer.exit().remove()
-
-        config.events.mousemove.on(function(d) {
-            if (config.dataIsAllNulls || d.shapePosition[1] === null) {
-                return
-            }
-            var tooltipText = config.tooltipFormat(d)
-            var axisText = config.axisTitleXFormat(d)
-
-            tooltip.attr('transform', 'translate(' + d.shapePosition + ')')
-            tooltipContent.attr('dx', 4)
-                .text(tooltipText)
-            config.axisTitleXComponent.text(axisText)
-                .attr('transform', 'translate(' + (-axisText.length * 6) + ',-12)')
-        })
-
-        config.events.mouseenter.on(function(d) {
-            if (config.dataIsAllNulls) {
-                return
-            }
-            tooltip.style('display', 'block')
-            config.axisTitleXComponent.style('pointer-events', 'none')
-                .style('display', 'block')
-        })
-        config.events.mouseout.on(function(d) {
-            tooltip.style('display', 'none')
-            config.axisTitleXComponent.style('display', 'none')
-        })
-
-        return {}
-    }
-
-    var hoverCircleComponent = function(config) {
-        var circleContainer = config.panel.selectAll('circle.hover-circle')
-            .data([0])
-        circleContainer.enter().append('circle')
-            .classed('hover-circle', true)
-            .attr('r', 3)
-            .style('pointer-events', 'none')
-            .style('display', 'none')
-        circleContainer.exit().remove()
-
-        config.events.mousemove.on(function(d) {
-            if (config.dataIsAllNulls || d.shapePosition[1] === null) {
-                return
-            }
-            circleContainer.attr('transform', 'translate(' + d.shapePosition + ')')
-        })
-
-        config.events.mouseenter.on(function(d) {
-            if (config.dataIsAllNulls) {
-                return
-            }
-            circleContainer.style('display', 'block')
-        })
-
-        config.events.mouseout.on(function(d) {
-            circleContainer.style('display', 'none')
-        })
-
-        return {}
-    }
-
-    var tooltipLineComponent = function(config) {
-        var lineGroup = config.panel.selectAll('g.line-container')
-            .data([0])
-        lineGroup.enter().append('g')
-            .attr('class', 'line-container')
-            .attr('pointer-events', 'none')
-            .style('visibility', 'hidden')
-            .append('line')
-            .attr('class', 'tooltip-line')
-        lineGroup.exit().remove()
-
-        var tooltipLine = lineGroup.select('.tooltip-line')
-
-        config.events.mouseenter.on(function(d) {
-            if (config.dataIsAllNulls) {
-                return
-            }
-            tooltipLine.style('visibility', 'visible')
-        })
-
-        config.events.mouseout.on(function(d) {
-            tooltipLine.style('visibility', 'hidden')
-        })
-
-        config.events.mousemove.on(function(d) {
-            if (config.dataIsAllNulls || d.shapePosition[1] === null) {
-                return
-            }
-            var x = d.shapePosition[0]
-            var y = d.shapePosition[1]
-            tooltipLine.attr('x1', 0)
-                .attr('y1', y)
-                .attr('x2', x)
-                .attr('y2', y)
-        })
-
-        return {}
-    }
-
     var shapePanel = function(config) {
-        var shapePanel = config.panel.selectAll('g.shapes')
+        var shapePanel = config.container.selectAll('g.shapes')
             .data([0])
         var panel = shapePanel.enter().append('g')
             .attr('class', 'shapes')
@@ -542,14 +323,14 @@
         shapes.enter().append('path')
             .attr('class', function(d, i) {
                 var className = 'line shape color-' + i
-                if(config.metadata) {
+                if (config.metadata) {
                     className = className + ' ' + config.metadata[i].key
                 }
                 return className
             })
             .style('fill', 'none')
             .merge(shapes)
-            .classed('hidden', function(d, i){
+            .classed('hidden', function(d, i) {
                 return config.metadata && config.metadata[i].isHidden
             })
             .attr('d', line)
@@ -584,77 +365,8 @@
         return {}
     }
 
-    var eventsBinder = function(config) {
-        events.mousemove = utils.reactiveProperty()
-        events.mouseenter = utils.reactiveProperty()
-        events.mouseout = utils.reactiveProperty()
-
-        var dataConvertedX = config.dataConverted.map(function(d) {
-            return d.x.getTime()
-        })
-        var deltaX = config.scaleX(dataConvertedX[1]) - config.scaleX(dataConvertedX[0])
-        var eventPanelContainer = config.panel.selectAll('g.event-panel-container')
-            .data([0])
-        eventPanelContainer.enter().append('g')
-            .attr('class', 'event-panel-container')
-            .append('rect')
-            .attr('class', 'event-panel')
-            .style('visibility', 'hidden')
-            .style('pointer-events', 'all')
-            .on('mouseenter', function(d) {
-                events.mouseenter({
-                    mouse: d3.mouse(this)
-                })
-            })
-            .on('mouseout', function(d) {
-                events.mouseout({
-                    mouse: d3.mouse(this)
-                })
-            })
-            .on('mousemove', function(d, i) {
-                var mouse = d3.mouse(this)
-                var mouseFromContainer = d3.mouse(config.container.node())
-                var panelBBox = this.getBoundingClientRect()
-                var containerBBox = config.container.node().getBoundingClientRect()
-                var absoluteOffsetLeft = containerBBox.left
-                var absoluteOffsetTop = containerBBox.top
-                var dateAtCursor = config.scaleX.invert(mouse[0] - deltaX / 2)
-                var dataPointIndexAtCursor
-
-                if (dataConvertedX[0] > dataConvertedX[dataConvertedX.length - 1]) {
-                    dataPointIndexAtCursor = utils.bisectionReversed(dataConvertedX, dateAtCursor.getTime())
-                } else {
-                    dataPointIndexAtCursor = utils.bisection(dataConvertedX, dateAtCursor.getTime())
-                }
-
-                var dataPointAtCursor = config.dataConverted[dataPointIndexAtCursor]
-                if (dataPointAtCursor) {
-                    var xValue = dataPointAtCursor.x
-                    var value = dataPointAtCursor.y
-                    var x = config.scaleX(xValue)
-                    var y = value !== null ? config.scaleY(value) : null
-                }
-
-                events.mousemove({
-                    data: dataPointAtCursor,
-                    mouse: mouse,
-                    mouseFromContainer: [mouseFromContainer[0] + absoluteOffsetLeft + window.pageXOffset, mouseFromContainer[1] + absoluteOffsetTop + window.pageYOffset],
-                    shapePosition: [x, y],
-                    shapePositionFromContainer: [x + panelBBox.left - containerBBox.left, y + panelBBox.top - containerBBox.top]
-                })
-            })
-            .merge(eventPanelContainer)
-            .attr('width', config.chartWidth)
-            .attr('height', config.chartHeight)
-        eventPanelContainer.exit().remove()
-
-        return {
-            events: events
-        }
-    }
-
     var axisXFormatterTime = function(config) {
-        config.panel.select('g.axis.x').selectAll('.tick text')
+        config.container.select('g.axis.x').selectAll('.tick text')
             .text(function(d) {
                 return d3.timeFormat('%a')(d)
             })
@@ -663,7 +375,7 @@
     }
 
     var axisXFormatterTimeHour = function(config) {
-        config.panel.select('g.axis.x').selectAll('.tick text')
+        config.container.select('g.axis.x').selectAll('.tick text')
             .text(function(d) {
                 return d3.timeFormat('%x')(d)
             })
@@ -672,7 +384,7 @@
     }
 
     var axisXFormatterRotate30 = function(config) {
-        config.panel.select('g.axis.x').selectAll('.tick text')
+        config.container.select('g.axis.x').selectAll('.tick text')
             .style('transform', 'rotate(30deg)')
             .style('text-anchor', 'start')
 
@@ -685,184 +397,26 @@
         return {}
     }
 
-    var legendElements = function(config) {
-        var elements = config.container.selectAll('.element')
-            .data(config.elements)
-        var elementsEnter = elements.enter().append('div')
-            .attr('class', 'element')
-        elementsEnter.append('div')
-            .attr('class', function(d) {
-                return 'color-band ' + d.colorClass
-            })
-        elementsEnter.append('div')
-            .attr('class', 'label')
-            .merge(elements)
-            .text(function(d) {
-                return d.label
-            })
-        elementsEnter.append('div')
-            .attr('class', 'unit')
-            .merge(elements)
-            .text(function(d) {
-                return d.value + ' ' + d.unit
-            })
-        elements.exit().remove()
-
-        return {}
-    }
-
-    var buttonGroupElements = function(config) {
-        events.buttonClick = utils.reactiveProperty()
-
-        var elements = config.container.selectAll('.element')
-            .data(config.elements)
-        var elementsAll = elements.enter().append('div')
-            .attr('class', 'element')
-            .classed('active', function(d) {
-                return d === config.defaultElement
-            })
-            .on('click', function(d) {
-                var that = this
-                var isUnselection = false
-                elementsAll.classed('active', function() {
-                    isAlreadyActive = this.classList.contains('active')
-                    isTarget = (that === this)
-                    if(isTarget && isAlreadyActive) {
-                       isUnselection = true 
-                    }
-                    return !isAlreadyActive && isTarget
-                })
-                events.buttonClick(isUnselection ? null : d)
-            })
-            .merge(elements)
-            .text(function(d) {
-                return d
-            })
-        elements.exit().remove()
-
-        return {
-            events: events
-        }
-    }
-
-    var timeSlider = function(config) {
-        events.brush = utils.reactiveProperty()
-
-        var brushX = d3.brushX()
-            .extent([
-                [0, 0],
-                [config.sliderWidth, config.sliderHeight - 12]
-            ])
-            .handleSize(10)
-            .on('brush', function() {
-                var brushPixelExtent = d3.event.selection
-                var brushExtent = {
-                    start: config.scaleX.invert(brushPixelExtent[0]),
-                    end: config.scaleX.invert(brushPixelExtent[1])
-                }
-
-                events.brush({
-                    brushExtent: brushExtent
-                })
-            })
-
-        var brush = config.panel.selectAll('g.brush')
-            .data([0])
-        var brushMerged = brush.enter().append('g')
-            .attr('class', 'brush')
-            .attr('transform', 'translate(' + [0, config.margin.top] + ')')
-            .merge(brush)
-            .attr('transform', 'translate(' + [0, config.margin.top] + ')')
-            .call(brushX)
-            .call(brushX.move, config.scaleX.range())
-        brush.exit().remove()
-
-        if(config.initialTimeRange) {
-            // brush.call(brushX.move, config.scaleX.range())
-        }
-
-        return {
-            events: events
-        }
-    }
-
-    var timeseriesLineChart = utils.pipeline(
-        mergeData,
-        sortData,
-        detectDataAllNulls,
-        axesFormatAutoconfig,
-        scaleX,
-        scaleY,
-        axisX,
-        axisY,
-        panelComponent,
-        lineShapes,
-        lineCutShapes,
-        message,
-        axisComponentX,
-        axisTitleComponentX,
-        axisComponentY,
-        axisXFormatterRotate30,
-        axisTitleComponentY,
-        eventsBinder,
-        tooltipComponent,
-        hoverCircleComponent,
-        tooltipLineComponent
-    )
-
     var timeseriesMultilineChart = utils.pipeline(
-        chartDefaultConfig,
         mergeData2D,
         axesFormatAutoconfig,
         scaleX,
         scaleY,
         axisX,
         axisY,
-        container,
-        panelComponent,
+        svgContainer,
+        axisComponentY,
         lineShapes,
         lineCutShapes,
         message,
         axisComponentX,
         axisTitleComponentX,
-        axisComponentY,
         axisXFormatterRotate30,
         axisTitleComponentY
-        // eventsBinder,
-        // tooltipComponent,
-        // hoverCircleComponent,
-        // tooltipLineComponent
-    )
-
-    var legend = utils.pipeline(
-        legendDefaultConfig,
-        container,
-        legendElements
-    )
-
-    var timeSlider = utils.pipeline(
-        timeSliderDefaultConfig,
-        sliderScaleX,
-        sliderAxisX,
-        container,
-        panelComponent,
-        sliderAxisComponentX,
-        timeSlider
-    )
-
-    var buttonGroup = utils.pipeline(
-        buttonGroupDefaultConfig,
-        container,
-        buttonGroupElements
     )
 
     exports.chart = {
-        timeseriesLineChart: timeseriesLineChart,
-        timeseriesMultilineChart: timeseriesMultilineChart,
-        legend: legend,
-        timeSlider: timeSlider,
-        buttonGroup: buttonGroup,
-        events: events
+        timeseriesMultilineChart: timeseriesMultilineChart
     }
 
 }))

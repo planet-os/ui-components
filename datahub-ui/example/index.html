@@ -12,16 +12,15 @@
     <script src="../src/datahub-data.js"></script>
     <script src="../src/datahub-map.js"></script>
     <script src="../src/datahub-chart.js"></script>
+    <script src="../src/datahub-widgets.js"></script>
+    <script src="../src/datahub-layout.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.2/leaflet.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.7/leaflet.draw.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flexboxgrid/6.3.1/flexboxgrid.min.css" />
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
     <link rel="stylesheet" href="../style/components.css" />
+    <link rel="stylesheet" href="../style/dark-theme.css" />
     <style>
-
-    body {
-        font-family: Tahoma, sans-serif;
-    }
-
     div {
         /*border: 1px solid silver;*/
     }
@@ -58,17 +57,20 @@
         margin: 0 auto;
     }
     
-    .widget {
+    .section {
         max-width: 64em;
-        margin: 0 auto 60px auto;
-        border-top: 1px solid silver;
-        padding-top: 20px; 
+        margin: 0 auto 20px auto;
+        padding: 20px;
+    }
+    
+    .button-group.vertical {
+        max-width: 64px;
     }
     </style>
 </head>
 
 <body>
-    <div class="row widget">
+    <div class="row section">
         <div class="col-xs-12 col-md-7">
             <div class="row map-group">
                 <div class="map map-light"></div>
@@ -79,7 +81,7 @@
             <div class="description">A map can have a light or dark basemap.</div>
         </div>
     </div>
-    <div class="row widget">
+    <div class="row section">
         <div class="col-xs-12 col-md-7">
             <div class="row map-group">
                 <div class="map map-grayscale"></div>
@@ -90,7 +92,7 @@
             <div class="description">A map can load raster data. Multiple palettes are available, like a simple linear grayscale and a rainbow palette using histogram equalization.</div>
         </div>
     </div>
-    <div class="row widget">
+    <div class="row section">
         <div class="col-xs-12 col-md-7">
             <div class="map map-raster"></div>
         </div>
@@ -98,7 +100,7 @@
             <div class="description">A map can zoom and pan raster efficiently. A tooltip shows value under the cursor.</div>
         </div>
     </div>
-    <div class="row widget">
+    <div class="row section">
         <div class="col-xs-12 col-md-7">
             <div class="map map-vector"></div>
         </div>
@@ -106,7 +108,7 @@
             <div class="description">A map can load vector data, points and polygons.</div>
         </div>
     </div>
-    <div class="row widget">
+    <div class="row section">
         <div class="col-xs-12 col-md-7">
             <div class="map map-selector"></div>
         </div>
@@ -114,7 +116,7 @@
             <div class="description">A vector map supports markers and rectangle selection. Clicking on the selection deletes it.</div>
         </div>
     </div>
-    <div class="row widget">
+    <div class="row section">
         <div class="col-xs-12 col-md-7">
             <div class="multiline-chart"></div>
         </div>
@@ -122,7 +124,7 @@
             <div class="description">A timeseries chart can have multiple lines.</div>
         </div>
     </div>
-    <div class="row widget">
+    <div class="row section">
         <div class="col-xs-12 col-md-7">
             <div class="time-slider"></div>
             <div class="slider-chart"></div>
@@ -131,10 +133,74 @@
             <div class="description">A time slider is used to zoom in a timeseries.</div>
         </div>
     </div>
+    <div class="row section">
+        <div class="col-xs-12 col-md-7">
+            <div class="row">
+                <div class="number-widget big col-xs"></div>
+                <div class="number-widget medium col-xs"></div>
+                <div class="number-widget small col-xs"></div>
+            </div>
+        </div>
+        <div class="col-xs-12 col-md-5">
+            <div class="description">A number widget comes in 3 sizes. It can have a title, a value and some info.</div>
+        </div>
+    </div>
+    <div class="row section">
+        <div class="col-xs-12 col-md-7">
+            <div class="row">
+                <div class="number-group small col-xs"></div>
+            </div>
+        </div>
+        <div class="col-xs-12 col-md-5">
+            <div class="description">Number widgets can be grouped.</div>
+        </div>
+    </div>
+    <div class="row section">
+        <div class="col-xs-12 col-md-7">
+            <div class="row">
+                <div class="table-widget col-xs"></div>
+            </div>
+        </div>
+        <div class="col-xs-12 col-md-5">
+            <div class="description">A table can be sorted.</div>
+        </div>
+    </div>
+    <div class="row section">
+        <div class="col-xs-12 col-md-7">
+            <div class="row">
+                <div class="button-group vertical col-xs"></div>
+                <div class="button-group horizontal col-xs"></div>
+                <div class="button-group exclusive col-xs"></div>
+            </div>
+        </div>
+        <div class="col-xs-12 col-md-5">
+            <div class="description">A group of buttons can be stacked vertically or horizontally. It can also be exclusive, forcing only one button to be selected.</div>
+        </div>
+    </div>
+    <div class="row section">
+        <div class="col-xs-12 col-md-7">
+            <div class="row">
+                <div class="legend col-xs"></div>
+            </div>
+        </div>
+        <div class="col-xs-12 col-md-5">
+            <div class="description">A group of buttons accepts html labels and can be styled as a legend. Legend element can be toggled on or off.</div>
+        </div>
+    </div>
+    <div class="row section">
+        <div class="col-xs-12 col-md-7">
+            <div class="row">
+                <div class="alert-message col-xs"></div>
+            </div>
+        </div>
+        <div class="col-xs-12 col-md-5">
+            <div class="description">An alert message has a colored band with icon and a message.</div>
+        </div>
+    </div>
     <script>
     /**/
     /*
-        upgrades:
+        changelog:
         - d3v4 scales
         - which scale as rgb, uses custom parser
         - default imagePath
@@ -143,6 +209,7 @@
         - flattenAndUniquify -> arrayStats
         - zoom is in mapConfig.zoom
         - el and container -> parent
+        - datahub.data.setApiKey
     */
 
     datahub.data.setApiKey('0f58fe2540fa4cf19a4aa68f290fd148')
@@ -159,7 +226,7 @@
 
     datahub.map.rasterMap({
             parent: document.querySelector('.map-dark'),
-            basemapName: 'basemapDark',
+            basemapName: 'basemapLight',
             showLabels: false,
             mapConfig: {
                 zoomControl: false
@@ -238,7 +305,6 @@
         axisTitleY: 'Unit'
     })
 
-
     var sliderChartContainer = document.querySelector('.slider-chart')
 
     function renderMainChart(timeSeries) {
@@ -260,7 +326,7 @@
     var timeSeries = datahub.data.generateTimeSeries(365, 6, '2016-01-01', 'day', 1)
 
     var timeSliderContainer = document.querySelector('.time-slider')
-    var timeSlider = datahub.chart.timeSlider({
+    var timeSlider = datahub.widget.timeSlider({
         parent: timeSliderContainer,
         timeRange: ['2016-01-01', '2017-01-01'],
         initialTimeRange: ['2016-01-01', '2017-01-01'],
@@ -274,7 +340,7 @@
         }
     })
 
-    timeSlider.events.brush.on(function(d) {
+    timeSlider.events.on('brush', function(d) {
         var startIndex = datahub.utils.bisection(timeSeries.timestamps, d.brushExtent.start)
         var endIndex = datahub.utils.bisection(timeSeries.timestamps, d.brushExtent.end)
         var timeseriesSlice = {
@@ -287,45 +353,160 @@
         renderMainChart(timeseriesSlice)
     })
 
+    renderMainChart(timeSeries)
 
-    // var heightSelector = datahub.chart.buttonGroup({
-    //     parent: document.querySelector('.vertical-buttons'),
-    //     elements: ['All', 200, 180, 160, 140, 120, 100, 80, 60, 50, 40],
-    //     defaultElement: 'All',
-    //     margin: {
-    //         top: 0,
-    //         right: 0,
-    //         bottom: 0,
-    //         left: 0
-    //     }
-    // })
+    datahub.widget.number({
+        parent: document.querySelector('.number-widget.big'),
+        title: 'NET PRODUCTION',
+        value: '236,43GWh',
+        info: 'Plan: 231,64GWh'
+    })
 
-    // heightSelector.events.buttonClick.on(function(d) {
-    //     console.log(d)
-    // })
+    datahub.widget.number({
+        parent: document.querySelector('.number-widget.medium'),
+        value: '236,43GWh',
+        info: 'Net Production'
+    })
 
+    datahub.widget.number({
+        parent: document.querySelector('.number-widget.small'),
+        value: '16,00%',
+        info: 'MTD Actual'
+    })
 
+    datahub.layout.numberGroup({
+        parent: document.querySelector('.number-group'),
+        elements: [{
+            value: '236,43GWh',
+            info: 'Net Production'
+        },
+        {
+            value: '236,43GWh',
+            info: 'Plan: 231,64GWh'
+        },
+        {
+            value: '16,00%',
+            info: 'MTD Actual'
+        }]
+    })
 
-    // datahub.chart.legend({
-    //     parent: document.querySelector('.legend'),
-    //     elements: [{
-    //         label: 'Vaisala @ 40M',
-    //         colorClass: 'color-0',
-    //         value: 2.2,
-    //         unit: 'm/s'
-    //     }, {
-    //         label: 'National Weather Service',
-    //         colorClass: 'color-1',
-    //         value: 2.1,
-    //         unit: 'm/s'
-    //     }, {
-    //         label: 'NOAA GFS',
-    //         colorClass: 'color-2',
-    //         value: 2.0,
-    //         unit: 'm/s'
-    //     }]
-    // })
+    datahub.widget.table({
+        parent: document.querySelector('.table-widget'),
+        elements: [
+            ['Spain', 1, 2],
+            ['Germany', 7, 8],
+            ['United Kingdom', 1, 2],
+            ['Poland', 7, 8],
+            ['Netherlands', 1, 2],
+            ['Italy', 7, 8],
+        ],
+        metadata: [{
+            key: 'country',
+            label: 'Country',
+            sortable: true
+        }, {
+            key: 'production',
+            label: 'Production',
+            units: 'MWh',
+            sortable: true
+        }, {
+            key: 'revenues',
+            label: 'Revenues',
+            units: 'M€'
+        }]
+    })
 
+    var heightSelector = datahub.widget.buttonGroup({
+        parent: document.querySelector('.button-group.vertical'),
+        elements: [{
+            label: 'All',
+            key: 'all'
+        }, {
+            label: '200',
+            key: '200'
+        }, {
+            label: '180',
+            key: '180'
+        }, {
+            label: '160',
+            key: '160'
+        }],
+        defaultElement: 'all',
+        isExclusive: true
+    })
+
+    heightSelector.events.on('click', function(d) {
+        console.log(d)
+    })
+
+    datahub.widget.buttonGroup({
+        parent: document.querySelector('.button-group.horizontal'),
+        elements: [{
+            label: 'All',
+            key: 'all'
+        }, {
+            label: '200',
+            key: '200'
+        }, {
+            label: '180',
+            key: '180'
+        }, {
+            label: '160',
+            key: '160'
+        }],
+        defaultElement: 'all'
+    })
+
+    datahub.widget.buttonGroup({
+        parent: document.querySelector('.button-group.exclusive'),
+        elements: [{
+            label: 'All',
+            key: 'all'
+        }, {
+            label: '200',
+            key: '200'
+        }, {
+            label: '180',
+            key: '180'
+        }, {
+            label: '160',
+            key: '160'
+        }],
+        defaultElement: 'all',
+        isExclusive: true
+    })
+
+    datahub.widget.buttonGroup({
+        parent: document.querySelector('.legend'),
+        elements: [{
+            label: 'Legend element 1 <span class="units">(MWh)</span>',
+            key: 'element1',
+            colorClass: 'color-1'
+        }, {
+            label: 'Legend element 2 <span class="units">(MWh)</span>',
+            key: 'element2',
+            colorClass: 'color-2'
+        }],
+        defaultElement: 'element1'
+    })
+
+    datahub.widget.alertMessage({
+        parent: document.querySelector('.alert-message'),
+        level: 'low',
+        message: 'Alert message, low'
+    })
+
+    datahub.widget.alertMessage({
+        parent: document.querySelector('.alert-message'),
+        level: 'medium',
+        message: 'Alert message, medium'
+    })
+
+    datahub.widget.alertMessage({
+        parent: document.querySelector('.alert-message'),
+        level: 'high',
+        message: 'Alert message, high'
+    })
     </script>
 </body>
 
