@@ -1,6 +1,6 @@
 {
   "name": "datahub-ui",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Reusable components for Planet OS Datahub",
   "main": "src/index.js",
   "repository": {
@@ -17,11 +17,9 @@
     "url": "https://github.com/planet-os/ui-components/issues"
   },
   "homepage": "https://github.com/planet-os/ui-components#readme",
-  "devDependencies": {
+  "dependencies": {
+    "leaflet": "^1.0.2",
     "d3": "^4.4.0",
     "d3-scale-chromatic": "^1.1.0"
-  },
-  "dependencies": {
-    "leaflet": "^1.0.2"
   }
 }

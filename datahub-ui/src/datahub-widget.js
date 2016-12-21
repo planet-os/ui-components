@@ -35,10 +35,10 @@
 
     var container = function(config) {
         var container = d3.select(config.parent)
-            .selectAll('div.container')
+            .selectAll('div.widget-container')
             .data([0])
         var containerUpdate = container.enter().append('div')
-            .attr('class', 'container')
+            .attr('class', 'widget-container')
             .merge(container)
             .attr('width', config.width)
             .attr('height', config.height)

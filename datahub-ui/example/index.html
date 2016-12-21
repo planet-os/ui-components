@@ -11,9 +11,9 @@
     <script src="../src/datahub-palette.js"></script>
     <script src="../src/datahub-data.js"></script>
     <script src="../src/datahub-map.js"></script>
+    <script src="../src/datahub-widget.js"></script>
+    <script src="../src/datahub-group.js"></script>
     <script src="../src/datahub-chart.js"></script>
-    <script src="../src/datahub-widgets.js"></script>
-    <script src="../src/datahub-layout.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.2/leaflet.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.7/leaflet.draw.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flexboxgrid/6.3.1/flexboxgrid.min.css" />
@@ -374,7 +374,7 @@
         info: 'MTD Actual'
     })
 
-    datahub.layout.numberGroup({
+    datahub.group.number({
         parent: document.querySelector('.number-group'),
         elements: [{
             value: '236,43GWh',

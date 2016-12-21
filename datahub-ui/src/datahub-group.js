@@ -29,8 +29,8 @@
         numbers
     )
 
-    exports.layout = {
-        numberGroup: numberGroup
+    exports.group = {
+        number: numberGroup
     }
 
 }))

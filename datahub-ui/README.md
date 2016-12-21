@@ -32,8 +32,8 @@ npm run build
   * table
   * alertMessage
 
-* datahub.layout
-  * numberGroup
+* datahub.group
+  * number
 
 * datahub.data
   * generateRaster

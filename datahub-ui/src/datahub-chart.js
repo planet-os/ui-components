@@ -1,10 +1,10 @@
 (function(root, factory) {
     if (typeof module === 'object' && module.exports) {
-        factory(module.exports, require('d3'), require('./datahub-utils.js').utils)
+        factory(module.exports, require('d3'), require('./datahub-utils.js').utils, require('./datahub-widget.js'))
     } else {
-        factory((root.datahub = root.datahub || {}), root.d3, root.datahub.utils)
+        factory((root.datahub = root.datahub || {}), root.d3, root.datahub.utils, root.datahub.widget)
     }
-}(this, function(exports, d3, utils) {
+}(this, function(exports, d3, utils, widget) {
 
     var axesFormatAutoconfig = function(_config) {
         var timeFormat = d3.utcFormat('%b %e, %Y at %H:%M UTC')
@@ -404,7 +404,7 @@
         scaleY,
         axisX,
         axisY,
-        svgContainer,
+        widget.svgContainer,
         axisComponentY,
         lineShapes,
         lineCutShapes,

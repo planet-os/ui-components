@@ -17,8 +17,23 @@ body {
 }
 
 .section {
-    border-top: 3px solid #5f6773;
     background-color: #233541;
+}
+
+.top-bar {
+    border-top: 3px solid #575F6D;
+}
+
+.top-bar.low {
+    border-color: #5ECF52;
+}
+
+.top-bar.medium {
+    border-color: #F8E81C;
+}
+
+.top-bar.high {
+    border-color: #FF5A6E;
 }
 
 .datahub-chart text {
