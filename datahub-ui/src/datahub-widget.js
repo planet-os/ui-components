@@ -148,7 +148,7 @@
     // }
 
     var buttonGroupElements = function(config) {
-        config.container.attr('class', 'datahub-button-group')
+        config.container.classed('datahub-button-group', true)
 
         var events = d3.dispatch('click')
 
@@ -191,7 +191,7 @@
     }
 
     var timeSlider = function(config) {
-        config.container.attr('class', 'datahub-slider')
+        config.container.classed('datahub-slider', true)
 
         var events = d3.dispatch('brush')
 
@@ -234,7 +234,7 @@
     }
 
     var numberWidget = function(config) {
-        config.container.attr('class', 'datahub-number')
+        config.container.classed('datahub-number', true)
 
         var elements = config.container.selectAll('div')
             .data(['title', 'value', 'info'])
@@ -255,7 +255,7 @@
     }
 
     var table = function(config) {
-        config.container.attr('class', 'datahub-table')
+        config.container.classed('datahub-table', true)
 
         var headerRow = config.container.selectAll('div.header-row')
             .data([0])
@@ -343,7 +343,7 @@
     }
 
     var alert = function(config) {
-        config.container.attr('class', 'datahub-alert-message')
+        config.container.classed('datahub-alert-message', true)
 
         var elements = config.container.selectAll('div')
             .data([0])

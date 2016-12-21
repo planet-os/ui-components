@@ -1,6 +1,5 @@
 (function(root, factory) {
     if (typeof module === 'object' && module.exports) {
-        console.log(111);
         factory(module.exports, require('./datahub-utils.js').utils, require('d3'))
     } else {
         factory((root.datahub = root.datahub || {}), root.datahub.utils, root.d3)

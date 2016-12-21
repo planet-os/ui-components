@@ -1,6 +1,6 @@
 (function(root, factory) {
     if (typeof module === 'object' && module.exports) {
-        factory(module.exports, require('d3'), require('./datahub-utils.js').utils, require('./datahub-widget.js'))
+        factory(module.exports, require('d3'), require('./datahub-utils.js').utils, require('./datahub-widget.js').widget)
     } else {
         factory((root.datahub = root.datahub || {}), root.d3, root.datahub.utils, root.datahub.widget)
     }
