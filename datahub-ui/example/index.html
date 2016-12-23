@@ -67,7 +67,7 @@
         max-width: 64px;
     }
     
-    .month-calendar {
+    .month-calendar, .dropdown-calendar, .dropdown1 {
         width: 200px;
     }
     
@@ -75,10 +75,6 @@
         padding-bottom: 20px;
         width: 200px;
         text-align: center;
-    }
-
-    .dropdown1 {
-        width: 200px;
     }
     </style>
 </head>
@@ -249,6 +245,18 @@
         </div>
         <div class="col-xs-12 col-md-5">
             <div class="description">A dropdown.</div>
+        </div>
+    </div>
+    <div class="row section">
+        <div class="col-xs-12 col-md-7">
+            <div class="row">
+                <div class="tags col-xs">
+                    <div class="dropdown-calendar"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-12 col-md-5">
+            <div class="description">A dropdown calendar.</div>
         </div>
     </div>
     <script>
@@ -584,6 +592,12 @@
             key: 'element2'
         }]
     })
+
+    datahub.widget.dropdownCalendar({
+        parent: document.querySelector('.dropdown-calendar'),
+        defaultDate: (new Date()).toString()
+    })
+
     </script>
 </body>
 
