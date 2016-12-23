@@ -40,17 +40,22 @@
 .datahub-number {
     width: 100%;
     font-size: 16px;
+    display: flex;
+    flex-direction: column;
 }
 
 .datahub-number .value {
+    display: flex;
     font-size: 28px;
+    align-items: center;
 }
 
 .big .datahub-number .value {
     font-size: 36px;
 }
 
-.small .datahub-number, .small .datahub-number .value  {
+.small .datahub-number,
+.small .datahub-number .value {
     font-size: 18px;
 }
 
@@ -88,24 +93,17 @@
 }
 
 .datahub-number-group {
-    display: flex; 
+    display: flex;
 }
 
 .datahub-number-group .element-container {
-    padding-left: 20px; 
-    padding-right: 20px; 
+    padding-left: 20px;
+    padding-right: 20px;
     flex: 1;
 }
 
 .datahub-alert-message {
     display: flex;
-}
-
-.datahub-alert-message .alert-band {
-    max-width: 64px;
-    min-width: 64px;
-    min-height: 1em;
-    background-color: yellow;
 }
 
 .datahub-alert-message .alert-band {
@@ -124,7 +122,6 @@
 
 .datahub-alert-message .medium {
     background-color: #F8E81C;
-
 }
 
 .datahub-alert-message .high {
@@ -133,4 +130,48 @@
 
 .datahub-alert-message .alert-message {
     padding: 20px;
+}
+
+.datahub-month-calendar .date-selector {
+    width: 100%;
+    flex-wrap: wrap;
+}
+
+.datahub-month-calendar .month {
+    width: 33.33%;
+    float: left;
+    padding: 20px 0;
+    text-align: center;
+}
+
+.datahub-month-calendar .year-selector {
+    display: flex;
+    padding: 10px;
+}
+
+.datahub-month-calendar .year-shifter {
+    padding: 0 10px;
+    cursor: pointer;
+}
+
+.datahub-month-calendar .selected-year {
+    flex-grow: 1;
+    text-align: center;
+}
+
+.datahub-dropdown .elements {
+    display: none;
+}
+
+.datahub-dropdown .elements.active {
+    display: block;
+}
+
+.datahub-dropdown .selected-element {
+    padding: 10px 0;
+}
+
+.datahub-dropdown .selected-element:after {
+    content: "\25BC";
+    float: right;
 }

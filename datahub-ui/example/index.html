@@ -66,6 +66,20 @@
     .button-group.vertical {
         max-width: 64px;
     }
+    
+    .month-calendar {
+        width: 200px;
+    }
+    
+    .selected-date {
+        padding-bottom: 20px;
+        width: 200px;
+        text-align: center;
+    }
+
+    .dropdown1 {
+        width: 200px;
+    }
     </style>
 </head>
 
@@ -162,7 +176,7 @@
             </div>
         </div>
         <div class="col-xs-12 col-md-5">
-            <div class="description">A table can be sorted.</div>
+            <div class="description">A table can be sorted. It can handle html styles.</div>
         </div>
     </div>
     <div class="row section">
@@ -190,11 +204,51 @@
     <div class="row section">
         <div class="col-xs-12 col-md-7">
             <div class="row">
-                <div class="alert-message col-xs"></div>
+                <div class="alert-message1 col-xs"></div>
+                <div class="alert-message2 col-xs"></div>
+                <div class="alert-message3 col-xs"></div>
             </div>
         </div>
         <div class="col-xs-12 col-md-5">
             <div class="description">An alert message has a colored band with icon and a message.</div>
+        </div>
+    </div>
+    <div class="row section">
+        <div class="col-xs-12 col-md-7">
+            <div class="row">
+                <div class="tags col-xs">
+                    <div class="dh-tag">3,10%</div>
+                    <div class="dh-tag negative">-3,10%</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-12 col-md-5">
+            <div class="description">A simple tag style.</div>
+        </div>
+    </div>
+    <div class="row section">
+        <div class="col-xs-12 col-md-7">
+            <div class="row">
+                <div class="tags col-xs">
+                    <div class="selected-date"></div>
+                    <div class="month-calendar"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-12 col-md-5">
+            <div class="description">A month calendar.</div>
+        </div>
+    </div>
+    <div class="row section">
+        <div class="col-xs-12 col-md-7">
+            <div class="row">
+                <div class="tags col-xs">
+                    <div class="dropdown1"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-12 col-md-5">
+            <div class="description">A dropdown.</div>
         </div>
     </div>
     <script>
@@ -358,7 +412,7 @@
     datahub.widget.number({
         parent: document.querySelector('.number-widget.big'),
         title: 'NET PRODUCTION',
-        value: '236,43GWh',
+        value: '236,43GWh<div class="dh-tag">3,10%</div>',
         info: 'Plan: 231,64GWh'
     })
 
@@ -393,10 +447,10 @@
     datahub.widget.table({
         parent: document.querySelector('.table-widget'),
         elements: [
-            ['Spain', 1, 2],
-            ['Germany', 7, 8],
-            ['United Kingdom', 1, 2],
-            ['Poland', 7, 8],
+            ['Spain', '1<span class="dh-tag">3,10%</span>', '<span class="dh-negative">(2)</span>'],
+            ['Germany', '7 <span class="dh-negative-arrow"></span>', '8 <span class="dh-positive-arrow"></span>'],
+            ['United Kingdom', '<span class="dh-positive-cell">1<span>', 2],
+            ['Poland', '95% <span class="dh-dim">/ 80%</span>', 8],
             ['Netherlands', 1, 2],
             ['Italy', 7, 8],
         ],
@@ -431,7 +485,7 @@
             label: '160',
             key: '160'
         }],
-        defaultElement: 'all',
+        defaultElementKey: 'all',
         isExclusive: true
     })
 
@@ -454,7 +508,7 @@
             label: '160',
             key: '160'
         }],
-        defaultElement: 'all'
+        defaultElementKey: 'all'
     })
 
     datahub.widget.buttonGroup({
@@ -472,7 +526,7 @@
             label: '160',
             key: '160'
         }],
-        defaultElement: 'all',
+        defaultElementKey: 'all',
         isExclusive: true
     })
 
@@ -481,31 +535,54 @@
         elements: [{
             label: 'Legend element 1 <span class="units">(MWh)</span>',
             key: 'element1',
-            colorClass: 'color-1'
+            className: 'color-1'
         }, {
             label: 'Legend element 2 <span class="units">(MWh)</span>',
             key: 'element2',
-            colorClass: 'color-2'
+            className: 'color-2'
         }],
-        defaultElement: 'element1'
+        defaultElementKey: 'element1'
     })
 
     datahub.widget.alertMessage({
-        parent: document.querySelector('.alert-message'),
+        parent: document.querySelector('.alert-message1'),
         level: 'low',
         message: 'Alert message, low'
     })
 
     datahub.widget.alertMessage({
-        parent: document.querySelector('.alert-message'),
+        parent: document.querySelector('.alert-message2'),
         level: 'medium',
         message: 'Alert message, medium'
     })
 
     datahub.widget.alertMessage({
-        parent: document.querySelector('.alert-message'),
+        parent: document.querySelector('.alert-message3'),
         level: 'high',
         message: 'Alert message, high'
+    })
+
+    var monthCalendar = datahub.widget.monthCalendar({
+        parent: document.querySelector('.month-calendar'),
+        defaultDate: (new Date()).toString(),
+    })
+
+    function setDate() {
+        var date = monthCalendar.getFormattedDate()
+        document.querySelector('.selected-date').innerText = date
+    }
+    setDate()
+    monthCalendar.events.on('change', setDate)
+
+    var dropdown = datahub.widget.dropdown({
+        parent: document.querySelector('.dropdown1'),
+        elements: [{
+            label: 'Element 1',
+            key: 'element1'
+        }, {
+            label: 'Element 2',
+            key: 'element2'
+        }]
     })
     </script>
 </body>

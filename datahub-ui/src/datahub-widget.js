@@ -121,32 +121,6 @@
         }
     }
 
-    // var legendElements = function(config) {
-    //     var elements = config.container.selectAll('.element')
-    //         .data(config.elements)
-    //     var elementsEnter = elements.enter().append('div')
-    //         .attr('class', 'element')
-    //     elementsEnter.append('div')
-    //         .attr('class', function(d) {
-    //             return 'color-band ' + d.colorClass
-    //         })
-    //     elementsEnter.append('div')
-    //         .attr('class', 'label')
-    //         .merge(elements)
-    //         .text(function(d) {
-    //             return d.label
-    //         })
-    //     elementsEnter.append('div')
-    //         .attr('class', 'unit')
-    //         .merge(elements)
-    //         .text(function(d) {
-    //             return d.value + ' ' + d.unit
-    //         })
-    //     elements.exit().remove()
-
-    //     return {}
-    // }
-
     var buttonGroupElements = function(config) {
         config.container.classed('datahub-button-group', true)
 
@@ -161,13 +135,12 @@
                 elementsAll.classed('active', function() {
                     isAlreadyActive = this.classList.contains('active')
                     isTarget = (that === this)
-                    if (isTarget && isAlreadyActive) {
+                    if (isTarget && isAlreadyActive && config.isTogglable !== false) {
                         isUnselection = true
                     }
-                    if(config.isExclusive) {
-                        return !isAlreadyActive && isTarget
-                    }
-                    else {
+                    if (config.isExclusive) {
+                        return (!isAlreadyActive || (isAlreadyActive && config.isTogglable === false)) && isTarget
+                    } else {
                         return isTarget ? !isAlreadyActive : isAlreadyActive
                     }
                 })
@@ -175,10 +148,10 @@
             })
             .merge(elements)
             .attr('class', function(d) {
-                return 'element ' + (d.colorClass || '')
+                return 'element ' + (d.className || '')
             })
             .classed('active', function(d) {
-                return d.key === config.defaultElement
+                return d.key === config.defaultElementKey
             })
             .html(function(d) {
                 return d.label
@@ -345,10 +318,9 @@
     var alert = function(config) {
         config.container.classed('datahub-alert-message', true)
 
-        var elements = config.container.selectAll('div')
+        var elements = config.container.selectAll('div.alert-band')
             .data([0])
         var elementsEnter = elements.enter()
-
         elementsEnter.append('div')
             .attr('class', 'alert-band ' + config.level)
         elementsEnter.append('div')
@@ -357,10 +329,144 @@
             .html(function(d) {
                 return config.message
             })
-
         elements.exit().remove()
 
         return {}
+    }
+
+    var calendar = function(config) {
+        config.container.classed('datahub-month-calendar', true)
+
+        var events = d3.dispatch('change')
+
+        var monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+        var state = {
+            year: config.defaultYear || (new Date()).getFullYear(),
+            month: config.defaultMonthNumber || monthNames[(new Date()).getMonth() - 1]
+        }
+
+        function setDate() {
+            selectedYear.text(state.year)
+            events.call('change', null, state)
+        }
+
+        var elements = config.container.selectAll('div.calendar')
+            .data([0])
+        var elementsEnter = elements.enter()
+        elements.exit().remove()
+
+        var yearSelector = elementsEnter.append('div')
+            .attr('class', 'year-selector')
+
+        yearSelector.append('div')
+            .attr('class', 'year-shifter')
+            .text('<')
+            .on('click', function(d) {
+                state.year = parseInt(selectedYear.text()) - 1
+                setDate()
+            })
+        var selectedYear = yearSelector.append('div')
+            .attr('class', 'selected-year')
+        yearSelector.append('div')
+            .attr('class', 'year-shifter')
+            .text('>')
+            .on('click', function(d) {
+                state.year = parseInt(selectedYear.text()) + 1
+                setDate()
+            })
+
+        var months = elementsEnter.append('div')
+            .attr('class', 'date-selector')
+
+        buttonConfig = JSON.parse(JSON.stringify(config))
+        buttonConfig.elements = monthNames.map(function(d) {
+            return { key: d, label: d, className: 'month' }
+        })
+        buttonConfig.container = months
+        buttonConfig.isExclusive = true
+        buttonConfig.defaultElementKey = state.month
+
+        var monthButtons = buttonGroupElements(buttonConfig)
+        monthButtons.events.on('click', function(d) {
+            state.month = d.selected.key
+            setDate()
+        })
+
+        setDate()
+
+        var getDate = function() {
+            return new Date(state.year, monthNames.indexOf(state.month))
+        }
+
+        var getFormattedDate = function(_format) {
+            var format = _format || '%B %Y'
+            return d3.timeFormat(format)(getDate())
+        }
+
+        return {
+            events: events,
+            getDate: getDate,
+            getFormattedDate: getFormattedDate
+        }
+    }
+
+    var dropdownWidget = function(config) {
+        config.container.classed('datahub-dropdown', true)
+        var defaultElement = config.defaultElement || config.elements[0]
+
+        var events = d3.dispatch('change')
+
+        var dropdownContainer = config.container.selectAll('div.dropdown')
+            .data([0])
+        var dropdownEnter = dropdownContainer.enter()
+        dropdownContainer.exit().remove()
+
+        var selectedElement = dropdownEnter.append('div')
+            .attr('class', 'selected-element')
+            .html(defaultElement.label)
+            .on('click', function(d){
+                toggle()
+            })
+
+        var elements = dropdownEnter.append('div')
+            .attr('class', 'elements')
+            .merge(dropdownContainer)
+
+        var buttonConfig = {
+            container: elements,
+            elements: config.elements,
+            isExclusive: true,
+            defaultElementKey: defaultElement.key,
+            isTogglable: false
+        }
+
+        var elementButtons = buttonGroupElements(buttonConfig)
+        elementButtons.events.on('click', function(d) {
+            selectedElement.html(d.selected.label)
+            close()
+        })
+
+        var toggle = function(open){
+            elements.node().classList.toggle('active', open)
+            return this;
+        }
+
+        var open = function(){
+            toggle(true)
+            return this;
+        }
+
+        var close = function(){
+            toggle(false)
+            return this;
+        }
+
+        return {
+            events: events,
+            toggle: toggle, 
+            open: open,
+            close: close
+        }
     }
 
     var timeSlider = utils.pipeline(
@@ -391,6 +497,16 @@
         alert
     )
 
+    var monthCalendar = utils.pipeline(
+        container,
+        calendar
+    )
+
+    var dropdown = utils.pipeline(
+        container,
+        dropdownWidget
+    )
+
     exports.widget = {
         container: container,
         svgContainer: svgContainer,
@@ -398,7 +514,9 @@
         buttonGroup: buttonGroup,
         number: number,
         table: table,
-        alertMessage: alertMessage
+        alertMessage: alertMessage,
+        monthCalendar: monthCalendar,
+        dropdown: dropdown
     }
 
 }))

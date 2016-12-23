@@ -1,7 +1,7 @@
 # datahub-ui
 Reusable UI components and [API](http://docs.planetos.com/) wrappers to build data apps at [Planet OS](https://planetos.com/)
 
-*Notice: The current version is v0.3.2. The components will be out of beta when they will reach v1.0.0. But they are wrappers around components that are used in production for [Planet OS Datahub](http://data.planetos.com/datasets) and for custom [Powerboards](https://planetos.com/powerboard/).*
+*Notice: The current version is v0.3.5. The components will be out of beta when they will reach v1.0.0. But they are wrappers around components that are used in production for [Planet OS Datahub](http://data.planetos.com/datasets) and for custom [Powerboards](https://planetos.com/powerboard/).*
 
 See some of these components in action [here](https://planet-os.github.io/ui-components/datahub-ui/example/index.html)
 
@@ -31,6 +31,8 @@ npm run build
   * number
   * table
   * alertMessage
+  * monthCalendar
+  * dropdown
 
 * datahub.group
   * number

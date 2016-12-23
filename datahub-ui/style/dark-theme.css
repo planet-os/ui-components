@@ -8,32 +8,13 @@ orange: #F6A623
 yellow: #F8E81C
 green: #5ECF52
 sky-blue: #05BDFF
+red: #FF5A6E
 */
 
 body {
     background-color: #182228;
     color: #adb7c5;
     font-family: 'Roboto', sans-serif;
-}
-
-.section {
-    background-color: #233541;
-}
-
-.top-bar {
-    border-top: 3px solid #575F6D;
-}
-
-.top-bar.low {
-    border-color: #5ECF52;
-}
-
-.top-bar.medium {
-    border-color: #F8E81C;
-}
-
-.top-bar.high {
-    border-color: #FF5A6E;
 }
 
 .datahub-chart text {
@@ -112,4 +93,84 @@ body {
 
 .legend .datahub-button-group .element.color-2 {
     border-left: 16px solid #5ECF52;
+}
+
+.datahub-month-calendar .date-selector {
+    background-color: #5f6773;
+}
+
+.datahub-month-calendar .month {
+    background-color: #5f6773;
+}
+
+.datahub-month-calendar .year-selector {
+    background-color: #5f6773;
+    border-bottom: 1px solid black;
+}
+
+.datahub-month-calendar .year-shifter:hover {
+    background-color: #5f6773;
+}
+
+/* non-component styling */
+.section {
+    background-color: #233541;
+}
+
+.top-bar {
+    border-top: 3px solid #575F6D;
+}
+
+.top-bar.low {
+    border-color: #5ECF52;
+}
+
+.top-bar.medium {
+    border-color: #F8E81C;
+}
+
+.top-bar.high {
+    border-color: #FF5A6E;
+}
+
+.dh-tag {
+    background-color: #5ECF52;
+    color: black;
+    padding: 2px 4px;
+    margin: 0 4px;
+    display: inline;
+    border-radius: 8px;
+    font-size: 1rem;
+    height: 1.5rem;
+}
+
+.dh-tag.negative {
+    background-color: #FF5A6E;
+}
+
+.dh-negative {
+    color: #FF5A6E;
+}
+
+.dh-negative-arrow, .dh-positive-arrow {
+    display: inline;
+}
+
+.dh-positive-arrow:after {
+    content: "\25B2";
+    color: #FF5A6E;
+}
+
+.dh-negative-arrow:after {
+    content: "\25BC";
+    color: #5ECF52;
+}
+
+.dh-positive-cell {
+    background-color: #5ECF52;
+    display: block;
+}
+
+.dh-dim {
+    color: #adb7c5;
 }
