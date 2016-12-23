@@ -384,7 +384,8 @@
             }),
             container: months,
             isExclusive: true,
-            defaultElementKey: state.month
+            defaultElementKey: state.month,
+            isTogglable: false
         }
 
         var monthButtons = buttonGroupElements(buttonConfig)
