@@ -590,7 +590,20 @@
         }, {
             label: 'Element 2',
             key: 'element2'
-        }]
+        }],
+        title: 'title1'
+    })
+
+    var dropdown = datahub.widget.dropdown({
+        parent: document.querySelector('.dropdown1'),
+        elements: [{
+            label: 'Element 2',
+            key: 'element2'
+        }, {
+            label: 'Element 3',
+            key: 'element3'
+        }],
+        title: 'title2'
     })
 
     datahub.widget.dropdownCalendar({

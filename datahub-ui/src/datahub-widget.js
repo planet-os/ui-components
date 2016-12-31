@@ -420,22 +420,39 @@
 
         var dropdownContainer = config.container.selectAll('div.dropdown')
             .data([0])
-        var dropdownEnter = dropdownContainer.enter().append('div')
+        var dropdownUpdate = dropdownContainer.enter().append('div')
             .attr('class', 'dropdown')
+            .merge(dropdownContainer)
         dropdownContainer.exit().remove()
 
-        var selectedElement = dropdownEnter.append('div')
+        var title = dropdownUpdate.selectAll('.title')
+            .data([config.title])
+        title.enter().append('div')
+            .attr('class', 'title')
+            .merge(title)
+            .html(function(d){ return d; })
+        title.exit().remove()
+
+        var selectedElement = dropdownUpdate.selectAll('.selected-element')
+            .data([defaultElement.label])
+        var selectedElementUpdate = selectedElement.enter().append('div')
             .attr('class', 'selected-element')
-            .html(defaultElement.label)
             .on('click', function(d){
                 toggle()
             })
+            .merge(selectedElement)
+            .html(function(d){ return d; })
+        selectedElement.exit().remove()
 
-        var elements = dropdownEnter.append('div')
+        var elements = dropdownUpdate.selectAll('.elements')
+            .data([0])
+        var elementUpdate = elements.enter().append('div')
             .attr('class', 'elements')
+            .merge(elements)
+        elements.exit().remove()
 
         var buttonConfig = {
-            container: dropdownEnter.merge(dropdownContainer).select('.elements'),
+            container: elementUpdate,
             elements: config.elements,
             isExclusive: true,
             defaultElementKey: defaultElement.key,
@@ -445,14 +462,14 @@
         var elementButtons = buttonGroupElements(buttonConfig)
         elementButtons.events.on('click', function(d) {
             if(!config.ignoreClickEvents) {
-                selectedElement.html(d.selected.label)
+                selectedElementUpdate.html(d.selected.label)
                 events.call('change', null, { selected: d.selected })
                 close()
             }
         })
 
         var toggle = function(open){
-            elements.node().classList.toggle('active', open)
+            elementUpdate.node().classList.toggle('active', open)
             return this
         }
 

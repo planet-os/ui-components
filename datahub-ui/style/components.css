@@ -42,6 +42,7 @@
     font-size: 16px;
     display: flex;
     flex-direction: column;
+    justify-content: center;
 }
 
 .datahub-number .value {
