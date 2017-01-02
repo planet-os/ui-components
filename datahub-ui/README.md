@@ -15,6 +15,17 @@ npm install
 npm run build
 ```
 
+While the library is in development, the best way to keep it up-to-date is by using [npm link](https://docs.npmjs.com/cli/link) from the downloaded repo.
+
+```javascript
+cd /datahub-ui
+npm link
+cd ../project-folder
+npm install
+npm uninstall datahub-ui
+npm link datahub-ui
+```
+
 ## Modules
 * datahub.map
   * selectorMap
