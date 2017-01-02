@@ -220,7 +220,7 @@
                 return config[d]
             })
             .attr('display', function(d) {
-                return config[d] ? null : 'none';
+                return config[d] ? null : 'none'
             })
         elements.exit().remove()
 
@@ -282,8 +282,8 @@
             var sortedData = JSON.parse(JSON.stringify(data))
                 .sort(function(a, b) {
                     if (a[sortKey] < b[sortKey]) return isAscending ? 1 : -1
-                    if (a[sortKey] > b[sortKey]) return isAscending ? -1 : 1;
-                    return 0;
+                    if (a[sortKey] > b[sortKey]) return isAscending ? -1 : 1
+                    return 0
                 })
             return sortedData
         }
@@ -378,13 +378,15 @@
         var months = elementsEnter.append('div')
             .attr('class', 'date-selector')
 
-        buttonConfig = JSON.parse(JSON.stringify(config))
-        buttonConfig.elements = monthNames.map(function(d) {
-            return { key: d, label: d, className: 'month' }
-        })
-        buttonConfig.container = months
-        buttonConfig.isExclusive = true
-        buttonConfig.defaultElementKey = state.month
+        var buttonConfig = {
+            elements: monthNames.map(function(d) {
+                return { key: d, label: d, className: 'month' }
+            }),
+            container: months,
+            isExclusive: true,
+            defaultElementKey: state.month,
+            isTogglable: false
+        }
 
         var monthButtons = buttonGroupElements(buttonConfig)
         monthButtons.events.on('click', function(d) {
@@ -418,22 +420,39 @@
 
         var dropdownContainer = config.container.selectAll('div.dropdown')
             .data([0])
-        var dropdownEnter = dropdownContainer.enter()
+        var dropdownUpdate = dropdownContainer.enter().append('div')
+            .attr('class', 'dropdown')
+            .merge(dropdownContainer)
         dropdownContainer.exit().remove()
 
-        var selectedElement = dropdownEnter.append('div')
+        var title = dropdownUpdate.selectAll('.title')
+            .data([config.title])
+        title.enter().append('div')
+            .attr('class', 'title')
+            .merge(title)
+            .html(function(d){ return d; })
+        title.exit().remove()
+
+        var selectedElement = dropdownUpdate.selectAll('.selected-element')
+            .data([defaultElement.label])
+        var selectedElementUpdate = selectedElement.enter().append('div')
             .attr('class', 'selected-element')
-            .html(defaultElement.label)
             .on('click', function(d){
                 toggle()
             })
+            .merge(selectedElement)
+            .html(function(d){ return d; })
+        selectedElement.exit().remove()
 
-        var elements = dropdownEnter.append('div')
+        var elements = dropdownUpdate.selectAll('.elements')
+            .data([0])
+        var elementUpdate = elements.enter().append('div')
             .attr('class', 'elements')
-            .merge(dropdownContainer)
+            .merge(elements)
+        elements.exit().remove()
 
         var buttonConfig = {
-            container: elements,
+            container: elementUpdate,
             elements: config.elements,
             isExclusive: true,
             defaultElementKey: defaultElement.key,
@@ -442,23 +461,26 @@
 
         var elementButtons = buttonGroupElements(buttonConfig)
         elementButtons.events.on('click', function(d) {
-            selectedElement.html(d.selected.label)
-            close()
+            if(!config.ignoreClickEvents) {
+                selectedElementUpdate.html(d.selected.label)
+                events.call('change', null, { selected: d.selected })
+                close()
+            }
         })
 
         var toggle = function(open){
-            elements.node().classList.toggle('active', open)
-            return this;
+            elementUpdate.node().classList.toggle('active', open)
+            return this
         }
 
         var open = function(){
             toggle(true)
-            return this;
+            return this
         }
 
         var close = function(){
             toggle(false)
-            return this;
+            return this
         }
 
         return {
@@ -466,6 +488,40 @@
             toggle: toggle, 
             open: open,
             close: close
+        }
+    }
+
+    var dropdownCalendarWidget = function(config) {
+        config.container.classed('datahub-dropdown-calendar', true)
+
+        var events = d3.dispatch('change')
+
+        dropdownWidget({
+            container: config.container,
+            elements: [{
+                className: 'calendar-element'
+            }],
+            ignoreClickEvents: true
+        })
+
+        var selectedElement = config.container.select('.selected-element')
+        
+        var monthCalendar = calendar({
+            container: config.container.select('.calendar-element'),
+            defaultDate: (new Date()).toString(),
+        })
+
+        selectedElement.text(monthCalendar.getFormattedDate())
+
+        monthCalendar.events.on('change', function(d){
+            selectedElement.text(monthCalendar.getFormattedDate())
+            events.call('change', null, {
+                formattedDate: monthCalendar.getFormattedDate()
+            })
+        })
+        
+        return {
+            events: events
         }
     }
 
@@ -507,6 +563,11 @@
         dropdownWidget
     )
 
+    var dropdownCalendar = utils.pipeline(
+        container,
+        dropdownCalendarWidget
+    )
+
     exports.widget = {
         container: container,
         svgContainer: svgContainer,
@@ -516,7 +577,8 @@
         table: table,
         alertMessage: alertMessage,
         monthCalendar: monthCalendar,
-        dropdown: dropdown
+        dropdown: dropdown,
+        dropdownCalendar: dropdownCalendar
     }
 
 }))

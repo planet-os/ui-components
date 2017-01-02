@@ -117,20 +117,20 @@ body {
     background-color: #233541;
 }
 
-.top-bar {
+.top-bar.normal {
     border-top: 3px solid #575F6D;
 }
 
 .top-bar.low {
-    border-color: #5ECF52;
+    border-top: 3px solid #5ECF52;
 }
 
 .top-bar.medium {
-    border-color: #F8E81C;
+    border-top: 3px solid #F8E81C;
 }
 
 .top-bar.high {
-    border-color: #FF5A6E;
+    border-top: 3px solid #FF5A6E;
 }
 
 .dh-tag {

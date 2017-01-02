@@ -42,6 +42,7 @@
     font-size: 16px;
     display: flex;
     flex-direction: column;
+    justify-content: center;
 }
 
 .datahub-number .value {
@@ -132,6 +133,10 @@
     padding: 20px;
 }
 
+.datahub-month-calendar.element {
+    padding: 0;
+}
+
 .datahub-month-calendar .date-selector {
     width: 100%;
     flex-wrap: wrap;
@@ -161,17 +166,23 @@
 
 .datahub-dropdown .elements {
     display: none;
+    position: absolute;
 }
 
 .datahub-dropdown .elements.active {
-    display: block;
+    display: initial;
 }
 
 .datahub-dropdown .selected-element {
+    width: 100%;
     padding: 10px 0;
 }
 
 .datahub-dropdown .selected-element:after {
     content: "\25BC";
     float: right;
+}
+
+.datahub-calendar .datahub-button-group {
+    display: block;
 }
