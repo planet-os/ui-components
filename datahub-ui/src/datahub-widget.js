@@ -319,15 +319,20 @@
         config.container.classed('datahub-alert-message', true)
 
         var elements = config.container.selectAll('div.alert-band')
-            .data([0])
-        var elementsEnter = elements.enter()
-        elementsEnter.append('div')
-            .attr('class', 'alert-band ' + config.level)
-        elementsEnter.append('div')
+            .data([config.level])
+        elements.enter().append('div')
+            .attr('class', 'alert-band')
+            .merge(elements)
+            .classed(config.level, true)
+        elements.exit().remove()
+
+        var elements = config.container.selectAll('div.alert-message')
+            .data([config.message])
+        elements.enter().append('div')
             .attr('class', 'alert-message')
             .merge(elements)
             .html(function(d) {
-                return config.message
+                return d
             })
         elements.exit().remove()
 
