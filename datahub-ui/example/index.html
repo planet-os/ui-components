@@ -363,7 +363,8 @@
             left: 60
         },
         data: timeSeries,
-        axisTitleY: 'Unit'
+        axisTitleY: 'Unit',
+        reference: timeSeries.values[0][0]
     })
 
     var sliderChartContainer = document.querySelector('.slider-chart')
@@ -601,6 +602,7 @@
     monthCalendar.setDate('2015-10-01T04:00:00.000Z')
 
     function setDate(d) {
+        console.log(monthCalendar.getFormattedDate('%Y/%m/%d %H:%M'));
         document.querySelector('.selected-date').innerText = d.iso
     }
 

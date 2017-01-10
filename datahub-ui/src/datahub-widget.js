@@ -402,7 +402,10 @@
         var parent = d3.select(parentNode)
 
         var monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-        var configCache = {}
+        var configCache = {
+            month: monthNames[(new Date()).getMonth()],
+            year: (new Date()).getFullYear()
+        }
 
         var events = d3.dispatch('change')
 
@@ -453,8 +456,12 @@
                 return d === configCache.month
             })
 
-        if(config.defaultMonth, config.defaultYear) {
+        if(config.defaultMonth && config.defaultYear) {
             setMonth(config.defaultMonth)
+            setYear(config.defaultYear)
+        }
+        else if(config.defaultMonthNumber && config.defaultYear) {
+            setMonthNumber(config.defaultMonthNumber)
             setYear(config.defaultYear)
         }
         else {
@@ -503,6 +510,15 @@
             changeYear()
         }
 
+        function getMonthNames() {
+            return monthNames
+        }
+
+        function setMonthNumber(monthNumber) {
+            configCache.month = monthNames[monthNumber]
+            changeMonth()
+        }
+
         return {
             on: utils.rebind(events),
             getDateFormats: getDateFormats,
@@ -511,7 +527,9 @@
             getFormattedDate: getFormattedDate,
             setDate: setDate,
             setMonth: setMonth,
-            setYear: setYear
+            setYear: setYear,
+            getMonthNames: getMonthNames,
+            setMonthNumber: setMonthNumber
         }
     }
 
@@ -622,21 +640,16 @@
         var monthCalendar = calendar({
                 parent: config.parent.querySelector('.elements'),
                 defaultDate: config.defaultDate,
+                defaultMonthNumber: config.defaultMonthNumber,
+                defaultYear: config.defaultYear,
+                defaultMonth: config.defaultMonth
             })
             .on('change', function(d) {
                 menu.setSelected(d.formatted)
                 events.call('change', null, d)
             })
 
-        setSelected()
-
-        function setSelected() {
-            menu.setSelected(monthCalendar.getFormattedDate())
-        }
-
-        function setDate(date) {
-            monthCalendar.setDate(date)
-        }
+        menu.setSelected(monthCalendar.getFormattedDate())
 
         return {
             on: utils.rebind(events),
@@ -644,11 +657,17 @@
             open: menu.open,
             close: menu.close,
             isOpened: menu.isOpened,
+            setElements: menu.setElements,
+            setSelected: menu.setSelected,
             getDateFormats: monthCalendar.getDateFormats,
             getDate: monthCalendar.getDate,
             getISODate: monthCalendar.getISODate,
             getFormattedDate: monthCalendar.getFormattedDate,
-            setDate: setDate
+            setDate: monthCalendar.setDate,
+            setMonth: monthCalendar.setMonth,
+            setYear: monthCalendar.setYear,
+            getMonthNames: monthCalendar.getMonthNames,
+            setMonthNumber: monthCalendar.setMonthNumber
         }
     }
 
