@@ -353,6 +353,24 @@
         return {}
     }
 
+    var referenceLine = function(config) {
+        var panel = shapePanel(config)
+
+        var line = panel.shapePanel.selectAll('line.reference-line')
+            .data([config.reference])
+        line.enter().append('line')
+            .attr('class', 'reference-line')
+            .merge(line)
+            .attr('x1', 0)
+            .attr('y1', function(d){ return config.scaleY(d) || 0 })
+            .attr('x2', config.chartWidth)
+            .attr('y2', function(d){ return config.scaleY(d) || 0 })
+            .attr('display', function(d){ return d ? null : 'none' })
+        line.exit().remove()
+
+        return {}
+    }
+
     var axisXFormatterTime = function(config) {
         config.container.select('g.axis.x').selectAll('.tick text')
             .text(function(d) {
@@ -397,6 +415,7 @@
         axisComponentY,
         lineShapes,
         lineCutShapes,
+        referenceLine,
         message,
         axisComponentX,
         axisTitleComponentX,

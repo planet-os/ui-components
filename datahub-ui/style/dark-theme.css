@@ -39,6 +39,11 @@ body {
     fill: #1A2730;
 }
 
+.datahub-chart .reference-line {
+    stroke: #F6A623;
+    stroke-dasharray: 5,5;
+}
+
 .datahub-table {
     color: white;
 }
