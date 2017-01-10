@@ -178,6 +178,13 @@
         }
     }
 
+    var rebind = function(target) {
+        return function(){
+            target.on.apply(target, arguments)
+            return this
+        }
+    }
+
     exports.utils = {
         merge: merge,
         mergeAll: mergeAll,
@@ -194,7 +201,8 @@
         findMin: findMin,
         parseRGB: parseRGB,
         pipeline: pipeline,
-        override: override
+        override: override,
+        rebind: rebind
     }
 
 }))

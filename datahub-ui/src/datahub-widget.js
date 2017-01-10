@@ -206,98 +206,131 @@
         }
     }
 
-    var numberWidget = function(config) {
-        config.container.classed('datahub-number', true)
+    var number = function(_config) {
+        var configCache = {
+            title: _config.title,
+            value: _config.value,
+            info: _config.info
+        }
 
-        var elements = config.container.selectAll('div')
-            .data(['title', 'value', 'info'])
-        elements.enter().append('div')
-            .attr('class', function(d) {
-                return d
+        var template = '<div class="datahub-number">' 
+            + '<div class="title"></div>' 
+            + '<div class="value"></div>' 
+            + '<div class="info"></div>' 
+            + '</div>'
+        var parentNode = utils.appendHtmlToNode(template, _config.parent)
+        var parent = d3.select(parentNode)
+            .on('click', function(d) {
+                events.call('click', null, configCache)
             })
-            .merge(elements)
-            .html(function(d) {
-                return config[d]
-            })
-            .attr('display', function(d) {
-                return config[d] ? null : 'none'
-            })
-        elements.exit().remove()
 
-        return {}
+        var events = d3.dispatch('click')
+
+        setTitle(configCache.title)
+        setValue(configCache.value)
+        setInfo(configCache.info)
+
+        function setTitle(text) {
+            configCache.title = text || configCache.title
+            parent.select('.title').html(text)
+            return this
+        }
+
+        function setValue(text) {
+            configCache.value = text || configCache.value
+            parent.select('.value').html(text)
+            return this
+        }
+
+        function setInfo(text) {
+            configCache.info = text || configCache.info
+            parent.select('.info').html(text)
+            return this
+        }
+
+        return {
+            on: utils.rebind(events),
+            setTitle: setTitle,
+            setValue: setValue,
+            setInfo: setInfo
+        }
     }
 
     var table = function(config) {
-        config.container.classed('datahub-table', true)
+        var template = '<div class="datahub-table">' 
+            + '<div class="header-row"></div>' 
+            + '</div>'
+        var parentNode = utils.appendHtmlToNode(template, config.parent)
+        var parent = d3.select(parentNode)
 
-        var headerRow = config.container.selectAll('div.header-row')
-            .data([0])
-        var headerRowAll = headerRow.enter().append('div')
-            .attr('class', 'header-row')
-            .merge(headerRow)
-        headerRow.exit().remove()
-
-        var headerElements = headerRowAll.selectAll('div.header-cell')
-            .data(config.metadata)
-        var allHeaderELements = headerElements.enter().append('div')
-            .on('click', function(d, i) {
-                var that = this
-                var isAscending = false
-                allHeaderELements.classed('ascending', function(d) {
-                    var match = that === this
-                    if (match) {
-                        isAscending = this.classList.contains('ascending')
-                        match = !isAscending
-                    }
-                    return match
-                })
-
-                var sortedData = sortData(config.elements, d.key, isAscending)
-                renderElements(sortedData)
-            })
-            .merge(headerElements)
-            .attr('class', function(d) {
-                return 'header-cell ' + d.key
-            })
-            .classed('sortable', function(d) {
-                return d.sortable
-            })
-            .html(function(d) {
-                var label = d.label
-                if (!label) {
-                    return
-                }
-                if (d.units) {
-                    label += ' (' + d.units + ')'
-                }
-                return label || ''
-            })
-        headerElements.exit().remove()
-
-        function sortData(data, sortBy, isAscending) {
-            var sortKey = config.metadata.map(function(d) {
-                    return d.key
-                })
-                .indexOf(sortBy)
-            var sortedData = JSON.parse(JSON.stringify(data))
-                .sort(function(a, b) {
-                    if (a[sortKey] < b[sortKey]) return isAscending ? 1 : -1
-                    if (a[sortKey] > b[sortKey]) return isAscending ? -1 : 1
-                    return 0
-                })
-            return sortedData
+        var configCache = {
+            elements: config.elements,
+            header: config.header,
+            defaultSortKey: config.header ? config.header[0].key : null
         }
 
-        function renderElements(data) {
-            var elements = config.container.selectAll('div.table-row')
-                .data(data)
-            var elementsEnter = elements.enter().append('div')
-            var allElements = elementsEnter.merge(elements)
-                .attr('class', 'table-row')
-                .attr('display', function(d) {
-                    return config[d] ? null : 'none'
+        renderCells(config.elements)
+        renderHeader(config.header)
+
+        function renderHeader(header) {
+            if (!header) {
+                return this
+            } else {
+                configCache.header = header
+                configCache.defaultSortKey = header[0].key
+            }
+            var headerCells = parent.select('.header-row').selectAll('.header-cell')
+                .data(header)
+            var headerCellsUpdate = headerCells.enter().append('div')
+                .attr('class', 'header-cell')
+                .on('click', function(d, i) {
+                    if (!this.classList.contains('sortable') || !configCache.elements) {
+                        return
+                    }
+                    var that = this
+                    var isAscending = false
+                    headerCellsUpdate.classed('ascending', function(d) {
+                        var match = that === this
+                        if (match) {
+                            isAscending = this.classList.contains('ascending')
+                            match = !isAscending
+                        }
+                        return match
+                    })
+                    renderCells(configCache.elements, d.key, !isAscending)
                 })
-            var cells = allElements.selectAll('div.cell')
+                .merge(headerCells)
+                .classed('sortable', function(d) {
+                    return d.sortable
+                })
+                .classed('ascending', function(d) {
+                    return d.key === configCache.defaultSortKey
+                })
+                .html(function(d) {
+                    return d.label
+                })
+            headerCells.exit().remove()
+        }
+
+        function renderCells(elements, _sortKey, _isAscending) {
+            if (!elements || !configCache.header) {
+                return this
+            } else {
+                configCache.elements = elements
+            }
+
+            var sortKey = _sortKey || configCache.defaultSortKey
+            var isAscending = typeof _isAscending === 'undefined' ? true : _isAscending
+
+            var sortedElements = sortElements(elements, sortKey, isAscending)
+            var rows = parent.selectAll('.table-row')
+                .data(sortedElements)
+            var rowsUpdate = rows.enter().append('div')
+                .attr('class', 'table-row')
+                .merge(rows)
+            rows.exit().remove()
+
+            var cells = rowsUpdate.selectAll('.cell')
                 .data(function(d) {
                     return d
                 })
@@ -307,221 +340,315 @@
                 .html(function(d) {
                     return d
                 })
-            elements.exit().remove()
+            cells.exit().remove()
         }
-        var sortedData = sortData(config.elements, config.metadata[0].key, true)
-        renderElements(sortedData)
 
-        return {}
+        function sortElements(data, sortBy, isAscending) {
+            var sortKey = configCache.header.map(function(d) {
+                    return d.key
+                })
+                .indexOf(sortBy)
+            var sortedData = JSON.parse(JSON.stringify(data))
+                .sort(function(a, b) {
+                    if (a[sortKey] < b[sortKey]) return isAscending ? -1 : 1
+                    if (a[sortKey] > b[sortKey]) return isAscending ? 1 : -1
+                    return 0
+                })
+            return sortedData
+        }
+
+        return {
+            setHeader: renderHeader,
+            setElements: renderCells
+        }
     }
 
     var alert = function(config) {
-        config.container.classed('datahub-alert-message', true)
+        var template = '<div class="datahub-alert-message">' 
+            + '<div class="alert-band"></div>' 
+            + '<div class="alert-message"></div>' 
+            + '</div>'
+        var parentNode = utils.appendHtmlToNode(template, config.parent)
+        var parent = d3.select(parentNode)
 
-        var elements = config.container.selectAll('div.alert-band')
-            .data([0])
-        var elementsEnter = elements.enter()
-        elementsEnter.append('div')
-            .attr('class', 'alert-band ' + config.level)
-        elementsEnter.append('div')
-            .attr('class', 'alert-message')
-            .merge(elements)
-            .html(function(d) {
-                return config.message
-            })
-        elements.exit().remove()
+        setLevel(config.level)
+        setMessage(config.message)
 
-        return {}
+        function setLevel(level) {
+            parent.select('.alert-band').classed(level, true)
+        }
+
+        function setMessage(message) {
+            parent.select('.alert-message').html(message)
+        }
+
+        return {
+            setLevel: setLevel,
+            setMessage: setMessage
+        }
     }
 
     var calendar = function(config) {
-        config.container.classed('datahub-month-calendar', true)
+        var template = '<div class="datahub-month-calendar">' 
+            + ' <div class="year-selector">' 
+            + '     <div class="prev-year">&lsaquo;</div>' 
+            + '     <div class="selected-year"></div>' 
+            + '     <div class="next-year">&rsaquo;</div>' 
+            + ' </div>' 
+            + ' <div class="month-selector">' 
+            + ' </div>' 
+            + '</div>'
+        var parentNode = utils.appendHtmlToNode(template, config.parent)
+        var parent = d3.select(parentNode)
+
+        var monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+        var configCache = {}
 
         var events = d3.dispatch('change')
 
-        var monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-        var state = {
-            year: config.defaultYear || (new Date()).getFullYear(),
-            month: config.defaultMonthNumber || monthNames[(new Date()).getMonth() - 1]
+        function changeYear() {
+            var dateFormats = getDateFormats()
+            events.call('change', null, dateFormats)
+
+            selectYear.text(configCache.year)
         }
 
-        function setDate() {
-            selectedYear.text(state.year)
-            events.call('change', null, state)
-        }
+        function changeMonth() {
+            var dateFormats = getDateFormats()
+            events.call('change', null, dateFormats)
 
-        var elements = config.container.selectAll('div.calendar')
-            .data([0])
-        var elementsEnter = elements.enter()
-        elements.exit().remove()
-
-        var yearSelector = elementsEnter.append('div')
-            .attr('class', 'year-selector')
-
-        yearSelector.append('div')
-            .attr('class', 'year-shifter')
-            .text('<')
-            .on('click', function(d) {
-                state.year = parseInt(selectedYear.text()) - 1
-                setDate()
+            monthsUpdate.classed('active', function(d) {
+                return d === configCache.month
             })
-        var selectedYear = yearSelector.append('div')
-            .attr('class', 'selected-year')
-        yearSelector.append('div')
-            .attr('class', 'year-shifter')
-            .text('>')
-            .on('click', function(d) {
-                state.year = parseInt(selectedYear.text()) + 1
-                setDate()
-            })
-
-        var months = elementsEnter.append('div')
-            .attr('class', 'date-selector')
-
-        var buttonConfig = {
-            elements: monthNames.map(function(d) {
-                return { key: d, label: d, className: 'month' }
-            }),
-            container: months,
-            isExclusive: true,
-            defaultElementKey: state.month,
-            isTogglable: false
         }
 
-        var monthButtons = buttonGroupElements(buttonConfig)
-        monthButtons.events.on('click', function(d) {
-            state.month = d.selected.key
-            setDate()
+        var selectYear = parent.select('.selected-year').text(configCache.year)
+        parent.select('.prev-year').on('click', function(d) {
+            configCache.year -= 1
+            changeYear()
+        })
+        parent.select('.next-year').on('click', function(d) {
+            configCache.year += 1
+            changeYear()
         })
 
-        setDate()
+        var months = parent.select('.month-selector').selectAll('.element')
+            .data(monthNames)
+        var monthsUpdate = months.enter().append('div')
+            .attr('class', 'element month')
+            .text(function(d) {
+                return d
+            })
+            .on('click', function(d) {
+                var that = this
+                monthsUpdate.classed('active', function() {
+                    return that === this
+                })
 
-        var getDate = function() {
-            return new Date(state.year, monthNames.indexOf(state.month))
+                configCache.month = d
+                changeMonth()
+            })
+            .merge(months)
+            .classed('active', function(d) {
+                return d === configCache.month
+            })
+
+        if(config.defaultMonth, config.defaultYear) {
+            setMonth(config.defaultMonth)
+            setYear(config.defaultYear)
+        }
+        else {
+            setDate(config.defaultDate || new Date())
         }
 
-        var getFormattedDate = function(_format) {
+        function getDateFormats() {
+            return {
+                year: configCache.year,
+                month: configCache.month,
+                date: getDate(),
+                iso: getISODate(),
+                formatted: getFormattedDate()
+            }
+        }
+
+        function getDate() {
+            return new Date(configCache.year, monthNames.indexOf(configCache.month))
+        }
+
+        function getFormattedDate(_format) {
             var format = _format || '%B %Y'
             return d3.timeFormat(format)(getDate())
         }
 
+        function getISODate(_format) {
+            return d3.isoFormat(getDate())
+        }
+
+        function setDate(date) {
+            configCache = {
+                month: monthNames[(new Date(date)).getMonth()],
+                year: (new Date(date)).getFullYear()
+            }
+            changeYear()
+            changeMonth()
+        }
+
+        function setMonth(month) {
+            configCache.month = month
+            changeMonth()
+        }
+
+        function setYear(year) {
+            configCache.year = year
+            changeYear()
+        }
+
         return {
-            events: events,
+            on: utils.rebind(events),
+            getDateFormats: getDateFormats,
             getDate: getDate,
-            getFormattedDate: getFormattedDate
+            getISODate: getISODate,
+            getFormattedDate: getFormattedDate,
+            setDate: setDate,
+            setMonth: setMonth,
+            setYear: setYear
         }
     }
 
-    var dropdownWidget = function(config) {
-        config.container.classed('datahub-dropdown', true)
-        var defaultElement = config.defaultElement || config.elements[0]
+    var dropdown = function(config) {
+        var template = '<div class="datahub-dropdown">' 
+            + ' <div class="title"></div>' 
+            + ' <div class="selected-element"></div>' 
+            + ' <div class="elements"></div>' 
+            + '</div>'
+        var parentNode = utils.appendHtmlToNode(template, config.parent)
+        var parent = d3.select(parentNode)
+            .on('mouseout', close)
+        var elementsContainer = parent.select('.elements')
+            .on('mouseover', open)
+        var elementsUpdate
 
         var events = d3.dispatch('change')
 
-        var dropdownContainer = config.container.selectAll('div.dropdown')
-            .data([0])
-        var dropdownUpdate = dropdownContainer.enter().append('div')
-            .attr('class', 'dropdown')
-            .merge(dropdownContainer)
-        dropdownContainer.exit().remove()
+        parent.select('.title').html(config.title)
+        var selectedElement = parent.select('.selected-element')
+            .on('mouseover', open)
 
-        var title = dropdownUpdate.selectAll('.title')
-            .data([config.title])
-        title.enter().append('div')
-            .attr('class', 'title')
-            .merge(title)
-            .html(function(d){ return d; })
-        title.exit().remove()
-
-        var selectedElement = dropdownUpdate.selectAll('.selected-element')
-            .data([defaultElement.label])
-        var selectedElementUpdate = selectedElement.enter().append('div')
-            .attr('class', 'selected-element')
-            .on('click', function(d){
-                toggle()
-            })
-            .merge(selectedElement)
-            .html(function(d){ return d; })
-        selectedElement.exit().remove()
-
-        var elements = dropdownUpdate.selectAll('.elements')
-            .data([0])
-        var elementUpdate = elements.enter().append('div')
-            .attr('class', 'elements')
-            .merge(elements)
-        elements.exit().remove()
-
-        var buttonConfig = {
-            container: elementUpdate,
-            elements: config.elements,
-            isExclusive: true,
-            defaultElementKey: defaultElement.key,
-            isTogglable: false
-        }
-
-        var elementButtons = buttonGroupElements(buttonConfig)
-        elementButtons.events.on('click', function(d) {
-            if(!config.ignoreClickEvents) {
-                selectedElementUpdate.html(d.selected.label)
-                events.call('change', null, { selected: d.selected })
-                close()
+        function setSelected(label) {
+            selectedElement.html(label)
+            if (elementsUpdate) {
+                elementsUpdate.classed('active', function(d) {
+                    return d.label === label
+                })
             }
-        })
-
-        var toggle = function(open){
-            elementUpdate.node().classList.toggle('active', open)
             return this
         }
 
-        var open = function(){
+        function setElements(_elements) {
+            if (!_elements) {
+                return this
+            }
+            var elements = elementsContainer.selectAll('.element')
+                .data(_elements, function(d) {
+                    return d.key
+                })
+            elementsUpdate = elements.enter().append('div')
+                .attr('class', 'element')
+                .on('mouseover', open)
+                .on('click', function(d) {
+                    if (config.ignoreClickEvents) {
+                        return
+                    }
+                    var that = this
+                    elementsUpdate.classed('active', function() {
+                        return that === this
+                    })
+
+                    setSelected(d.label)
+                    events.call('change', null, d)
+                    close()
+                })
+                .merge(elements)
+                .html(function(d) {
+                    return d.label
+                })
+            elements.exit().remove()
+
+            setSelected(config.selected || config.elements[0].label)
+            return this
+        }
+
+        setElements(config.elements)
+
+        function toggle(open) {
+            elementsContainer.classed('active', open)
+            return this
+        }
+
+        function open() {
             toggle(true)
             return this
         }
 
-        var close = function(){
+        function close() {
             toggle(false)
             return this
         }
 
+        function isOpened() {
+            return elementsContainer.classed('active')
+        }
+
         return {
-            events: events,
-            toggle: toggle, 
+            on: utils.rebind(events),
+            toggle: toggle,
             open: open,
-            close: close
+            close: close,
+            isOpened: isOpened,
+            setElements: setElements,
+            setSelected: setSelected
         }
     }
 
-    var dropdownCalendarWidget = function(config) {
-        config.container.classed('datahub-dropdown-calendar', true)
-
+    var dropdownCalendar = function(config) {
         var events = d3.dispatch('change')
 
-        dropdownWidget({
-            container: config.container,
-            elements: [{
-                className: 'calendar-element'
-            }],
+        var menu = dropdown({
+            parent: config.parent,
+            title: 'title1',
             ignoreClickEvents: true
         })
 
-        var selectedElement = config.container.select('.selected-element')
-        
         var monthCalendar = calendar({
-            container: config.container.select('.calendar-element'),
-            defaultDate: (new Date()).toString(),
-        })
-
-        selectedElement.text(monthCalendar.getFormattedDate())
-
-        monthCalendar.events.on('change', function(d){
-            selectedElement.text(monthCalendar.getFormattedDate())
-            events.call('change', null, {
-                formattedDate: monthCalendar.getFormattedDate()
+                parent: config.parent.querySelector('.elements'),
+                defaultDate: config.defaultDate,
             })
-        })
-        
+            .on('change', function(d) {
+                menu.setSelected(d.formatted)
+                events.call('change', null, d)
+            })
+
+        setSelected()
+
+        function setSelected() {
+            menu.setSelected(monthCalendar.getFormattedDate())
+        }
+
+        function setDate(date) {
+            monthCalendar.setDate(date)
+        }
+
         return {
-            events: events
+            on: utils.rebind(events),
+            toggle: menu.toggle,
+            open: menu.open,
+            close: menu.close,
+            isOpened: menu.isOpened,
+            getDateFormats: monthCalendar.getDateFormats,
+            getDate: monthCalendar.getDate,
+            getISODate: monthCalendar.getISODate,
+            getFormattedDate: monthCalendar.getFormattedDate,
+            setDate: setDate
         }
     }
 
@@ -538,36 +665,6 @@
         buttonGroupElements
     )
 
-    var number = utils.pipeline(
-        container,
-        numberWidget
-    )
-
-    var table = utils.pipeline(
-        container,
-        table
-    )
-
-    var alertMessage = utils.pipeline(
-        container,
-        alert
-    )
-
-    var monthCalendar = utils.pipeline(
-        container,
-        calendar
-    )
-
-    var dropdown = utils.pipeline(
-        container,
-        dropdownWidget
-    )
-
-    var dropdownCalendar = utils.pipeline(
-        container,
-        dropdownCalendarWidget
-    )
-
     exports.widget = {
         container: container,
         svgContainer: svgContainer,
@@ -575,8 +672,8 @@
         buttonGroup: buttonGroup,
         number: number,
         table: table,
-        alertMessage: alertMessage,
-        monthCalendar: monthCalendar,
+        alertMessage: alert,
+        monthCalendar: calendar,
         dropdown: dropdown,
         dropdownCalendar: dropdownCalendar
     }

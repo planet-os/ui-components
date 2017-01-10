@@ -154,7 +154,8 @@
     padding: 10px;
 }
 
-.datahub-month-calendar .year-shifter {
+.datahub-month-calendar .prev-year,
+.datahub-month-calendar .next-year {
     padding: 0 10px;
     cursor: pointer;
 }
@@ -167,6 +168,7 @@
 .datahub-dropdown .elements {
     display: none;
     position: absolute;
+    min-width: 200px;
 }
 
 .datahub-dropdown .elements.active {
