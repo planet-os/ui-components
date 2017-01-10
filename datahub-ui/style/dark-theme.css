@@ -1,6 +1,7 @@
 /*
 very-dark-gray: #182228
 dark-grey: #233541
+stripe-gray: #1A2730
 grey: #2E3F4B
 light-grey: #5f6773
 very-light-grey: #adb7c5
@@ -32,6 +33,10 @@ body {
 
 .datahub-chart .axis.y path {
     display: none;
+}
+
+.datahub-chart .stripe {
+    fill: #1A2730;
 }
 
 .datahub-table {

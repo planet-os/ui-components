@@ -157,44 +157,6 @@
         }
     }
 
-    var container = function(config) {
-        var container = d3.select(config.parent)
-            .selectAll('div.container')
-            .data([0])
-        var containerUpdate = container.enter().append('div')
-            .attr('class', 'container')
-            .merge(container)
-            .attr('width', config.width)
-            .attr('height', config.height)
-        container.exit().remove()
-
-        return {
-            container: containerUpdate
-        }
-    }
-
-    var svgContainer = function(config) {
-        var widgetContainer = container(config).container
-
-        var root = widgetContainer.selectAll('svg')
-            .data([0])
-        var rootEnter = root.enter().append('svg')
-            .attr('class', 'datahub-chart')
-        var panel = rootEnter.append('g')
-            .attr('class', 'panel')
-            .merge(root)
-            .attr('transform', 'translate(' + config.margin.left + ',' + config.margin.top + ')')
-        rootEnter.merge(root)
-            .attr('width', config.width)
-            .attr('height', config.height)
-        root.exit().remove()
-
-        return {
-            root: root,
-            container: panel
-        }
-    }
-
     var axisComponentX = function(config) {
         var axisX = config.container.selectAll('g.axis.x')
             .data([0])
@@ -365,6 +327,32 @@
         return {}
     }
 
+    var stripes = function(config) {
+        var panel = shapePanel(config)
+
+        var ticks = config.scaleX.ticks()
+        var stripeW = (config.scaleX(ticks[1]) - config.scaleX(ticks[0])) / 2
+
+        var stripes = panel.shapePanel.selectAll('rect.stripe')
+            .data(ticks)
+        stripes.enter().append('rect')
+            .attr('class', 'stripe')
+            .merge(stripes)
+            .attr('x', function(d){ return config.scaleX(d) })
+            .attr('y', 0)
+            .attr('width', function(d){
+                if((config.scaleX(d) + stripeW) > config.chartWidth) {
+                    return config.chartWidth - config.scaleX(d)
+
+                }
+                return stripeW
+            })
+            .attr('height', config.chartHeight)
+        stripes.exit().remove()
+
+        return {}
+    }
+
     var axisXFormatterTime = function(config) {
         config.container.select('g.axis.x').selectAll('.tick text')
             .text(function(d) {
@@ -405,6 +393,7 @@
         axisX,
         axisY,
         widget.svgContainer,
+        stripes,
         axisComponentY,
         lineShapes,
         lineCutShapes,
