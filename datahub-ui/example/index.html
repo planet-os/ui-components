@@ -350,7 +350,6 @@
         parent: document.querySelector('.map-selector')
     })
 
-
     var timeSeries = datahub.data.generateTimeSeries(400, 3)
     var container = document.querySelector('.multiline-chart')
     datahub.chart.timeseriesMultilineChart({
@@ -417,12 +416,17 @@
 
     renderMainChart(timeSeries)
 
-    datahub.widget.number({
-        parent: document.querySelector('.number-widget.big'),
-        title: 'NET PRODUCTION',
-        value: '236,43GWh<div class="dh-tag">3,10%</div>',
-        info: 'Plan: 231,64GWh'
-    })
+    var number = datahub.widget.number({
+            parent: document.querySelector('.number-widget.big'),
+            title: 'title',
+            value: 'value',
+            info: 'info'
+        })
+        .on('click', function(d){ console.log(d) })
+
+    number.setTitle('NET PRODUCTION')
+        .setValue('236,43GWh<div class="dh-tag">3,10%</div>')
+        .setInfo('Plan: 231,64GWh')
 
     datahub.widget.number({
         parent: document.querySelector('.number-widget.medium'),
@@ -452,31 +456,37 @@
         }]
     })
 
-    datahub.widget.table({
+    var table = datahub.widget.table({
         parent: document.querySelector('.table-widget'),
-        elements: [
-            ['Spain', '1<span class="dh-tag">3,10%</span>', '<span class="dh-negative">(2)</span>'],
-            ['Germany', '7 <span class="dh-negative-arrow"></span>', '8 <span class="dh-positive-arrow"></span>'],
-            ['United Kingdom', '<span class="dh-positive-cell">1<span>', 2],
-            ['Poland', '95% <span class="dh-dim">/ 80%</span>', 8],
-            ['Netherlands', 1, 2],
-            ['Italy', 7, 8],
-        ],
-        metadata: [{
-            key: 'country',
-            label: 'Country',
+        header: [{
+            key: 'header1',
+            label: 'Header 1',
             sortable: true
-        }, {
-            key: 'production',
-            label: 'Production',
-            units: 'MWh',
-            sortable: true
-        }, {
-            key: 'revenues',
-            label: 'Revenues',
-            units: 'M€'
-        }]
+        }],
+        elements: [['Element 1']]
     })
+
+    table.setHeader([{
+        key: 'country',
+        label: 'Country',
+        sortable: true
+    }, {
+        key: 'production',
+        label: 'Production',
+        sortable: true
+    }, {
+        key: 'revenues',
+        label: 'Revenues',
+    }])
+
+    table.setElements([
+        ['Spain', '1<span class="dh-tag">3,10%</span>', '<span class="dh-negative">(2)</span>'],
+        ['Germany', '7 <span class="dh-negative-arrow"></span>', '8 <span class="dh-positive-arrow"></span>'],
+        ['United Kingdom', '<span class="dh-positive-cell">1<span>', 2],
+        ['Poland', '95% <span class="dh-dim">/ 80%</span>', 8],
+        ['Netherlands', 1, 2],
+        ['Italy', 7, 8],
+    ])
 
     var heightSelector = datahub.widget.buttonGroup({
         parent: document.querySelector('.button-group.vertical'),
@@ -552,11 +562,14 @@
         defaultElementKey: 'element1'
     })
 
-    datahub.widget.alertMessage({
+    var alert = datahub.widget.alertMessage({
         parent: document.querySelector('.alert-message1'),
         level: 'low',
-        message: 'Alert message, low'
+        message: 'Alert message'
     })
+
+    alert.setLevel('low')
+    alert.setMessage('Alert message, low')
 
     datahub.widget.alertMessage({
         parent: document.querySelector('.alert-message2'),
@@ -571,45 +584,44 @@
     })
 
     var monthCalendar = datahub.widget.monthCalendar({
-        parent: document.querySelector('.month-calendar'),
-        defaultDate: (new Date()).toString(),
-    })
+            parent: document.querySelector('.month-calendar'),
+            defaultDate: (new Date()).toString(),
+        })
+        .on('change', setDate)
 
-    function setDate() {
-        var date = monthCalendar.getFormattedDate()
-        document.querySelector('.selected-date').innerText = date
+    monthCalendar.setDate('2015-10-01T04:00:00.000Z')
+
+    function setDate(d) {
+        document.querySelector('.selected-date').innerText = d.iso
     }
-    setDate()
-    monthCalendar.events.on('change', setDate)
 
     var dropdown = datahub.widget.dropdown({
         parent: document.querySelector('.dropdown1'),
         elements: [{
             label: 'Element 1',
             key: 'element1'
-        }, {
-            label: 'Element 2',
-            key: 'element2'
         }],
+        selected: 'Element 1',
         title: 'title1'
     })
+    .on('change', function(d){ console.log(d) })
 
-    var dropdown = datahub.widget.dropdown({
-        parent: document.querySelector('.dropdown1'),
-        elements: [{
+    dropdown.setElements([
+        {
+            label: 'Element 1',
+            key: 'element1'
+        }, {
             label: 'Element 2',
             key: 'element2'
-        }, {
-            label: 'Element 3',
-            key: 'element3'
-        }],
-        title: 'title2'
-    })
+        }
+    ])
+    dropdown.setSelected('Element 2')
 
     datahub.widget.dropdownCalendar({
         parent: document.querySelector('.dropdown-calendar'),
         defaultDate: (new Date()).toString()
     })
+    .on('change', function(d){ console.log(d) })
 
     </script>
 </body>

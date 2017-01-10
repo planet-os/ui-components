@@ -50,17 +50,21 @@ body {
     color: white;
 }
 
-.datahub-button-group .element {
+.datahub-button-group .element,
+.datahub-dropdown .element {
     background-color: #5f6773;
 }
 
-.datahub-button-group .element:hover {
+.datahub-button-group .element:hover,
+.datahub-dropdown .element:hover {
     background-color: #5f6773;
     color: black;
     cursor: pointer;
 }
 
-.datahub-button-group .element.active {
+.datahub-button-group .element.active,
+.datahub-month-calendar .element.active,
+.datahub-dropdown .element.active {
     background-color: #adb7c5;
     color: black;
 }
@@ -75,7 +79,8 @@ body {
     color: #adb7c5;
 }
 
-.legend .datahub-button-group .element.active:hover {
+.legend .datahub-button-group .element.active:hover
+.datahub-dropdown .element.active:hover {
     color: #5f6773;
 }
 
