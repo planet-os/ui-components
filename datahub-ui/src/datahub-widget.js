@@ -213,42 +213,42 @@
             info: _config.info
         }
 
-        var template = '<div class="datahub-number">'
-            + '<div class="title"></div>'
-            + '<div class="value"></div>'
-            + '<div class="info"></div>'
+        var template = '<div class="datahub-number">' 
+            + '<div class="title"></div>' 
+            + '<div class="value"></div>' 
+            + '<div class="info"></div>' 
             + '</div>'
         var parentNode = utils.appendHtmlToNode(template, _config.parent)
         var parent = d3.select(parentNode)
             .on('click', function(d) {
                 events.call('click', null, configCache)
             })
-        
+
         var events = d3.dispatch('click')
 
         setTitle(configCache.title)
         setValue(configCache.value)
         setInfo(configCache.info)
 
-        function setTitle(text){
-            configCache.title = text
+        function setTitle(text) {
+            configCache.title = text || configCache.title
             parent.select('.title').html(text)
             return this
         }
 
-        function setValue(text){
-            configCache.value = text
+        function setValue(text) {
+            configCache.value = text || configCache.value
             parent.select('.value').html(text)
             return this
         }
 
-        function setInfo(text){
-            configCache.info = text
+        function setInfo(text) {
+            configCache.info = text || configCache.info
             parent.select('.info').html(text)
             return this
         }
 
-        return  {
+        return {
             on: utils.rebind(events),
             setTitle: setTitle,
             setValue: setValue,
@@ -257,8 +257,8 @@
     }
 
     var table = function(config) {
-        var template = '<div class="datahub-table">'
-            + '<div class="header-row"></div>'
+        var template = '<div class="datahub-table">' 
+            + '<div class="header-row"></div>' 
             + '</div>'
         var parentNode = utils.appendHtmlToNode(template, config.parent)
         var parent = d3.select(parentNode)
@@ -273,10 +273,9 @@
         renderHeader(config.header)
 
         function renderHeader(header) {
-            if(!header) {
+            if (!header) {
                 return this
-            }
-            else {
+            } else {
                 configCache.header = header
                 configCache.defaultSortKey = header[0].key
             }
@@ -285,9 +284,8 @@
             var headerCellsUpdate = headerCells.enter().append('div')
                 .attr('class', 'header-cell')
                 .on('click', function(d, i) {
-                    if (!this.classList.contains('sortable')
-                        || !configCache.elements) {
-                        return 
+                    if (!this.classList.contains('sortable') || !configCache.elements) {
+                        return
                     }
                     var that = this
                     var isAscending = false
@@ -308,15 +306,16 @@
                 .classed('ascending', function(d) {
                     return d.key === configCache.defaultSortKey
                 })
-                .html(function(d){ return d.label })
+                .html(function(d) {
+                    return d.label
+                })
             headerCells.exit().remove()
         }
 
         function renderCells(elements, _sortKey, _isAscending) {
-            if(!elements || !configCache.header) {
+            if (!elements || !configCache.header) {
                 return this
-            }
-            else {
+            } else {
                 configCache.elements = elements
             }
 
@@ -332,11 +331,15 @@
             rows.exit().remove()
 
             var cells = rowsUpdate.selectAll('.cell')
-                .data(function(d){ return d })
+                .data(function(d) {
+                    return d
+                })
             cells.enter().append('div')
                 .attr('class', 'cell')
                 .merge(cells)
-                .html(function(d){ return d })
+                .html(function(d) {
+                    return d
+                })
             cells.exit().remove()
         }
 
@@ -361,9 +364,9 @@
     }
 
     var alert = function(config) {
-        var template = '<div class="datahub-alert-message">'
-            + '<div class="alert-band"></div>'
-            + '<div class="alert-message"></div>'
+        var template = '<div class="datahub-alert-message">' 
+            + '<div class="alert-band"></div>' 
+            + '<div class="alert-message"></div>' 
             + '</div>'
         var parentNode = utils.appendHtmlToNode(template, config.parent)
         var parent = d3.select(parentNode)
@@ -380,20 +383,20 @@
         }
 
         return {
-            setLevel: setLevel, 
+            setLevel: setLevel,
             setMessage: setMessage
         }
     }
 
     var calendar = function(config) {
-        var template = '<div class="datahub-month-calendar">'
-            + ' <div class="year-selector">'
-            + '     <div class="prev-year">&lsaquo;</div>'
-            + '     <div class="selected-year"></div>'
-            + '     <div class="next-year">&rsaquo;</div>'
-            + ' </div>'
-            + ' <div class="month-selector">'
-            + ' </div>'
+        var template = '<div class="datahub-month-calendar">' 
+            + ' <div class="year-selector">' 
+            + '     <div class="prev-year">&lsaquo;</div>' 
+            + '     <div class="selected-year"></div>' 
+            + '     <div class="next-year">&rsaquo;</div>' 
+            + ' </div>' 
+            + ' <div class="month-selector">' 
+            + ' </div>' 
             + '</div>'
         var parentNode = utils.appendHtmlToNode(template, config.parent)
         var parent = d3.select(parentNode)
@@ -414,15 +417,17 @@
             var dateFormats = getDateFormats()
             events.call('change', null, dateFormats)
 
-            monthsUpdate.classed('active', function(d){ return d === configCache.month })
+            monthsUpdate.classed('active', function(d) {
+                return d === configCache.month
+            })
         }
 
         var selectYear = parent.select('.selected-year').text(configCache.year)
-        parent.select('.prev-year').on('click', function(d){
+        parent.select('.prev-year').on('click', function(d) {
             configCache.year -= 1
             changeYear()
         })
-        parent.select('.next-year').on('click', function(d){
+        parent.select('.next-year').on('click', function(d) {
             configCache.year += 1
             changeYear()
         })
@@ -431,8 +436,10 @@
             .data(monthNames)
         var monthsUpdate = months.enter().append('div')
             .attr('class', 'element month')
-            .text(function(d){ return d })
-            .on('click', function(d){
+            .text(function(d) {
+                return d
+            })
+            .on('click', function(d) {
                 var that = this
                 monthsUpdate.classed('active', function() {
                     return that === this
@@ -442,9 +449,17 @@
                 changeMonth()
             })
             .merge(months)
-            .classed('active', function(d){ return d === configCache.month })
+            .classed('active', function(d) {
+                return d === configCache.month
+            })
 
-        setDate(config.defaultDate || new Date())
+        if(config.defaultMonth, config.defaultYear) {
+            setMonth(config.defaultMonth)
+            setYear(config.defaultYear)
+        }
+        else {
+            setDate(config.defaultDate || new Date())
+        }
 
         function getDateFormats() {
             return {
@@ -455,6 +470,7 @@
                 formatted: getFormattedDate()
             }
         }
+
         function getDate() {
             return new Date(configCache.year, monthNames.indexOf(configCache.month))
         }
@@ -477,21 +493,33 @@
             changeMonth()
         }
 
-        return  {
+        function setMonth(month) {
+            configCache.month = month
+            changeMonth()
+        }
+
+        function setYear(year) {
+            configCache.year = year
+            changeYear()
+        }
+
+        return {
             on: utils.rebind(events),
             getDateFormats: getDateFormats,
             getDate: getDate,
             getISODate: getISODate,
             getFormattedDate: getFormattedDate,
-            setDate: setDate
+            setDate: setDate,
+            setMonth: setMonth,
+            setYear: setYear
         }
     }
 
     var dropdown = function(config) {
-        var template = '<div class="datahub-dropdown">'
-            + ' <div class="title"></div>'
-            + ' <div class="selected-element"></div>'
-            + ' <div class="elements"></div>'
+        var template = '<div class="datahub-dropdown">' 
+            + ' <div class="title"></div>' 
+            + ' <div class="selected-element"></div>' 
+            + ' <div class="elements"></div>' 
             + '</div>'
         var parentNode = utils.appendHtmlToNode(template, config.parent)
         var parent = d3.select(parentNode)
@@ -508,23 +536,27 @@
 
         function setSelected(label) {
             selectedElement.html(label)
-            if(elementsUpdate) {
-                elementsUpdate.classed('active', function(d){ return d.label === label })
+            if (elementsUpdate) {
+                elementsUpdate.classed('active', function(d) {
+                    return d.label === label
+                })
             }
             return this
         }
 
         function setElements(_elements) {
-            if(!_elements) {
+            if (!_elements) {
                 return this
             }
             var elements = elementsContainer.selectAll('.element')
-                .data(_elements, function(d){ return d.key })
+                .data(_elements, function(d) {
+                    return d.key
+                })
             elementsUpdate = elements.enter().append('div')
                 .attr('class', 'element')
                 .on('mouseover', open)
-                .on('click', function(d){
-                    if(config.ignoreClickEvents) {
+                .on('click', function(d) {
+                    if (config.ignoreClickEvents) {
                         return
                     }
                     var that = this
@@ -537,7 +569,9 @@
                     close()
                 })
                 .merge(elements)
-                .html(function(d){ return d.label })
+                .html(function(d) {
+                    return d.label
+                })
             elements.exit().remove()
 
             setSelected(config.selected || config.elements[0].label)
@@ -546,7 +580,7 @@
 
         setElements(config.elements)
 
-        function toggle(open){
+        function toggle(open) {
             elementsContainer.classed('active', open)
             return this
         }
@@ -567,7 +601,7 @@
 
         return {
             on: utils.rebind(events),
-            toggle: toggle, 
+            toggle: toggle,
             open: open,
             close: close,
             isOpened: isOpened,
@@ -579,37 +613,37 @@
     var dropdownCalendar = function(config) {
         var events = d3.dispatch('change')
 
-        var dropdown = datahub.widget.dropdown({
+        var menu = dropdown({
             parent: config.parent,
             title: 'title1',
             ignoreClickEvents: true
         })
 
-        var monthCalendar = datahub.widget.monthCalendar({
-            parent: config.parent.querySelector('.elements'),
-            defaultDate: config.defaultDate,
-        })
-        .on('change', function(d){
-            dropdown.setSelected(d.formatted)
-            events.call('change', null, d)
-        })
+        var monthCalendar = calendar({
+                parent: config.parent.querySelector('.elements'),
+                defaultDate: config.defaultDate,
+            })
+            .on('change', function(d) {
+                menu.setSelected(d.formatted)
+                events.call('change', null, d)
+            })
 
         setSelected()
 
         function setSelected() {
-            dropdown.setSelected(monthCalendar.getFormattedDate())
+            menu.setSelected(monthCalendar.getFormattedDate())
         }
 
         function setDate(date) {
             monthCalendar.setDate(date)
         }
-        
+
         return {
             on: utils.rebind(events),
-            toggle: dropdown.toggle, 
-            open: dropdown.open,
-            close: dropdown.close,
-            isOpened: dropdown.isOpened,
+            toggle: menu.toggle,
+            open: menu.open,
+            close: menu.close,
+            isOpened: menu.isOpened,
             getDateFormats: monthCalendar.getDateFormats,
             getDate: monthCalendar.getDate,
             getISODate: monthCalendar.getISODate,

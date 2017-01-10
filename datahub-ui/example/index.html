@@ -440,6 +440,15 @@
         info: 'MTD Actual'
     })
 
+    var numberGroup = datahub.group.number({
+        parent: document.querySelector('.number-group'),
+        values: ['235,43GWh', '235,43GWh', '15,00%'],
+        infos: ['Net Production', 'Plan: 231,64GWh', 'MTD Actual'],
+        titles: ['Title 1', 'Title 2', 'Title 3']
+    })
+
+    numberGroup.setValues(['236,43GWh', '236,43GWh', '16,00%'])
+
     datahub.group.number({
         parent: document.querySelector('.number-group'),
         elements: [{
