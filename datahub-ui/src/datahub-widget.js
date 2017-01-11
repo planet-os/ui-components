@@ -535,8 +535,10 @@
 
     var dropdown = function(config) {
         var template = '<div class="datahub-dropdown">' 
-            + ' <div class="title"></div>' 
-            + ' <div class="selected-element"></div>' 
+            + ' <div class="top">' 
+            + '     <div class="title"></div>' 
+            + '     <div class="selected-element"></div>'
+            + ' </div>'
             + ' <div class="elements"></div>' 
             + '</div>'
         var parentNode = utils.appendHtmlToNode(template, config.parent)
@@ -549,8 +551,7 @@
         var events = d3.dispatch('change')
 
         parent.select('.title').html(config.title)
-        var selectedElement = parent.select('.selected-element')
-            .on('mouseover', open)
+        var selectedElement = parent.on('mouseover', open).select('.selected-element')
 
         function setSelected(label) {
             selectedElement.html(label)
