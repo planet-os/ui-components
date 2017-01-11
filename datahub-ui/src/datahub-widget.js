@@ -232,19 +232,19 @@
 
         function setTitle(text) {
             configCache.title = text || configCache.title
-            parent.select('.title').html(text)
+            parent.select('.title').html(configCache.title)
             return this
         }
 
         function setValue(text) {
             configCache.value = text || configCache.value
-            parent.select('.value').html(text)
+            parent.select('.value').html(configCache.value)
             return this
         }
 
         function setInfo(text) {
             configCache.info = text || configCache.info
-            parent.select('.info').html(text)
+            parent.select('.info').html(configCache.info)
             return this
         }
 
