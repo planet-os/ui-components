@@ -633,7 +633,6 @@
 
         var menu = dropdown({
             parent: config.parent,
-            title: 'title1',
             ignoreClickEvents: true
         })
 
