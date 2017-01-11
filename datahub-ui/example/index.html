@@ -145,6 +145,22 @@
     </div>
     <div class="row section">
         <div class="col-xs-12 col-md-7">
+            <div class="bar-chart"></div>
+        </div>
+        <div class="col-xs-12 col-md-5">
+            <div class="description">A bar chart.</div>
+        </div>
+    </div>
+    <div class="row section">
+        <div class="col-xs-12 col-md-7">
+            <div class="stacked-bar-chart"></div>
+        </div>
+        <div class="col-xs-12 col-md-5">
+            <div class="description">A stacked bar chart.</div>
+        </div>
+    </div>
+    <div class="row section">
+        <div class="col-xs-12 col-md-7">
             <div class="row">
                 <div class="number-widget big col-xs"></div>
                 <div class="number-widget medium col-xs"></div>
@@ -350,9 +366,43 @@
         parent: document.querySelector('.map-selector')
     })
 
-    var timeSeries = datahub.data.generateTimeSeries(400, 3)
+    var timeSeries = datahub.data.generateTimeSeries(100, 3)
     var container = document.querySelector('.multiline-chart')
     datahub.chart.timeseriesMultilineChart({
+        parent: container,
+        width: container.clientWidth,
+        height: 300,
+        margin: {
+            top: 50,
+            right: 40,
+            bottom: 90,
+            left: 60
+        },
+        data: timeSeries,
+        axisTitleY: 'Unit',
+        reference: timeSeries.values[0][0]
+    })
+
+    var timeSeries = datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1)
+    var container = document.querySelector('.bar-chart')
+    datahub.chart.barChart({
+        parent: container,
+        width: container.clientWidth,
+        height: 300,
+        margin: {
+            top: 50,
+            right: 40,
+            bottom: 90,
+            left: 60
+        },
+        data: timeSeries,
+        axisTitleY: 'Unit',
+        reference: timeSeries.values[0][0]
+    })
+
+    var timeSeries = datahub.data.generateTimeSeries(12, 3, '2016-01-01', 'month', 1)
+    var container = document.querySelector('.stacked-bar-chart')
+    datahub.chart.stackedBarChart({
         parent: container,
         width: container.clientWidth,
         height: 300,
@@ -449,22 +499,6 @@
     })
 
     numberGroup.setValues(['236,43GWh', '236,43GWh', '16,00%'])
-
-    datahub.group.number({
-        parent: document.querySelector('.number-group'),
-        elements: [{
-            value: '236,43GWh',
-            info: 'Net Production'
-        },
-        {
-            value: '236,43GWh',
-            info: 'Plan: 231,64GWh'
-        },
-        {
-            value: '16,00%',
-            info: 'MTD Actual'
-        }]
-    })
 
     var table = datahub.widget.table({
         parent: document.querySelector('.table-widget'),
