@@ -44,6 +44,11 @@ body {
     stroke-dasharray: 5,5;
 }
 
+.datahub-chart .bar {
+    fill: #05BDFF;
+    stroke: white;
+}
+
 .datahub-table {
     color: white;
 }

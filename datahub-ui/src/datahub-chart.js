@@ -107,6 +107,18 @@
         }
     }
 
+    var barScaleX = function(config) {
+        var chartWidth = config.width - config.margin.left - config.margin.right
+        var dataX = config.data.timestamps
+        var scaleX = d3.scaleBand().domain(dataX).rangeRound([0, chartWidth])
+            .paddingInner(0.2).paddingOuter(0.2)
+
+        return {
+            scaleX: scaleX,
+            chartWidth: chartWidth
+        }
+    }
+
     var scaleY = function(config) {
         var chartHeight = config.height - config.margin.top - config.margin.bottom
         var extent = d3.extent(config.flattenedData)
@@ -124,6 +136,30 @@
         }
 
         var scaleY = d3.scaleLinear().domain(domain).range([chartHeight, 0])
+
+        return {
+            scaleY: scaleY,
+            chartHeight: chartHeight
+        }
+    }
+
+    var stackedScaleY = function(config) {
+        var chartHeight = config.height - config.margin.top - config.margin.bottom
+        var extent = d3.extent(config.flattenedData)
+        var domain
+        if (extent[1] === extent[0]) {
+            domain = [extent[0] - 0.1, extent[1] + 1]
+        } else {
+            var padding = (extent[1] - extent[0]) / 10
+            var paddedMin = extent[0] - padding
+            domain = [paddedMin, extent[1]]
+        }
+
+        if (config.dataIsAllNulls) {
+            domain = [null, null]
+        }
+
+        var scaleY = d3.scaleLinear().domain([0, 300]).range([chartHeight, 0])
 
         return {
             scaleY: scaleY,
@@ -327,6 +363,89 @@
         return {}
     }
 
+    var barShapes = function(config) {
+        var panel = shapePanel(config)
+
+        var shapes = panel.shapePanel.selectAll('rect.bar')
+            .data(config.dataConverted[0])
+        shapes.enter().append('rect')
+            .attr('class', 'bar')
+            .merge(shapes)
+            .attr('x', function(d) {
+                return config.scaleX(d.x)
+            })
+            .attr('y', function(d) {
+                return config.chartHeight - config.scaleY(d.y)
+            })
+            .attr('width', function(d) {
+                return config.scaleX.bandwidth()
+            })
+            .attr('height', function(d) {
+                return config.scaleY(d.y)
+            })
+        shapes.exit().remove()
+
+        return {}
+    }
+
+    var stackedBarShapes = function(config) {
+        var panel = shapePanel(config)
+
+        // var shapes = panel.shapePanel.selectAll('rect.bar')
+        //     .data(config.dataConverted[0])
+        // shapes.enter().append('rect')
+        //     .attr('class', 'bar')
+        //     .merge(shapes)
+        //     .attr('x', function(d) {
+        //         return config.scaleX(d.x)
+        //     })
+        //     .attr('y', function(d) {
+        //         return config.chartHeight - config.scaleY(d.y)
+        //     })
+        //     .attr('width', function(d) {
+        //         return config.scaleX.bandwidth()
+        //     })
+        //     .attr('height', function(d) {
+        //         return config.scaleY(d.y)
+        //     })
+        // shapes.exit().remove()
+
+        var keys = config.dataConverted.map(function(d, i) {
+                return 'y' + i
+            })
+            //TODO: move this to data conversion, use for finding stack max
+        var data = config.dataConverted[0].map(function(d, i) {
+            var datum = { x: d.x }
+            config.dataConverted.forEach(function(dB, iB) {
+                datum['y' + iB] = dB[i].y
+            })
+            return datum
+        })
+
+        panel.shapePanel.append("g")
+            .selectAll("g")
+            .data(d3.stack().keys(keys)(data))
+            .enter().append("g")
+            .selectAll("rect.bar")
+            .data(function(d) {
+                return d
+            })
+            .enter().append("rect")
+            .attr('class', 'bar')
+            .attr('x', function(d) {
+                return config.scaleX(d.data.x)
+            })
+            .attr('y', function(d) {
+                return config.scaleY(d[1])
+            })
+            .attr('height', function(d) {
+                return config.scaleY(d[0]) - config.scaleY(d[1])
+            })
+            .attr('width', config.scaleX.bandwidth())
+
+        return {}
+    }
+
     var stripes = function(config) {
         var panel = shapePanel(config)
 
@@ -338,12 +457,13 @@
         stripes.enter().append('rect')
             .attr('class', 'stripe')
             .merge(stripes)
-            .attr('x', function(d){ return config.scaleX(d) })
+            .attr('x', function(d) {
+                return config.scaleX(d)
+            })
             .attr('y', 0)
-            .attr('width', function(d){
-                if((config.scaleX(d) + stripeW) > config.chartWidth) {
+            .attr('width', function(d) {
+                if ((config.scaleX(d) + stripeW) > config.chartWidth) {
                     return config.chartWidth - config.scaleX(d)
-
                 }
                 return stripeW
             })
@@ -362,10 +482,16 @@
             .attr('class', 'reference-line')
             .merge(line)
             .attr('x1', 0)
-            .attr('y1', function(d){ return config.scaleY(d) || 0 })
+            .attr('y1', function(d) {
+                return config.scaleY(d) || 0
+            })
             .attr('x2', config.chartWidth)
-            .attr('y2', function(d){ return config.scaleY(d) || 0 })
-            .attr('display', function(d){ return d ? null : 'none' })
+            .attr('y2', function(d) {
+                return config.scaleY(d) || 0
+            })
+            .attr('display', function(d) {
+                return d ? null : 'none'
+            })
         line.exit().remove()
 
         return {}
@@ -423,8 +549,46 @@
         axisTitleComponentY
     )
 
+    var barChart = utils.pipeline(
+        mergeData2D,
+        axesFormatAutoconfig,
+        barScaleX,
+        scaleY,
+        axisX,
+        axisY,
+        widget.svgContainer,
+        axisComponentY,
+        barShapes,
+        referenceLine,
+        message,
+        axisComponentX,
+        axisTitleComponentX,
+        axisXFormatterRotate30,
+        axisTitleComponentY
+    )
+
+    var stackedBarChart = utils.pipeline(
+        mergeData2D,
+        axesFormatAutoconfig,
+        barScaleX,
+        stackedScaleY,
+        axisX,
+        axisY,
+        widget.svgContainer,
+        axisComponentY,
+        stackedBarShapes,
+        referenceLine,
+        message,
+        axisComponentX,
+        axisTitleComponentX,
+        axisXFormatterRotate30,
+        axisTitleComponentY
+    )
+
     exports.chart = {
-        timeseriesMultilineChart: timeseriesMultilineChart
+        timeseriesMultilineChart: timeseriesMultilineChart,
+        barChart: barChart,
+        stackedBarChart: stackedBarChart
     }
 
 }))

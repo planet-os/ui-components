@@ -132,7 +132,7 @@
         var intervalFunc = d3[intervalFuncName]
         var intervalRangeFunc = d3[intervalFuncName + 's']
         var dateStart = _timeStart ? new Date(_timeStart) : new Date()
-        var dateEnd = intervalFunc.offset(dateStart, n)
+        var dateEnd = intervalFunc.offset(dateStart, n * step)
 
         return intervalRangeFunc(dateStart, dateEnd, step)
     }
