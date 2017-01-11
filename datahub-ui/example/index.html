@@ -161,6 +161,14 @@
     </div>
     <div class="row section">
         <div class="col-xs-12 col-md-7">
+            <div class="multiline-chart-empty"></div>
+        </div>
+        <div class="col-xs-12 col-md-5">
+            <div class="description">A chart has an empty state.</div>
+        </div>
+    </div>
+    <div class="row section">
+        <div class="col-xs-12 col-md-7">
             <div class="row">
                 <div class="number-widget big col-xs"></div>
                 <div class="number-widget medium col-xs"></div>
@@ -368,7 +376,7 @@
 
     var timeSeries = datahub.data.generateTimeSeries(100, 3)
     var container = document.querySelector('.multiline-chart')
-    datahub.chart.timeseriesMultilineChart({
+    datahub.chart.lineChart({
         parent: container,
         width: container.clientWidth,
         height: 300,
@@ -417,10 +425,14 @@
         reference: timeSeries.values[0][0]
     })
 
+    datahub.chart.lineChart({
+        parent: document.querySelector('.multiline-chart-empty')
+    })
+
     var sliderChartContainer = document.querySelector('.slider-chart')
 
     function renderMainChart(timeSeries) {
-        datahub.chart.timeseriesMultilineChart({
+        datahub.chart.lineChart({
             parent: sliderChartContainer,
             width: sliderChartContainer.clientWidth,
             height: 300,

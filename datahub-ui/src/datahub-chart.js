@@ -6,26 +6,28 @@
     }
 }(this, function(exports, d3, utils, widget) {
 
-    var axesFormatAutoconfig = function(_config) {
+    var axesFormatAutoconfig = function(config) {
         var timeFormat = d3.utcFormat('%b %e, %Y at %H:%M UTC')
-
-        var fixedFloat = function(d) {
-            return (d % 1) ? ~~(d * 100) / 100 : d
+        var axisXFormat = ''
+        if (!config.dataIsEmpty) {
+            var fixedFloat = function(d) {
+                return (d % 1) ? ~~(d * 100) / 100 : d
+            }
+            var formatString = []
+            var timeExtent = d3.extent(config.data.timestamps)
+            var min = timeExtent[0]
+            var max = timeExtent[1]
+            if (min.getTime() !== max.getTime() || min.getUTCMonth() !== max.getUTCMonth()) {
+                formatString.push('%b %e')
+            }
+            if (min.getYear() !== max.getYear()) {
+                formatString.push('%Y')
+            }
+            if (min.getYear() === max.getYear() && min.getUTCHours() !== max.getUTCHours()) {
+                formatString.push('%H:%M')
+            }
+            axisXFormat = d3.utcFormat(formatString.join(' '))
         }
-        var formatString = []
-        var timeExtent = d3.extent(_config.data.timestamps)
-        var min = timeExtent[0]
-        var max = timeExtent[1]
-        if (min.getTime() !== max.getTime() || min.getUTCMonth() !== max.getUTCMonth()) {
-            formatString.push('%b %e')
-        }
-        if (min.getYear() !== max.getYear()) {
-            formatString.push('%Y')
-        }
-        if (min.getYear() === max.getYear() && min.getUTCHours() !== max.getUTCHours()) {
-            formatString.push('%H:%M')
-        }
-        var axisXFormat = d3.utcFormat(formatString.join(' '))
 
         return {
             axisXFormat: axisXFormat,
@@ -35,6 +37,21 @@
             tooltipFormat: function(d) {
                 return fixedFloat(d.data.y)
             }
+        }
+    }
+
+    var defaultConfig = function(config) {
+        var defaultMargin = {
+            top: 50,
+            right: 50,
+            bottom: 100,
+            left: 50
+        }
+
+        return {
+            margin: config.margin || defaultMargin,
+            width: config.width || 600,
+            height: config.height || 300
         }
     }
 
@@ -52,6 +69,15 @@
     }
 
     var mergeData2D = function(config) {
+        if (!config.data || !config.data.values || !config.data.timestamps) {
+            return {
+                dataConverted: [
+                    [{ x: null, y: null }]
+                ],
+                flattenedData: [],
+                dataIsEmpty: true
+            }
+        }
         var flattened = []
         var dataConverted = config.data.values.map(function(d, i) {
             flattened = flattened.concat(d)
@@ -98,7 +124,7 @@
 
     var scaleX = function(config) {
         var chartWidth = config.width - config.margin.left - config.margin.right
-        var dataX = config.data.timestamps
+        var dataX = config.dataIsEmpty ? [0] : config.data.timestamps
         var scaleX = d3.scaleTime().domain(d3.extent(dataX)).range([0, chartWidth])
 
         return {
@@ -109,7 +135,7 @@
 
     var barScaleX = function(config) {
         var chartWidth = config.width - config.margin.left - config.margin.right
-        var dataX = config.data.timestamps
+        var dataX = config.dataIsEmpty ? 0 : config.data.timestamps
         var scaleX = d3.scaleBand().domain(dataX).rangeRound([0, chartWidth])
             .paddingInner(0.2).paddingOuter(0.2)
 
@@ -286,14 +312,21 @@
 
     var message = function(config) {
         var panel = shapePanel(config)
+        var message = ''
+        if (config.dataIsEmpty) {
+            message = 'No data available'
+        } else if (config.dataIsAllNulls) {
+            message = 'Values are all null'
+        }
 
         var text = panel.shapePanel.selectAll('text')
-            .data(config.dataIsAllNulls ? [0] : [])
+            .data([message])
         text.enter().append('text')
             .merge(text)
             .attr('x', (config.scaleX.range()[1] - config.scaleX.range()[0]) / 2)
             .attr('y', (config.scaleY.range()[0] - config.scaleY.range()[1]) / 2)
-            .text('Values are all null')
+            .text(function(d) {
+                return d })
             .attr('dx', function(d) {
                 return -this.getBBox().width / 2
             })
@@ -372,16 +405,16 @@
             .attr('class', 'bar')
             .merge(shapes)
             .attr('x', function(d) {
-                return config.scaleX(d.x)
+                return config.scaleX(d.x) || 0
             })
             .attr('y', function(d) {
-                return config.chartHeight - config.scaleY(d.y)
+                return config.chartHeight - (config.scaleY(d.y) || 0)
             })
             .attr('width', function(d) {
                 return config.scaleX.bandwidth()
             })
             .attr('height', function(d) {
-                return config.scaleY(d.y)
+                return config.scaleY(d.y) || 0
             })
         shapes.exit().remove()
 
@@ -529,11 +562,12 @@
         return {}
     }
 
-    var timeseriesMultilineChart = utils.pipeline(
+    var lineChart = utils.pipeline(
+        defaultConfig,
         mergeData2D,
-        axesFormatAutoconfig,
         scaleX,
         scaleY,
+        axesFormatAutoconfig,
         axisX,
         axisY,
         widget.svgContainer,
@@ -550,10 +584,11 @@
     )
 
     var barChart = utils.pipeline(
+        defaultConfig,
         mergeData2D,
-        axesFormatAutoconfig,
         barScaleX,
         scaleY,
+        axesFormatAutoconfig,
         axisX,
         axisY,
         widget.svgContainer,
@@ -568,10 +603,11 @@
     )
 
     var stackedBarChart = utils.pipeline(
+        defaultConfig,
         mergeData2D,
-        axesFormatAutoconfig,
         barScaleX,
         stackedScaleY,
+        axesFormatAutoconfig,
         axisX,
         axisY,
         widget.svgContainer,
@@ -586,7 +622,7 @@
     )
 
     exports.chart = {
-        timeseriesMultilineChart: timeseriesMultilineChart,
+        lineChart: lineChart,
         barChart: barChart,
         stackedBarChart: stackedBarChart
     }
