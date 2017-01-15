@@ -104,19 +104,89 @@
         var value = ~~(Math.random() * 100)
         var array2D = generateArray(layerCount, function() {
             return generateArray(n, function(d) {
-                value += Math.random() * 2 - 1
+                value += (Math.random() * 2 - 1) * 10
                 value = Math.max(value, 0)
                 return value
             })
         })
-
-        var dateNow = new Date().getTime()
 
         var timestamps = generateTimestamps(_timeStart, n, _timeIncrement, _step)
 
         return {
             values: array2D,
             timestamps: timestamps
+        }
+    }
+
+    var mergeTimeseries = function(data) {
+        if(!data.timestamp) {
+            return []
+        }
+        var dataConverted = data.timestamp.map(function(d, i) {
+            var point = {timestamp: d}
+            for(var x in data) {
+                if(x === 'timestamp') {
+                    continue
+                }
+                var index = data[x].timestamps.map(Number).indexOf(+d)
+                var values = data[x].values
+                if(index === -1) {
+                    // point[x] = null
+                }
+                else {
+                    point[x] = values.length > 1 ? values.map(function(d){ return d[index] }) : values[0][index]
+                } 
+            }
+            return point
+        })
+
+        return splitTimeseries(dataConverted)
+    }
+
+    var splitTimeseries = function(data) {
+        var data = [].concat(data)
+        var timestamp = data.filter(function(d){ return d && d.timestamp })
+            .map(function(d){
+                return d.timestamp
+            })
+        var barData = data.filter(function(d){ return d && d.barData })
+            .map(function(d){
+                return { timestamp: d.timestamp, value: d.barData }
+            })
+        var stackedData = data.filter(function(d){ return d && d.stackedBarData })
+            .map(function(d){
+                return { timestamp: d.timestamp, value: d.stackedBarData}
+            })
+        var lineData = data.filter(function(d){ return d && d.lineData })
+            .map(function(d){
+                return { timestamp: d.timestamp, value: d.lineData}
+            })
+        var referenceData = data.filter(function(d){ return d && d.referenceData })
+            .map(function(d){
+                return { timestamp: d.timestamp, value: d.referenceData }
+            })
+        var estimatedData = data.filter(function(d){ return d && d.estimateBarData })
+            .map(function(d){
+                return { timestamp: d.timestamp, value: d.estimateBarData }
+            })
+        var thresholdData = data.filter(function(d){ return d && d.thresholdData })
+            .map(function(d){
+                return { timestamp: d.timestamp, value: d.thresholdData }
+            })
+        var areaData = data.filter(function(d){ return d && d.areaData })
+            .map(function(d){
+                return { timestamp: d.timestamp, value: d.areaData }
+            })
+
+        return {
+            barData: barData,
+            timestamp: timestamp,
+            stackedData: stackedData,
+            lineData: lineData,
+            referenceData: referenceData,
+            estimatedData: estimatedData,
+            thresholdData: thresholdData,
+            areaData: areaData
         }
     }
 
@@ -378,6 +448,7 @@
         generateRaster: generateRaster,
         generateGeojson: generateGeojson,
         generateTimeSeries: generateTimeSeries,
+        mergeTimeseries: mergeTimeseries,
         getDatasetDetails: getDatasetDetails,
         getVariables: getVariables,
         getTimestamps: getTimestamps,

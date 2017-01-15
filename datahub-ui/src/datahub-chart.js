@@ -1,470 +1,145 @@
 (function(root, factory) {
     if (typeof module === 'object' && module.exports) {
-        factory(module.exports, require('d3'), require('./datahub-utils.js').utils, require('./datahub-widget.js').widget)
+        factory(module.exports, 
+            require('d3'), 
+            require('./datahub-utils.js').utils, 
+            require('./datahub-common.js').chart
+        )
     } else {
-        factory((root.datahub = root.datahub || {}), root.d3, root.datahub.utils, root.datahub.widget)
+        factory((root.datahub = root.datahub || {}), root.d3, root.datahub.utils, root.datahub.common)
     }
-}(this, function(exports, d3, utils, widget) {
+}(this, function(exports, d3, utils, common) {
 
-    var axesFormatAutoconfig = function(config) {
-        var timeFormat = d3.utcFormat('%b %e, %Y at %H:%M UTC')
-        var axisXFormat = ''
-        if (!config.dataIsEmpty) {
-            var fixedFloat = function(d) {
-                return (d % 1) ? ~~(d * 100) / 100 : d
-            }
-            var formatString = []
-            var timeExtent = d3.extent(config.data.timestamps)
-            var min = timeExtent[0]
-            var max = timeExtent[1]
-            if (min.getTime() !== max.getTime() || min.getUTCMonth() !== max.getUTCMonth()) {
-                formatString.push('%b %e')
-            }
-            if (min.getYear() !== max.getYear()) {
-                formatString.push('%Y')
-            }
-            if (min.getYear() === max.getYear() && min.getUTCHours() !== max.getUTCHours()) {
-                formatString.push('%H:%M')
-            }
-            axisXFormat = d3.utcFormat(formatString.join(' '))
-        }
+    /*
+        TODO:
+        -integrate into powerboard
+        -stacked area chart
+        -retained mode?
+        -verify scale stack vs bar
+        -chart resize
+        -legend
+        -legend interaction
+        -line with second scale (how to match with the rest? as multiple?)
+        -generator with min/max, randow walk step
+    */
 
+    var dataAdapter = function(config) {
         return {
-            axisXFormat: axisXFormat,
-            axisTitleXFormat: function(d) {
-                return timeFormat(d.data.x)
-            },
-            tooltipFormat: function(d) {
-                return fixedFloat(d.data.y)
+            dataIsEmpty: !config.data || !config.data.timestamp.length,
+            data: config.data || {
+                barData: [],
+                timestamp: [],
+                stackedData: [],
+                lineData: [],
+                referenceData: [],
+                estimatedData: [],
+                thresholdData: [],
+                areaData: []
             }
         }
     }
 
-    var defaultConfig = function(config) {
-        var defaultMargin = {
-            top: 50,
-            right: 50,
-            bottom: 100,
-            left: 50
-        }
-
-        return {
-            margin: config.margin || defaultMargin,
-            width: config.width || 600,
-            height: config.height || 300
-        }
-    }
-
-    var mergeData = function(config) {
-        var dataConverted = config.data.timestamps.map(function(d, i) {
-            return {
-                x: d,
-                y: config.data.values[i]
-            }
-        })
-
-        return {
-            dataConverted: dataConverted
-        }
-    }
-
-    var mergeData2D = function(config) {
-        if (!config.data || !config.data.values || !config.data.timestamps) {
-            return {
-                dataConverted: [
-                    [{ x: null, y: null }]
-                ],
-                flattenedData: [],
-                dataIsEmpty: true
-            }
-        }
-        var flattened = []
-        var dataConverted = config.data.values.map(function(d, i) {
-            flattened = flattened.concat(d)
-            return config.data.timestamps.map(function(dB, iB) {
-                return {
-                    x: dB,
-                    y: d[iB]
-                }
-            })
-        })
-
-        return {
-            dataConverted: dataConverted,
-            flattenedData: flattened
-        }
-    }
-
-    var sortData = function(config) {
-        config.dataConverted.sort(function(_a, _b) {
-            var a = _a.x.getTime()
-            var b = _b.x.getTime()
-            if (a < b) {
-                return -1
-            } else if (a > b) {
-                return 1
-            } else {
-                return 0
-            }
-        })
-
-        return {}
-    }
-
-    var detectDataAllNulls = function(config) {
-        var allNulls = !config.flattenedData.filter(function(d) {
-                return d.y != null
-            })
-            .length
-
-        return {
-            dataIsAllNulls: allNulls
-        }
+    var printer = function(config){
+        console.warn(config);
     }
 
     var scaleX = function(config) {
         var chartWidth = config.width - config.margin.left - config.margin.right
-        var dataX = config.dataIsEmpty ? [0] : config.data.timestamps
-        var scaleX = d3.scaleTime().domain(d3.extent(dataX)).range([0, chartWidth])
-
-        return {
-            scaleX: scaleX,
-            chartWidth: chartWidth
-        }
-    }
-
-    var barScaleX = function(config) {
-        var chartWidth = config.width - config.margin.left - config.margin.right
-        var dataX = config.dataIsEmpty ? 0 : config.data.timestamps
+        var dataX = config.dataIsEmpty ? 0 : config.data.timestamp
         var scaleX = d3.scaleBand().domain(dataX).rangeRound([0, chartWidth])
-            .paddingInner(0.2).paddingOuter(0.2)
+            .paddingInner(0.4).paddingOuter(0.2)
+
+        var referenceScaleX = scaleX.copy().paddingInner(0.1).paddingOuter(0)
+        var stripeScaleX = scaleX.copy().paddingInner(0).paddingOuter(0)
+        var lineScaleX = scaleX.copy().paddingInner(1).paddingOuter(0.5)
 
         return {
             scaleX: scaleX,
+            referenceScaleX: referenceScaleX,
+            stripeScaleX: stripeScaleX,
+            lineScaleX: lineScaleX,
             chartWidth: chartWidth
         }
     }
 
     var scaleY = function(config) {
         var chartHeight = config.height - config.margin.top - config.margin.bottom
-        var extent = d3.extent(config.flattenedData)
-        var domain
-        if (extent[1] === extent[0]) {
-            domain = [extent[0] - 0.1, extent[1] + 1]
-        } else {
-            var padding = (extent[1] - extent[0]) / 10
-            var paddedMin = extent[0] - padding
-            domain = [paddedMin, extent[1]]
-        }
 
-        if (config.dataIsAllNulls) {
-            domain = [null, null]
+        var maxs = []
+        if(config.data.barData) {
+            maxs.push(d3.max(config.data.barData.map(function(d){ return d.value })))
         }
+        if(config.data.referenceData) {
+            maxs.push(d3.max(config.data.referenceData.map(function(d, i){ return d.value })))
+        }
+        if(config.data.estimatedData) {
+            maxs.push(d3.max(config.data.estimatedData.map(function(d, i){ return d.value })))
+        }
+        if(config.data.thresholdData) {
+            maxs.push(d3.max(config.data.thresholdData.map(function(d, i){ return d.value })))
+        }
+        if(config.data.areaData) {
+            maxs.push(d3.max(config.data.areaData.map(function(d, i){ return d.value })))
+        }
+        if(config.data.lineData && config.data.lineData.length) {
+            var data = config.data.lineData.map(function(d, i){ return d.value })
+            if(data[0].length) {
+                data = d3.merge(data)
+            }
+            maxs.push(d3.max(data))
+        }
+        if(config.data.stackedData && config.data.stackedData.length) {
+            var sums = config.data.stackedData.map(function(d) {
+                return d3.sum(d.value)
+            })
+            maxs.push(d3.max(sums))
+        }
+        var max = d3.max(maxs)
 
-        var scaleY = d3.scaleLinear().domain(domain).range([chartHeight, 0])
+        var scaleY = d3.scaleLinear().domain([0, max]).range([chartHeight, 0])
 
         return {
             scaleY: scaleY,
             chartHeight: chartHeight
         }
-    }
-
-    var stackedScaleY = function(config) {
-        var chartHeight = config.height - config.margin.top - config.margin.bottom
-        var extent = d3.extent(config.flattenedData)
-        var domain
-        if (extent[1] === extent[0]) {
-            domain = [extent[0] - 0.1, extent[1] + 1]
-        } else {
-            var padding = (extent[1] - extent[0]) / 10
-            var paddedMin = extent[0] - padding
-            domain = [paddedMin, extent[1]]
-        }
-
-        if (config.dataIsAllNulls) {
-            domain = [null, null]
-        }
-
-        var scaleY = d3.scaleLinear().domain([0, 300]).range([chartHeight, 0])
-
-        return {
-            scaleY: scaleY,
-            chartHeight: chartHeight
-        }
-    }
-
-    var axisX = function(config) {
-        var axisXFormat = config.axisXFormat || function(d) {
-            return d.toString()
-        }
-        var axisX = d3.axisBottom().scale(config.scaleX)
-            .tickFormat(config.axisXFormat)
-
-        return {
-            axisX: axisX
-        }
-    }
-
-    var axisY = function(config) {
-        var axisYFormat = config.axisYFormat || d3.format('.2s')
-        var height = config.scaleY.range()[0]
-        var axisY = d3.axisLeft().scale(config.scaleY)
-            .ticks(Math.max(~~(height / 30), 2))
-            .tickPadding(10)
-            .tickFormat(config.axisYFormat)
-            .tickSize(-config.chartWidth)
-
-        return {
-            axisY: axisY
-        }
-    }
-
-    var axisComponentX = function(config) {
-        var axisX = config.container.selectAll('g.axis.x')
-            .data([0])
-        axisX.enter().append('g')
-            .attr('class', 'x axis')
-            .attr('transform', 'translate(' + [0, config.chartHeight] + ')')
-            .merge(axisX)
-            .transition()
-            .duration(0)
-            .attr('transform', 'translate(' + [0, config.chartHeight] + ')')
-            .call(config.axisX)
-        axisX.exit().remove()
-
-        return {}
-    }
-
-    var axisComponentY = function(config) {
-        var padding = config.axisYPadding || 0
-        var axisY = config.container.selectAll('g.axis.y')
-            .data([0])
-        axisY.enter().append('g')
-            .attr('class', 'y axis')
-            .attr('transform', 'translate(' + [-padding / 2, 0] + ')')
-            .merge(axisY)
-            .transition()
-            .call(config.axisY)
-        axisY.exit().remove()
-
-        return {}
-    }
-
-    var axisTitleComponentX = function(config) {
-        var axisTitleXComponent = config.container.selectAll('text.axis-title.x')
-            .data([0])
-        var axisX = axisTitleXComponent.enter().append('text')
-            .attr('class', 'x axis-title')
-            .merge(axisTitleXComponent)
-            .text(config.axisTitleX || '')
-            .attr('x', config.chartWidth)
-            .attr('y', config.chartHeight)
-            .merge(axisTitleXComponent)
-        axisTitleXComponent.exit().remove()
-
-        return {
-            axisTitleXComponent: axisX
-        }
-    }
-
-    var axisTitleComponentY = function(config) {
-        var axisTitleY = config.container.selectAll('text.axis-title.y')
-            .data([0])
-        var axisY = axisTitleY.enter().append('text')
-            .attr('class', 'y axis-title')
-            .merge(axisTitleY)
-            .text(config.axisTitleY || '')
-            .attr('x', -40)
-            .attr('y', -10)
-        axisTitleY.exit().remove()
-
-        return {}
-    }
-
-    var chartTitleComponent = function(config) {
-        var axisTitleX = config.container.selectAll('text.chart-title')
-            .data([0])
-        axisTitleX.enter().append('text')
-            .attr('class', 'chart-title')
-            .merge(axisTitleX)
-            .text(config.chartTitle || '')
-            .attr('x', function(d) {
-                return (config.chartWidth - config.chartTitle.length * 5) / 2
-            })
-            .attr('y', -5)
-        axisTitleX.exit().remove()
-
-        return {}
-    }
-
-    var shapePanel = function(config) {
-        var shapePanel = config.container.selectAll('g.shapes')
-            .data([0])
-        var panel = shapePanel.enter().append('g')
-            .attr('class', 'shapes')
-            .merge(shapePanel)
-        shapePanel.exit().remove()
-
-        return {
-            shapePanel: panel
-        }
-    }
-
-    var message = function(config) {
-        var panel = shapePanel(config)
-        var message = ''
-        if (config.dataIsEmpty) {
-            message = 'No data available'
-        } else if (config.dataIsAllNulls) {
-            message = 'Values are all null'
-        }
-
-        var text = panel.shapePanel.selectAll('text')
-            .data([message])
-        text.enter().append('text')
-            .merge(text)
-            .attr('x', (config.scaleX.range()[1] - config.scaleX.range()[0]) / 2)
-            .attr('y', (config.scaleY.range()[0] - config.scaleY.range()[1]) / 2)
-            .text(function(d) {
-                return d })
-            .attr('dx', function(d) {
-                return -this.getBBox().width / 2
-            })
-        text.exit().remove()
-
-        return {}
-    }
-
-    var lineShapes = function(config) {
-        var panel = shapePanel(config)
-
-        var line = d3.line()
-            .defined(function(d) {
-                return d.y != null
-            })
-            .x(function(d) {
-                return config.scaleX(d.x)
-            })
-            .y(function(d) {
-                return config.scaleY(d.y)
-            })
-
-        var shapes = panel.shapePanel.selectAll('path.line')
-            .data(config.dataConverted)
-        shapes.enter().append('path')
-            .attr('class', function(d, i) {
-                var className = 'line shape color-' + i
-                if (config.metadata) {
-                    className = className + ' ' + config.metadata[i].key
-                }
-                return className
-            })
-            .style('fill', 'none')
-            .merge(shapes)
-            .classed('hidden', function(d, i) {
-                return config.metadata && config.metadata[i].isHidden
-            })
-            .attr('d', line)
-        shapes.exit().remove()
-
-        return {}
-    }
-
-    var lineCutShapes = function(config) {
-        var panel = shapePanel(config)
-
-        var dataCut = config.dataConverted.filter(function(d, i) {
-            var prev = config.dataConverted[Math.max(0, i - 1)].y
-            var next = config.dataConverted[Math.min(config.dataConverted.length - 1, i + 1)].y
-            return d.y !== null && (prev === null || next === null)
-        })
-
-        var shapes = panel.shapePanel.selectAll('circle.cut')
-            .data(dataCut)
-        shapes.enter().append('circle')
-            .attr('class', 'cut shape')
-            .merge(shapes)
-            .attr('cx', function(d) {
-                return config.scaleX(d.x)
-            })
-            .attr('cy', function(d) {
-                return config.scaleY(d.y)
-            })
-            .attr('r', 2)
-        shapes.exit().remove()
-
-        return {}
-    }
-
-    var barShapes = function(config) {
-        var panel = shapePanel(config)
-
-        var shapes = panel.shapePanel.selectAll('rect.bar')
-            .data(config.dataConverted[0])
-        shapes.enter().append('rect')
-            .attr('class', 'bar')
-            .merge(shapes)
-            .attr('x', function(d) {
-                return config.scaleX(d.x) || 0
-            })
-            .attr('y', function(d) {
-                return config.chartHeight - (config.scaleY(d.y) || 0)
-            })
-            .attr('width', function(d) {
-                return config.scaleX.bandwidth()
-            })
-            .attr('height', function(d) {
-                return config.scaleY(d.y) || 0
-            })
-        shapes.exit().remove()
-
-        return {}
     }
 
     var stackedBarShapes = function(config) {
-        var panel = shapePanel(config)
-
-        // var shapes = panel.shapePanel.selectAll('rect.bar')
-        //     .data(config.dataConverted[0])
-        // shapes.enter().append('rect')
-        //     .attr('class', 'bar')
-        //     .merge(shapes)
-        //     .attr('x', function(d) {
-        //         return config.scaleX(d.x)
-        //     })
-        //     .attr('y', function(d) {
-        //         return config.chartHeight - config.scaleY(d.y)
-        //     })
-        //     .attr('width', function(d) {
-        //         return config.scaleX.bandwidth()
-        //     })
-        //     .attr('height', function(d) {
-        //         return config.scaleY(d.y)
-        //     })
-        // shapes.exit().remove()
-
-        var keys = config.dataConverted.map(function(d, i) {
-                return 'y' + i
-            })
-            //TODO: move this to data conversion, use for finding stack max
-        var data = config.dataConverted[0].map(function(d, i) {
-            var datum = { x: d.x }
-            config.dataConverted.forEach(function(dB, iB) {
-                datum['y' + iB] = dB[i].y
-            })
-            return datum
+        if(!config.data.stackedData || !config.data.stackedData.length) {
+            return {}
+        }
+        var keys = config.data.stackedData[0].value.map(function(d, i) {
+            return 'y' + i
         })
 
-        panel.shapePanel.append("g")
-            .selectAll("g")
+        var data = []
+        config.data.stackedData.forEach(function(d, i) {
+            var datum = {x: d.timestamp}
+            if(d.value && d.value.length) {
+                d.value.forEach(function(dB, iB) {
+                    datum['y' + iB] = dB
+                })
+                data.push(datum)
+            }
+        })
+
+        var stackedBar = config.shapePanel.selectAll('g.stack')
             .data(d3.stack().keys(keys)(data))
-            .enter().append("g")
-            .selectAll("rect.bar")
-            .data(function(d) {
+        var bar = stackedBar.enter().append('g')
+            .attr('class', 'stack')
+            .merge(stackedBar)
+            .selectAll('rect.stacked-bar')
+            .data(function(d, i) {
+                d.forEach(function(dB){
+                    dB.index = d.index
+                })
                 return d
             })
-            .enter().append("rect")
-            .attr('class', 'bar')
+        bar.enter().append('rect')
+            .merge(bar)
+            .attr('class', function(d){
+                return 'stacked-bar layer' + d.index
+            })
             .attr('x', function(d) {
                 return config.scaleX(d.data.x)
             })
@@ -475,52 +150,223 @@
                 return config.scaleY(d[0]) - config.scaleY(d[1])
             })
             .attr('width', config.scaleX.bandwidth())
+        bar.exit().remove()
+        stackedBar.exit().remove()
+
+        return {}
+    }
+
+    var barShapes = function(config) {
+        var shapes = config.shapePanel.selectAll('rect.bar')
+            .data(config.data.barData)
+        shapes.enter().append('rect')
+            .attr('class', 'bar')
+            .merge(shapes)
+            .attr('x', function(d, i) {
+                return config.scaleX(d.timestamp) || 0
+            })
+            .attr('y', function(d) {
+                return (config.scaleY(d.value) || 0)
+            })
+            .attr('width', function(d) {
+                return config.scaleX.bandwidth()
+            })
+            .attr('height', function(d) {
+                return config.chartHeight - config.scaleY(d.value) || 0
+            })
+        shapes.exit().remove()
+
+        return {}
+    }
+
+    var futureShapes = function(config) {
+        var shapes = config.shapePanel.selectAll('rect.future-bar')
+            .data(config.data.estimatedData)
+        shapes.enter().append('rect')
+            .attr('class', 'future-bar')
+            .merge(shapes)
+            .attr('x', function(d, i) {
+                return config.scaleX(d.timestamp) || 0
+            })
+            .attr('y', function(d) {
+                return (config.scaleY(d.value) || 0)
+            })
+            .attr('width', function(d) {
+                return config.scaleX.bandwidth()
+            })
+            .attr('height', function(d) {
+                return config.chartHeight - config.scaleY(d.value) || 0
+            })
+        shapes.exit().remove()
 
         return {}
     }
 
     var stripes = function(config) {
-        var panel = shapePanel(config)
-
-        var ticks = config.scaleX.ticks()
-        var stripeW = (config.scaleX(ticks[1]) - config.scaleX(ticks[0])) / 2
-
-        var stripes = panel.shapePanel.selectAll('rect.stripe')
-            .data(ticks)
-        stripes.enter().append('rect')
+        var timestamps = config.data.timestamp
+            .filter(function(d, i){ return i%2 })
+        var shapes = config.container.selectAll('rect.stripe')
+            .data(timestamps)
+        shapes.enter().append('rect')
             .attr('class', 'stripe')
-            .merge(stripes)
-            .attr('x', function(d) {
-                return config.scaleX(d)
+            .merge(shapes)
+            .attr('x', function(d, i) {
+                return config.stripeScaleX(d) || 0
             })
-            .attr('y', 0)
+            .attr('y', function(d) {
+                return 0
+            })
             .attr('width', function(d) {
-                if ((config.scaleX(d) + stripeW) > config.chartWidth) {
-                    return config.chartWidth - config.scaleX(d)
-                }
-                return stripeW
+                return config.stripeScaleX.bandwidth()
             })
-            .attr('height', config.chartHeight)
-        stripes.exit().remove()
+            .attr('height', function(d) {
+                return config.chartHeight
+            })
+        shapes.exit().remove()
 
         return {}
     }
 
-    var referenceLine = function(config) {
-        var panel = shapePanel(config)
+    var referenceBarShapes = function(config) {
+        if(!config.data.referenceData) {
+            return {}
+        }
+        var shapes = config.shapePanel.selectAll('rect.reference-bar')
+            .data(config.data.referenceData)
+        shapes.enter().append('rect')
+            .attr('class', 'reference-bar')
+            .merge(shapes)
+            .attr('x', function(d, i) {
+                return config.referenceScaleX(d.timestamp) || 0
+            })
+            .attr('y', function(d) {
+                return (config.scaleY(d.value) || 0)
+            })
+            .attr('width', function(d) {
+                return config.referenceScaleX.bandwidth()
+            })
+            .attr('height', function(d) {
+                return config.chartHeight - config.scaleY(d.value) || 0
+            })
+        shapes.exit().remove()
 
-        var line = panel.shapePanel.selectAll('line.reference-line')
-            .data([config.reference])
+        var lines = config.shapePanel.selectAll('path.reference-top')
+            .data(config.data.referenceData)
+        lines.enter().append('path')
+            .attr('class', 'reference-top')
+            .merge(lines)
+            .attr('d', function(d, i) {
+                var x = config.referenceScaleX(d.timestamp) || 0
+                var y = config.scaleY(d.value) || 0
+                var width = config.referenceScaleX.bandwidth()
+                return 'M' + [[x, y], [x + width, y]]
+            })
+        lines.exit().remove()
+
+        return {}
+    }
+
+    var lineShapes = function(config) {
+        if(!config.data.lineData.length) {
+            return {}
+        }
+
+        var line = d3.line()
+            // .defined(function(d) {
+            //     return d.value != null
+            // })
+            .x(function(d) {
+                return config.lineScaleX(d.timestamp)
+            })
+            .y(function(d) {
+                return config.scaleY(d.value)
+            })
+
+        var data = []
+        var valueLength = config.data.lineData[0].value.length
+        if(typeof valueLength === 'undefined') {
+            data.push(config.data.lineData)
+        }
+        else {
+            for(var i=0; i<valueLength; i++) {
+                var layer = config.data.lineData.map(function(dB){
+                    return {timestamp: dB.timestamp, value: dB.value[i]}
+                })
+                data.push(layer)
+            }
+        }
+
+        var shapes = config.shapePanel.selectAll('path.line')
+            .data(data)
+        shapes.enter().append('path')
+            .attr('class', function(d, i) {
+                return 'line layer' + i
+            })
+            .style('fill', 'none')
+            .merge(shapes)
+            .attr('d', line)
+        shapes.exit().remove()
+
+        return {}
+    }
+
+    var areaShapes = function(config) {
+        if(!config.data.areaData || !config.data.areaData.length) {
+            return {}
+        }
+
+        var line = d3.area()
+            // .defined(function(d) {
+            //     return d.value != null
+            // })
+            .x(function(d) {
+                return config.lineScaleX(d.timestamp)
+            })
+            .y0(config.chartHeight)
+            .y1(function(d) {
+                return config.scaleY(d.value)
+            })
+
+        var data = []
+        var valueLength = config.data.areaData[0].value.length
+        if(typeof valueLength === 'undefined') {
+            data.push(config.data.areaData)
+        }
+        else {
+            for(var i=0; i<valueLength; i++) {
+                var layer = config.data.areaData.map(function(dB){
+                    return {timestamp: dB.timestamp, value: dB.value[i]}
+                })
+                data.push(layer)
+            }
+        }
+
+        var shapes = config.shapePanel.selectAll('path.area')
+            .data(data)
+        shapes.enter().append('path')
+            .attr('class', function(d, i) {
+                return 'area layer' + i
+            })
+            .merge(shapes)
+            .attr('d', line)
+        shapes.exit().remove()
+
+        return {}
+    }
+
+    var referenceLineShape = function(config) {
+        var line = config.shapePanel.selectAll('line.reference-line')
+            .data(config.data.thresholdData)
         line.enter().append('line')
             .attr('class', 'reference-line')
             .merge(line)
             .attr('x1', 0)
             .attr('y1', function(d) {
-                return config.scaleY(d) || 0
+                return config.scaleY(d.value) || 0
             })
             .attr('x2', config.chartWidth)
             .attr('y2', function(d) {
-                return config.scaleY(d) || 0
+                return config.scaleY(d.value) || 0
             })
             .attr('display', function(d) {
                 return d ? null : 'none'
@@ -530,101 +376,35 @@
         return {}
     }
 
-    var axisXFormatterTime = function(config) {
-        config.container.select('g.axis.x').selectAll('.tick text')
-            .text(function(d) {
-                return d3.timeFormat('%a')(d)
-            })
-
-        return {}
-    }
-
-    var axisXFormatterTimeHour = function(config) {
-        config.container.select('g.axis.x').selectAll('.tick text')
-            .text(function(d) {
-                return d3.timeFormat('%x')(d)
-            })
-
-        return {}
-    }
-
-    var axisXFormatterRotate30 = function(config) {
-        config.container.select('g.axis.x').selectAll('.tick text')
-            .style('transform', 'rotate(30deg)')
-            .style('text-anchor', 'start')
-
-        return {}
-    }
-
-    var axisYFormatSI = function(_config) {
-        config.axisY.tickFormat(d3.format('.2s'))
-
-        return {}
-    }
-
-    var lineChart = utils.pipeline(
-        defaultConfig,
-        mergeData2D,
+    var multi = utils.pipeline(
+        common.defaultConfig,
+        dataAdapter,
         scaleX,
         scaleY,
-        axesFormatAutoconfig,
-        axisX,
-        axisY,
-        widget.svgContainer,
+        // // chart.axesFormatAutoconfig,
+        common.axisX,
+        common.axisY,
+        common.svgContainer,
         stripes,
-        axisComponentY,
-        lineShapes,
-        lineCutShapes,
-        referenceLine,
-        message,
-        axisComponentX,
-        axisTitleComponentX,
-        axisXFormatterRotate30,
-        axisTitleComponentY
-    )
-
-    var barChart = utils.pipeline(
-        defaultConfig,
-        mergeData2D,
-        barScaleX,
-        scaleY,
-        axesFormatAutoconfig,
-        axisX,
-        axisY,
-        widget.svgContainer,
-        axisComponentY,
-        barShapes,
-        referenceLine,
-        message,
-        axisComponentX,
-        axisTitleComponentX,
-        axisXFormatterRotate30,
-        axisTitleComponentY
-    )
-
-    var stackedBarChart = utils.pipeline(
-        defaultConfig,
-        mergeData2D,
-        barScaleX,
-        stackedScaleY,
-        axesFormatAutoconfig,
-        axisX,
-        axisY,
-        widget.svgContainer,
-        axisComponentY,
+        common.shapePanel,
+        areaShapes,
+        referenceBarShapes,
         stackedBarShapes,
-        referenceLine,
-        message,
-        axisComponentX,
-        axisTitleComponentX,
-        axisXFormatterRotate30,
-        axisTitleComponentY
+        barShapes,
+        futureShapes,
+        lineShapes,
+        referenceLineShape,
+        common.axisComponentY,
+        common.message,
+        common.axisComponentX,
+        common.axisTitleComponentX,
+        // common.axisXFormatterRotate30,
+        common.axisTitleComponentY,
+        common.chartTitleComponent
     )
 
     exports.chart = {
-        lineChart: lineChart,
-        barChart: barChart,
-        stackedBarChart: stackedBarChart
+        multi: multi
     }
 
 }))

@@ -23,7 +23,7 @@ body {
 }
 
 .datahub-chart line {
-    stroke: #5f6773;
+    stroke: #adb7c5;
 }
 
 .datahub-chart .axis.x path,
@@ -33,6 +33,10 @@ body {
 
 .datahub-chart .axis.y path {
     display: none;
+}
+
+.datahub-chart .axis.y line {
+    opacity: 0.5;
 }
 
 .datahub-chart .stripe {
@@ -47,6 +51,54 @@ body {
 .datahub-chart .bar {
     fill: #05BDFF;
     stroke: white;
+}
+
+.datahub-chart .stacked-bar {
+    stroke: white;
+}
+
+.datahub-chart .stacked-bar.layer0 {
+    fill: #5ECF52;
+}
+
+.datahub-chart .stacked-bar.layer1 {
+    fill: #F8E81C;
+}
+
+.datahub-chart .stacked-bar.layer2 {
+    fill: #F6A623;
+}
+
+.datahub-chart .reference-bar {
+    fill: black;
+}
+
+.datahub-chart .reference-top {
+    stroke: #F6A623;
+    stroke-width: 2px;
+    opacity: 0.8;
+}
+
+.datahub-chart .future-bar {
+    fill: #F6A623;
+    opacity: 0.8;
+}
+
+.datahub-chart .line.layer0 {
+    stroke: #5ECF52;
+}
+
+.datahub-chart .line.layer1 {
+    stroke: #F8E81C;
+}
+
+.datahub-chart .line.layer2 {
+    stroke: #F6A623;
+}
+
+.datahub-chart .area {
+    fill: #5ECF52;
+    opacity: 0.8;
 }
 
 .datahub-table {

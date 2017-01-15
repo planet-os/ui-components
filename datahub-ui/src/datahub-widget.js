@@ -1,10 +1,10 @@
 (function(root, factory) {
     if (typeof module === 'object' && module.exports) {
-        factory(module.exports, require('d3'), require('./datahub-utils.js').utils)
+        factory(module.exports, require('d3'), require('./datahub-utils.js').utils, require('./datahub-common.js').common)
     } else {
-        factory((root.datahub = root.datahub || {}), root.d3, root.datahub.utils)
+        factory((root.datahub = root.datahub || {}), root.d3, root.datahub.utils, root.datahub.common)
     }
-}(this, function(exports, d3, utils) {
+}(this, function(exports, d3, utils, common) {
 
     var sliderScaleX = function(config) {
         var sliderWidth = config.width - config.margin.left - config.margin.right
@@ -30,44 +30,6 @@
         return {
             axisX: axisX,
             sliderHeight: sliderHeight
-        }
-    }
-
-    var container = function(config) {
-        var container = d3.select(config.parent)
-            .selectAll('div.widget-container')
-            .data([0])
-        var containerUpdate = container.enter().append('div')
-            .attr('class', 'widget-container')
-            .merge(container)
-            .attr('width', config.width)
-            .attr('height', config.height)
-        container.exit().remove()
-
-        return {
-            container: containerUpdate
-        }
-    }
-
-    var svgContainer = function(config) {
-        var widgetContainer = container(config).container
-
-        var root = widgetContainer.selectAll('svg')
-            .data([0])
-        var rootEnter = root.enter().append('svg')
-            .attr('class', 'datahub-chart')
-        var panel = rootEnter.append('g')
-            .attr('class', 'panel')
-            .merge(root)
-            .attr('transform', 'translate(' + config.margin.left + ',' + config.margin.top + ')')
-        rootEnter.merge(root)
-            .attr('width', config.width)
-            .attr('height', config.height)
-        root.exit().remove()
-
-        return {
-            root: root,
-            container: panel
         }
     }
 
@@ -674,19 +636,17 @@
     var timeSlider = utils.pipeline(
         sliderScaleX,
         sliderAxisX,
-        svgContainer,
+        common.svgContainer,
         sliderAxisComponentX,
         timeSlider
     )
 
     var buttonGroup = utils.pipeline(
-        container,
+        common.container,
         buttonGroupElements
     )
 
     exports.widget = {
-        container: container,
-        svgContainer: svgContainer,
         timeSlider: timeSlider,
         buttonGroup: buttonGroup,
         number: number,
