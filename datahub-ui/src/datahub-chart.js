@@ -3,7 +3,7 @@
         factory(module.exports, 
             require('d3'), 
             require('./datahub-utils.js').utils, 
-            require('./datahub-common.js').chart
+            require('./datahub-common.js').common
         )
     } else {
         factory((root.datahub = root.datahub || {}), root.d3, root.datahub.utils, root.datahub.common)
