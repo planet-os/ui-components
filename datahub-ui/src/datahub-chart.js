@@ -1,8 +1,8 @@
 (function(root, factory) {
     if (typeof module === 'object' && module.exports) {
-        factory(module.exports, 
-            require('d3'), 
-            require('./datahub-utils.js').utils, 
+        factory(module.exports,
+            require('d3'),
+            require('./datahub-utils.js').utils,
             require('./datahub-common.js').common
         )
     } else {
@@ -29,7 +29,7 @@
             data: config.data || {
                 barData: [],
                 timestamp: [],
-                stackedData: [],
+                stackedBarData: [],
                 lineData: [],
                 referenceData: [],
                 estimatedData: [],
@@ -39,7 +39,7 @@
         }
     }
 
-    var printer = function(config){
+    var printer = function(config) {
         console.warn(config);
     }
 
@@ -66,30 +66,48 @@
         var chartHeight = config.height - config.margin.top - config.margin.bottom
 
         var maxs = []
-        if(config.data.barData) {
-            maxs.push(d3.max(config.data.barData.map(function(d){ return d.value })))
+        if (config.data.barData) {
+            maxs.push(d3.max(config.data.barData.map(function(d) {
+                return d.value
+            })))
         }
-        if(config.data.referenceData) {
-            maxs.push(d3.max(config.data.referenceData.map(function(d, i){ return d.value })))
+        if (config.data.referenceData) {
+            maxs.push(d3.max(config.data.referenceData.map(function(d, i) {
+                return d.value
+            })))
         }
-        if(config.data.estimatedData) {
-            maxs.push(d3.max(config.data.estimatedData.map(function(d, i){ return d.value })))
+        if (config.data.estimatedData) {
+            maxs.push(d3.max(config.data.estimatedData.map(function(d, i) {
+                return d.value
+            })))
         }
-        if(config.data.thresholdData) {
-            maxs.push(d3.max(config.data.thresholdData.map(function(d, i){ return d.value })))
+        if (config.data.thresholdData) {
+            maxs.push(d3.max(config.data.thresholdData.map(function(d, i) {
+                return d.value
+            })))
         }
-        if(config.data.areaData) {
-            maxs.push(d3.max(config.data.areaData.map(function(d, i){ return d.value })))
+        if (config.data.areaData) {
+            maxs.push(d3.max(config.data.areaData.map(function(d, i) {
+                return d.value
+            })))
         }
-        if(config.data.lineData && config.data.lineData.length) {
-            var data = config.data.lineData.map(function(d, i){ return d.value })
-            if(data[0].length) {
+        if (config.data.lineData && config.data.lineData.length) {
+            var data = config.data.lineData.map(function(d, i) {
+                return d.value
+            })
+            if (data[0].length) {
                 data = d3.merge(data)
             }
             maxs.push(d3.max(data))
         }
-        if(config.data.stackedData && config.data.stackedData.length) {
-            var sums = config.data.stackedData.map(function(d) {
+        if (config.data.stackedBarData && config.data.stackedBarData.length) {
+            var sums = config.data.stackedBarData.map(function(d) {
+                return d3.sum(d.value)
+            })
+            maxs.push(d3.max(sums))
+        }
+        if (config.data.stackedAreaData && config.data.stackedAreaData.length) {
+            var sums = config.data.stackedAreaData.map(function(d) {
                 return d3.sum(d.value)
             })
             maxs.push(d3.max(sums))
@@ -105,17 +123,17 @@
     }
 
     var stackedBarShapes = function(config) {
-        if(!config.data.stackedData || !config.data.stackedData.length) {
+        if (!config.data.stackedBarData || !config.data.stackedBarData.length) {
             return {}
         }
-        var keys = config.data.stackedData[0].value.map(function(d, i) {
+        var keys = config.data.stackedBarData[0].value.map(function(d, i) {
             return 'y' + i
         })
 
         var data = []
-        config.data.stackedData.forEach(function(d, i) {
-            var datum = {x: d.timestamp}
-            if(d.value && d.value.length) {
+        config.data.stackedBarData.forEach(function(d, i) {
+            var datum = { x: d.timestamp }
+            if (d.value && d.value.length) {
                 d.value.forEach(function(dB, iB) {
                     datum['y' + iB] = dB
                 })
@@ -130,14 +148,14 @@
             .merge(stackedBar)
             .selectAll('rect.stacked-bar')
             .data(function(d, i) {
-                d.forEach(function(dB){
+                d.forEach(function(dB) {
                     dB.index = d.index
                 })
                 return d
             })
         bar.enter().append('rect')
             .merge(bar)
-            .attr('class', function(d){
+            .attr('class', function(d) {
                 return 'stacked-bar layer' + d.index
             })
             .attr('x', function(d) {
@@ -204,7 +222,8 @@
 
     var stripes = function(config) {
         var timestamps = config.data.timestamp
-            .filter(function(d, i){ return i%2 })
+            .filter(function(d, i) {
+                return i % 2 })
         var shapes = config.container.selectAll('rect.stripe')
             .data(timestamps)
         shapes.enter().append('rect')
@@ -228,7 +247,7 @@
     }
 
     var referenceBarShapes = function(config) {
-        if(!config.data.referenceData) {
+        if (!config.data.referenceData) {
             return {}
         }
         var shapes = config.shapePanel.selectAll('rect.reference-bar')
@@ -259,7 +278,10 @@
                 var x = config.referenceScaleX(d.timestamp) || 0
                 var y = config.scaleY(d.value) || 0
                 var width = config.referenceScaleX.bandwidth()
-                return 'M' + [[x, y], [x + width, y]]
+                return 'M' + [
+                    [x, y],
+                    [x + width, y]
+                ]
             })
         lines.exit().remove()
 
@@ -267,7 +289,7 @@
     }
 
     var lineShapes = function(config) {
-        if(!config.data.lineData.length) {
+        if (!config.data.lineData.length) {
             return {}
         }
 
@@ -284,13 +306,12 @@
 
         var data = []
         var valueLength = config.data.lineData[0].value.length
-        if(typeof valueLength === 'undefined') {
+        if (typeof valueLength === 'undefined') {
             data.push(config.data.lineData)
-        }
-        else {
-            for(var i=0; i<valueLength; i++) {
-                var layer = config.data.lineData.map(function(dB){
-                    return {timestamp: dB.timestamp, value: dB.value[i]}
+        } else {
+            for (var i = 0; i < valueLength; i++) {
+                var layer = config.data.lineData.map(function(dB) {
+                    return { timestamp: dB.timestamp, value: dB.value[i] }
                 })
                 data.push(layer)
             }
@@ -311,7 +332,7 @@
     }
 
     var areaShapes = function(config) {
-        if(!config.data.areaData || !config.data.areaData.length) {
+        if (!config.data.areaData || !config.data.areaData.length) {
             return {}
         }
 
@@ -329,13 +350,12 @@
 
         var data = []
         var valueLength = config.data.areaData[0].value.length
-        if(typeof valueLength === 'undefined') {
+        if (typeof valueLength === 'undefined') {
             data.push(config.data.areaData)
-        }
-        else {
-            for(var i=0; i<valueLength; i++) {
-                var layer = config.data.areaData.map(function(dB){
-                    return {timestamp: dB.timestamp, value: dB.value[i]}
+        } else {
+            for (var i = 0; i < valueLength; i++) {
+                var layer = config.data.areaData.map(function(dB) {
+                    return { timestamp: dB.timestamp, value: dB.value[i] }
                 })
                 data.push(layer)
             }
@@ -350,6 +370,65 @@
             .merge(shapes)
             .attr('d', line)
         shapes.exit().remove()
+
+        return {}
+    }
+
+    var stackedAreaShapes = function(config) {
+        if (!config.data.stackedAreaData || !config.data.stackedAreaData.length) {
+            return {}
+        }
+        var keys = config.data.stackedAreaData[0].value.map(function(d, i) {
+            return 'y' + i
+        })
+
+        var area = d3.area()
+            // .defined(function(d) {
+            //     return d.value != null
+            // })
+            .x(function(d) {
+                return config.lineScaleX(d.data.x)
+            })
+            .y0(function(d) {
+                return config.scaleY(d[0])
+            })
+            .y1(function(d) {
+                return config.scaleY(d[1])
+            })
+
+        var data = []
+        config.data.stackedAreaData.forEach(function(d, i) {
+            var datum = { x: d.timestamp }
+            if (d.value && d.value.length) {
+                d.value.forEach(function(dB, iB) {
+                    datum['y' + iB] = dB
+                })
+                data.push(datum)
+            }
+        })
+
+        var stackedBar = config.shapePanel.selectAll('g.stack-area')
+            .data(d3.stack().keys(keys)(data))
+        var bar = stackedBar.enter().append('g')
+            .attr('class', 'stack-area')
+            .merge(stackedBar)
+            .selectAll('path.stacked-area')
+            .data(function(d, i) {
+                d.forEach(function(dB) {
+                    dB.index = d.index
+                })
+                return [d]
+            })
+        bar.enter().append('path')
+            .merge(bar)
+            .attr('class', function(d) {
+                return 'stacked-area layer' + d.index
+            })
+            .attr('d', function(d, i) {
+                return area(d, i)
+            })
+        bar.exit().remove()
+        stackedBar.exit().remove()
 
         return {}
     }
@@ -390,6 +469,7 @@
         areaShapes,
         referenceBarShapes,
         stackedBarShapes,
+        stackedAreaShapes,
         barShapes,
         futureShapes,
         lineShapes,

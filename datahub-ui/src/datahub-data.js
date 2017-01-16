@@ -153,7 +153,7 @@
             .map(function(d){
                 return { timestamp: d.timestamp, value: d.barData }
             })
-        var stackedData = data.filter(function(d){ return d && d.stackedBarData })
+        var stackedBarData = data.filter(function(d){ return d && d.stackedBarData })
             .map(function(d){
                 return { timestamp: d.timestamp, value: d.stackedBarData}
             })
@@ -178,15 +178,21 @@
                 return { timestamp: d.timestamp, value: d.areaData }
             })
 
+        var stackedAreaData = data.filter(function(d){ return d && d.stackedAreaData })
+            .map(function(d){
+                return { timestamp: d.timestamp, value: d.stackedAreaData}
+            })
+
         return {
             barData: barData,
             timestamp: timestamp,
-            stackedData: stackedData,
+            stackedBarData: stackedBarData,
             lineData: lineData,
             referenceData: referenceData,
             estimatedData: estimatedData,
             thresholdData: thresholdData,
-            areaData: areaData
+            areaData: areaData,
+            stackedAreaData: stackedAreaData
         }
     }
 

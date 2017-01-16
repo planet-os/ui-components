@@ -123,6 +123,14 @@
     </div>
     <div class="row section">
         <div class="col-xs-12 col-md-7">
+            <div class="stacked-area-chart"></div>
+        </div>
+        <div class="col-xs-12 col-md-5">
+            <div class="description">A stacked area chart.</div>
+        </div>
+    </div>
+    <div class="row section">
+        <div class="col-xs-12 col-md-7">
             <div class="chart-types"></div>
         </div>
         <div class="col-xs-12 col-md-5">
@@ -360,6 +368,18 @@
     }
 
     var container = document.querySelector('.area-chart')
+    datahub.chart.multi({
+        parent: container,
+        width: container.clientWidth,
+        data: datahub.data.mergeTimeseries(dataMulti)
+    })
+
+    var dataMulti = {
+        timestamp: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1).timestamps,
+        stackedAreaData: datahub.data.generateTimeSeries(12, 3, '2016-01-01', 'month', 1)
+    }
+
+    var container = document.querySelector('.stacked-area-chart')
     datahub.chart.multi({
         parent: container,
         width: container.clientWidth,
