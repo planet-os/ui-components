@@ -243,7 +243,6 @@
     }
 
     var message = function(config) {
-        var panel = shapePanel(config)
         var message = ''
         if (config.dataIsEmpty) {
             message = 'No data available'
@@ -251,7 +250,8 @@
             message = 'Values are all null'
         }
 
-        var text = panel.shapePanel.selectAll('text')
+        var text = config.container.select('.message-group')
+            .selectAll('text')
             .data([message])
         text.enter().append('text')
             .merge(text)

@@ -12,7 +12,6 @@
 
     /*
         TODO:
-        -each shape type in its own group
         -retained mode?
         -verify scale stack vs bar
         -chart resize
@@ -20,6 +19,50 @@
         -legend interaction
         -line with second scale (how to match with the rest? as multiple?)
     */
+
+    var template = function(config) {
+        var containerNode = config.parent.querySelector('.widget-container')
+        if(!container) {
+            var template = '<div class="widget-container">'
+                + '<svg class="datahub-chart">'
+                    + '<g class="panel">'
+                        + '<g class="stripe-group"></g>'
+                        + '<g class="reference-bar-group"></g>'
+                        + '<g class="reference-line-group"></g>'                    
+                        + '<g class="bar-group"></g>'
+                        + '<g class="stacked-bar-group"></g>'
+                        + '<g class="estimate-bar-group"></g>'
+                        + '<g class="line-group"></g>'
+                        + '<g class="area-group"></g>'
+                        + '<g class="stacked-area-group"></g>'
+                        + '<g class="threshold-line-group"></g>'
+                        + '<g class="y axis"></g>'
+                        + '<g class="x axis"></g>'
+                        + '<g class="title-container">'
+                            + '<text class="y axis-title"></text>'
+                            + '<text class="x axis-title"></text>'
+                            + '<text class="chart-title"></text>'
+                        + '</g>'
+                        + '<g class="message-group"></g>'
+                    + '</g>'
+                + '</svg>'
+            + '</div>'
+
+            containerNode = utils.appendHtmlToNode(template, config.parent)
+        }
+        var container = d3.select(containerNode)
+
+        container.select('svg')
+            .attr('width', config.width)
+            .attr('height', config.height)
+
+        container.select('.panel')
+            .attr('transform', 'translate(' + config.margin.left + ',' + config.margin.top + ')')
+
+        return {
+            container: container
+        }
+    }
 
     var dataAdapter = function(config) {
         return {
@@ -139,7 +182,8 @@
             }
         })
 
-        var stackedBar = config.shapePanel.selectAll('g.stack')
+        var stackedBar = config.container.select('.stacked-bar-group')
+            .selectAll('g.stack')
             .data(d3.stack().keys(keys)(data))
         var bar = stackedBar.enter().append('g')
             .attr('class', 'stack')
@@ -173,7 +217,8 @@
     }
 
     var barShapes = function(config) {
-        var shapes = config.shapePanel.selectAll('rect.bar')
+        var shapes = config.container.select('.bar-group')
+            .selectAll('rect.bar')
             .data(config.data.barData)
         shapes.enter().append('rect')
             .attr('class', 'bar')
@@ -195,11 +240,12 @@
         return {}
     }
 
-    var futureShapes = function(config) {
-        var shapes = config.shapePanel.selectAll('rect.future-bar')
+    var estimateBarShapes = function(config) {
+        var shapes = config.container.select('.estimate-bar-group')
+            .selectAll('rect.estimate-bar')
             .data(config.data.estimatedData)
         shapes.enter().append('rect')
-            .attr('class', 'future-bar')
+            .attr('class', 'estimate-bar')
             .merge(shapes)
             .attr('x', function(d, i) {
                 return config.scaleX(d.timestamp) || 0
@@ -223,7 +269,8 @@
             .filter(function(d, i) {
                 return i % 2
             })
-        var shapes = config.container.selectAll('rect.stripe')
+        var shapes = config.container.select('.stripe-group')
+            .selectAll('rect.stripe')
             .data(timestamps)
         shapes.enter().append('rect')
             .attr('class', 'stripe')
@@ -249,7 +296,8 @@
         if (!config.data.referenceData) {
             return {}
         }
-        var shapes = config.shapePanel.selectAll('rect.reference-bar')
+        var shapes = config.container.select('.reference-bar-group')
+            .selectAll('rect.reference-bar')
             .data(config.data.referenceData)
         shapes.enter().append('rect')
             .attr('class', 'reference-bar')
@@ -268,7 +316,8 @@
             })
         shapes.exit().remove()
 
-        var lines = config.shapePanel.selectAll('path.reference-top')
+        var lines = config.container.select('.reference-line-group')
+            .selectAll('path.reference-top')
             .data(config.data.referenceData)
         lines.enter().append('path')
             .attr('class', 'reference-top')
@@ -316,7 +365,8 @@
             }
         }
 
-        var shapes = config.shapePanel.selectAll('path.line')
+        var shapes = config.container.select('.line-group')
+            .selectAll('path.line')
             .data(data)
         shapes.enter().append('path')
             .attr('class', function(d, i) {
@@ -360,7 +410,8 @@
             }
         }
 
-        var shapes = config.shapePanel.selectAll('path.area')
+        var shapes = config.container.select('.area-group')
+            .selectAll('path.area')
             .data(data)
         shapes.enter().append('path')
             .attr('class', function(d, i) {
@@ -406,7 +457,8 @@
             }
         })
 
-        var stackedBar = config.shapePanel.selectAll('g.stack-area')
+        var stackedBar = config.container.select('.stacked-area-group')
+            .selectAll('g.stack-area')
             .data(d3.stack().keys(keys)(data))
         var bar = stackedBar.enter().append('g')
             .attr('class', 'stack-area')
@@ -432,8 +484,9 @@
         return {}
     }
 
-    var referenceLineShape = function(config) {
-        var line = config.shapePanel.selectAll('line.reference-line')
+    var thresholdLineShape = function(config) {
+        var line = config.container.select('.threshold-line-group')
+            .selectAll('line.reference-line')
             .data(config.data.thresholdData)
         line.enter().append('line')
             .attr('class', 'reference-line')
@@ -459,20 +512,19 @@
         dataAdapter,
         scaleX,
         scaleY,
-        // // chart.axesFormatAutoconfig,
+        // chart.axesFormatAutoconfig,
         common.axisX,
         common.axisY,
-        common.svgContainer,
+        template,
         stripes,
-        common.shapePanel,
         areaShapes,
         referenceBarShapes,
         stackedBarShapes,
         stackedAreaShapes,
         barShapes,
-        futureShapes,
+        estimateBarShapes,
         lineShapes,
-        referenceLineShape,
+        thresholdLineShape,
         common.axisComponentY,
         common.message,
         common.axisComponentX,
