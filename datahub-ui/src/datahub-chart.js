@@ -12,15 +12,13 @@
 
     /*
         TODO:
-        -integrate into powerboard
-        -stacked area chart
+        -each shape type in its own group
         -retained mode?
         -verify scale stack vs bar
         -chart resize
         -legend
         -legend interaction
         -line with second scale (how to match with the rest? as multiple?)
-        -generator with min/max, randow walk step
     */
 
     var dataAdapter = function(config) {
@@ -223,7 +221,8 @@
     var stripes = function(config) {
         var timestamps = config.data.timestamp
             .filter(function(d, i) {
-                return i % 2 })
+                return i % 2
+            })
         var shapes = config.container.selectAll('rect.stripe')
             .data(timestamps)
         shapes.enter().append('rect')
