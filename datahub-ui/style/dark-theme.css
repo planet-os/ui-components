@@ -57,15 +57,18 @@ body {
     stroke: white;
 }
 
-.datahub-chart .stacked-bar.layer0 {
+.datahub-chart .stacked-bar.layer0,
+.datahub-chart .stacked-area.layer0 {
     fill: #5ECF52;
 }
 
-.datahub-chart .stacked-bar.layer1 {
+.datahub-chart .stacked-bar.layer1,
+.datahub-chart .stacked-area.layer1 {
     fill: #F8E81C;
 }
 
-.datahub-chart .stacked-bar.layer2 {
+.datahub-chart .stacked-bar.layer2,
+.datahub-chart .stacked-area.layer2 {
     fill: #F6A623;
 }
 
