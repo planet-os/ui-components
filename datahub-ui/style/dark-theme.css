@@ -104,6 +104,27 @@ body {
     opacity: 0.8;
 }
 
+.dummy .datahub-chart .bar {
+    fill: #444;
+    stroke: none;
+    opacity: 0.5;
+}
+
+.dummy .datahub-chart .axis,
+.dummy .datahub-chart .stripe {
+    opacity: 0.3;
+}
+
+.dummy .datahub-chart .axis.x path,
+.dummy .datahub-chart .axis.x .tick line {
+    stroke: #888;
+}
+
+.dummy .datahub-chart .title-container,
+.dummy .datahub-chart .axis text {
+    display: none;
+}
+
 .datahub-table {
     color: white;
 }
