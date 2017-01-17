@@ -22,7 +22,7 @@
 
     var template = function(config) {
         var containerNode = config.parent.querySelector('.widget-container')
-        if(!container) {
+        if(!containerNode) {
             var template = '<div class="widget-container">'
                 + '<svg class="datahub-chart">'
                     + '<g class="panel">'
