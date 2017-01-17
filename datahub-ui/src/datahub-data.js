@@ -13,7 +13,7 @@
         apiKey: null
     }
 
-    var setApiKey = function(apiKey){
+    var setApiKey = function(apiKey) {
         apiConfig.apiKey = apiKey
 
         return this
@@ -64,11 +64,11 @@
         }
     }
 
-    var getWorldVector = function(cb){
+    var getWorldVector = function(cb) {
         var geojsonUrl = 'https://cdn.rawgit.com/johan/world.geo.json/master/countries.geo.json'
 
         getJSON(geojsonUrl, function(error, json) {
-            cb(json);
+            cb(json)
         })
     }
 
@@ -119,23 +119,24 @@
     }
 
     var mergeTimeseries = function(data) {
-        if(!data.timestamp) {
+        if (!data.timestamp) {
             return []
         }
         var dataConverted = data.timestamp.map(function(d, i) {
-            var point = {timestamp: d}
-            for(var x in data) {
-                if(x === 'timestamp') {
+            var point = { timestamp: d }
+            for (var x in data) {
+                if (x === 'timestamp') {
                     continue
                 }
                 var index = data[x].timestamps.map(Number).indexOf(+d)
                 var values = data[x].values
-                if(index === -1) {
+                if (index === -1) {
                     // point[x] = null
+                } else {
+                    point[x] = values.length > 1 ? values.map(function(d) {
+                        return d[index]
+                    }) : values[0][index]
                 }
-                else {
-                    point[x] = values.length > 1 ? values.map(function(d){ return d[index] }) : values[0][index]
-                } 
             }
             return point
         })
@@ -145,42 +146,60 @@
 
     var splitTimeseries = function(data) {
         var data = [].concat(data)
-        var timestamp = data.filter(function(d){ return d && d.timestamp })
-            .map(function(d){
+        var timestamp = data.filter(function(d) {
+                return d && d.timestamp
+            })
+            .map(function(d) {
                 return d.timestamp
             })
-        var barData = data.filter(function(d){ return d && d.barData })
-            .map(function(d){
+        var barData = data.filter(function(d) {
+                return d && d.barData
+            })
+            .map(function(d) {
                 return { timestamp: d.timestamp, value: d.barData }
             })
-        var stackedBarData = data.filter(function(d){ return d && d.stackedBarData })
-            .map(function(d){
-                return { timestamp: d.timestamp, value: d.stackedBarData}
+        var stackedBarData = data.filter(function(d) {
+                return d && d.stackedBarData
             })
-        var lineData = data.filter(function(d){ return d && d.lineData })
-            .map(function(d){
-                return { timestamp: d.timestamp, value: d.lineData}
+            .map(function(d) {
+                return { timestamp: d.timestamp, value: d.stackedBarData }
             })
-        var referenceData = data.filter(function(d){ return d && d.referenceData })
-            .map(function(d){
+        var lineData = data.filter(function(d) {
+                return d && d.lineData
+            })
+            .map(function(d) {
+                return { timestamp: d.timestamp, value: d.lineData }
+            })
+        var referenceData = data.filter(function(d) {
+                return d && d.referenceData
+            })
+            .map(function(d) {
                 return { timestamp: d.timestamp, value: d.referenceData }
             })
-        var estimatedData = data.filter(function(d){ return d && d.estimateBarData })
-            .map(function(d){
+        var estimatedData = data.filter(function(d) {
+                return d && d.estimateBarData
+            })
+            .map(function(d) {
                 return { timestamp: d.timestamp, value: d.estimateBarData }
             })
-        var thresholdData = data.filter(function(d){ return d && d.thresholdData })
-            .map(function(d){
+        var thresholdData = data.filter(function(d) {
+                return d && d.thresholdData
+            })
+            .map(function(d) {
                 return { timestamp: d.timestamp, value: d.thresholdData }
             })
-        var areaData = data.filter(function(d){ return d && d.areaData })
-            .map(function(d){
+        var areaData = data.filter(function(d) {
+                return d && d.areaData
+            })
+            .map(function(d) {
                 return { timestamp: d.timestamp, value: d.areaData }
             })
 
-        var stackedAreaData = data.filter(function(d){ return d && d.stackedAreaData })
-            .map(function(d){
-                return { timestamp: d.timestamp, value: d.stackedAreaData}
+        var stackedAreaData = data.filter(function(d) {
+                return d && d.stackedAreaData
+            })
+            .map(function(d) {
+                return { timestamp: d.timestamp, value: d.stackedAreaData }
             })
 
         return {
@@ -232,12 +251,11 @@
         xhr.send()
     }
 
-    function verifyApiKey(apiKey){
-        if(apiKey) {
+    function verifyApiKey(apiKey) {
+        if (apiKey) {
             return true
-        }
-        else {
-            throw 'You need to set an API key using `datahub.data.setApiKey(API_KEY)`. You can get yours at http://data.planetos.com/';
+        } else {
+            throw 'You need to set an API key using `datahub.data.setApiKey(API_KEY)`. You can get yours at http://data.planetos.com/'
         }
     }
 

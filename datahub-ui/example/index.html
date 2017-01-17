@@ -164,6 +164,14 @@
     </div>
     <div class="row section">
         <div class="col-xs-12 col-md-7">
+            <div class="chart-dummy dummy"></div>
+        </div>
+        <div class="col-xs-12 col-md-5">
+            <div class="description">A chart can have a "dummy" state to act like a placeholder.</div>
+        </div>
+    </div>
+    <div class="row section">
+        <div class="col-xs-12 col-md-7">
             <div class="row">
                 <div class="number-widget big col-xs"></div>
                 <div class="number-widget medium col-xs"></div>
@@ -388,11 +396,11 @@
 
     var dataMulti = {
         timestamp: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1).timestamps,
-        barData: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1),
+        // barData: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1),
         stackedBarData: datahub.data.generateTimeSeries(8, 3, '2016-01-01', 'month', 1),
         estimateBarData: datahub.data.generateTimeSeries(4, 1, '2016-09-01', 'month', 1),
         lineData: datahub.data.generateTimeSeries(12, 2, '2016-01-01', 'month', 1),
-        areaData: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1),
+        // areaData: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1),
         referenceData: datahub.data.generateTimeSeries(8, 1, '2016-01-01', 'month', 1),
         thresholdData: datahub.data.generateTimeSeries(1, 1, '2016-01-01', 'month', 12)
     }
@@ -446,6 +454,18 @@
     datahub.chart.multi({
         parent: container,
         width: container.clientWidth
+    })
+
+    var dataMulti = {
+        timestamp: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1).timestamps,
+        barData: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1),
+    }
+
+    var container = document.querySelector('.chart-dummy')
+    datahub.chart.multi({
+        parent: container,
+        width: container.clientWidth,
+        data: datahub.data.mergeTimeseries(dataMulti)
     })
 
     var sliderChartContainer = document.querySelector('.slider-chart')

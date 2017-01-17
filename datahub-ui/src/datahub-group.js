@@ -30,8 +30,8 @@
                 .data(data)
             elements.enter().append('div')
                 .attr('class', 'element-container')
-                .each(function(d){
-                    numberWidgets.push(widget.number({parent: this}))
+                .each(function(d) {
+                    numberWidgets.push(widget.number({ parent: this }))
                 })
                 .merge(elements)
                 .each(function(d, i) {
@@ -43,8 +43,9 @@
         }
 
         function zip() {
-            var zipped = [], i = 0
-            while(configCache.titles[i] || configCache.values[i] || configCache.infos[i]){
+            var zipped = [],
+                i = 0
+            while (configCache.titles[i] || configCache.values[i] || configCache.infos[i]) {
                 zipped[i] = {
                     title: configCache.titles[i],
                     value: configCache.values[i],

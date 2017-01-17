@@ -116,7 +116,9 @@
             .attr('class', 'x axis')
             .attr('transform', 'translate(' + [0, config.chartHeight] + ')')
             .merge(axisX)
-            .attr('display', function(d){ return config.dataIsEmpty ? 'none' : null })
+            .attr('display', function(d) {
+                return config.dataIsEmpty ? 'none' : null
+            })
             .transition()
             .duration(0)
             .attr('transform', 'translate(' + [0, config.chartHeight] + ')')
@@ -177,7 +179,9 @@
         axisTitleX.enter().append('text')
             .attr('class', 'chart-title')
             .merge(axisTitleX)
-            .html(function(d){ return d; })
+            .html(function(d) {
+                return d
+            })
             .attr('x', function(d) {
                 return (config.chartWidth - d.length * 5) / 2
             })
@@ -239,7 +243,6 @@
     }
 
     var message = function(config) {
-        var panel = shapePanel(config)
         var message = ''
         if (config.dataIsEmpty) {
             message = 'No data available'
@@ -247,14 +250,16 @@
             message = 'Values are all null'
         }
 
-        var text = panel.shapePanel.selectAll('text')
+        var text = config.container.select('.message-group')
+            .selectAll('text')
             .data([message])
         text.enter().append('text')
             .merge(text)
             .attr('x', (config.scaleX.range()[1] - config.scaleX.range()[0]) / 2)
             .attr('y', (config.scaleY.range()[0] - config.scaleY.range()[1]) / 2)
             .text(function(d) {
-                return d })
+                return d
+            })
             .attr('dx', function(d) {
                 return -this.getBBox().width / 2
             })

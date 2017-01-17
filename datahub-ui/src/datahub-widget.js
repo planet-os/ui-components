@@ -418,15 +418,13 @@
                 return d === configCache.month
             })
 
-        if(config.defaultMonth && config.defaultYear) {
+        if (config.defaultMonth && config.defaultYear) {
             setMonth(config.defaultMonth)
             setYear(config.defaultYear)
-        }
-        else if(config.defaultMonthNumber && config.defaultYear) {
+        } else if (config.defaultMonthNumber && config.defaultYear) {
             setMonthNumber(config.defaultMonthNumber)
             setYear(config.defaultYear)
-        }
-        else {
+        } else {
             setDate(config.defaultDate || new Date())
         }
 
