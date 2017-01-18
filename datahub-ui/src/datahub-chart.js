@@ -65,17 +65,18 @@
     }
 
     var dataAdapter = function(config) {
+        var d = config.data || {}
         return {
-            dataIsEmpty: !config.data || !config.data.timestamp.length,
-            data: config.data || {
-                barData: [],
-                timestamp: [],
-                stackedBarData: [],
-                lineData: [],
-                referenceData: [],
-                estimatedData: [],
-                thresholdData: [],
-                areaData: []
+            dataIsEmpty: !d || !d.timestamp || !d.timestamp.length,
+            data:  {
+                barData: d.barData || [],
+                timestamp: d.timestamp || [],
+                stackedBarData: d.stackedBarData || [],
+                lineData: d.lineData || [],
+                referenceData: d.referenceData || [],
+                estimatedData: d.estimatedData || [],
+                thresholdData: d.thresholdData || [],
+                areaData: d.areaData || []
             }
         }
     }

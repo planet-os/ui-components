@@ -96,12 +96,13 @@
     }
 
     var axisY = function(config) {
-        var axisYFormat = config.axisYFormat || d3.format('.2s')
+        var format = config.axisYFormat || '.2s'
+        var axisYFormat = d3.format(format)
         var height = config.scaleY.range()[0]
         var axisY = d3.axisLeft().scale(config.scaleY)
             .ticks(Math.max(~~(height / 30), 2))
             .tickPadding(10)
-            .tickFormat(config.axisYFormat)
+            .tickFormat(axisYFormat)
             .tickSize(-config.chartWidth)
 
         return {
