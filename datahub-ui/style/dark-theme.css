@@ -110,6 +110,11 @@ body {
     opacity: 0.5;
 }
 
+.dummy .datahub-chart .line,
+.dummy .datahub-chart .reference-line {
+    stroke: #444;
+}
+
 .dummy .datahub-chart .axis,
 .dummy .datahub-chart .stripe {
     opacity: 0.3;

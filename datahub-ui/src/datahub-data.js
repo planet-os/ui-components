@@ -176,11 +176,11 @@
             .map(function(d) {
                 return { timestamp: d.timestamp, value: d.referenceData }
             })
-        var estimatedData = data.filter(function(d) {
-                return d && d.estimateBarData
+        var estimateData = data.filter(function(d) {
+                return d && d.estimateData
             })
             .map(function(d) {
-                return { timestamp: d.timestamp, value: d.estimateBarData }
+                return { timestamp: d.timestamp, value: d.estimateData }
             })
         var thresholdData = data.filter(function(d) {
                 return d && d.thresholdData
@@ -208,7 +208,7 @@
             stackedBarData: stackedBarData,
             lineData: lineData,
             referenceData: referenceData,
-            estimatedData: estimatedData,
+            estimateData: estimateData,
             thresholdData: thresholdData,
             areaData: areaData,
             stackedAreaData: stackedAreaData
