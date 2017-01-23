@@ -334,65 +334,65 @@
     </div>
     <script>
 
-    // var dataMulti = {
-    //     timestamp: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1).timestamps,
-    //     barData: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1)
-    // }
+    var dataMulti = {
+        timestamp: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1).timestamps,
+        barData: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1)
+    }
 
-    // var container = document.querySelector('.bar-chart')
-    // datahub.chart.multi({
-    //     parent: container,
-    //     width: container.clientWidth,
-    //     data: datahub.data.mergeTimeseries(dataMulti)
-    // })
+    var container = document.querySelector('.bar-chart')
+    datahub.chart.multi({
+        parent: container,
+        width: container.clientWidth,
+        data: datahub.data.mergeTimeseries(dataMulti)
+    })
 
-    // var dataMulti = {
-    //     timestamp: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1).timestamps,
-    //     stackedBarData: datahub.data.generateTimeSeries(12, 3, '2016-01-01', 'month', 1)
-    // }
+    var dataMulti = {
+        timestamp: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1).timestamps,
+        stackedBarData: datahub.data.generateTimeSeries(12, 3, '2016-01-01', 'month', 1)
+    }
 
-    // var container = document.querySelector('.stacked-bar-chart')
-    // datahub.chart.multi({
-    //     parent: container,
-    //     width: container.clientWidth,
-    //     data: datahub.data.mergeTimeseries(dataMulti)
-    // })
+    var container = document.querySelector('.stacked-bar-chart')
+    datahub.chart.multi({
+        parent: container,
+        width: container.clientWidth,
+        data: datahub.data.mergeTimeseries(dataMulti)
+    })
 
-    // var dataMulti = {
-    //     timestamp: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1).timestamps,
-    //     lineData: datahub.data.generateTimeSeries(12, 2, '2016-01-01', 'month', 1)
-    // }
+    var dataMulti = {
+        timestamp: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1).timestamps,
+        lineData: datahub.data.generateTimeSeries(12, 2, '2016-01-01', 'month', 1)
+    }
 
-    // var container = document.querySelector('.multiline-chart')
-    // datahub.chart.multi({
-    //     parent: container,
-    //     width: container.clientWidth,
-    //     data: datahub.data.mergeTimeseries(dataMulti)
-    // })
+    var container = document.querySelector('.multiline-chart')
+    datahub.chart.multi({
+        parent: container,
+        width: container.clientWidth,
+        data: datahub.data.mergeTimeseries(dataMulti)
+    })
 
-    // var dataMulti = {
-    //     timestamp: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1).timestamps,
-    //     areaData: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1)
-    // }
+    var dataMulti = {
+        timestamp: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1).timestamps,
+        areaData: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1)
+    }
 
-    // var container = document.querySelector('.area-chart')
-    // datahub.chart.multi({
-    //     parent: container,
-    //     width: container.clientWidth,
-    //     data: datahub.data.mergeTimeseries(dataMulti)
-    // })
+    var container = document.querySelector('.area-chart')
+    datahub.chart.multi({
+        parent: container,
+        width: container.clientWidth,
+        data: datahub.data.mergeTimeseries(dataMulti)
+    })
 
-    // var dataMulti = {
-    //     timestamp: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1).timestamps,
-    //     stackedAreaData: datahub.data.generateTimeSeries(12, 3, '2016-01-01', 'month', 1)
-    // }
+    var dataMulti = {
+        timestamp: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1).timestamps,
+        stackedAreaData: datahub.data.generateTimeSeries(12, 3, '2016-01-01', 'month', 1)
+    }
 
-    // var container = document.querySelector('.stacked-area-chart')
-    // datahub.chart.multi({
-    //     parent: container,
-    //     width: container.clientWidth,
-    //     data: datahub.data.mergeTimeseries(dataMulti)
-    // })
+    var container = document.querySelector('.stacked-area-chart')
+    datahub.chart.multi({
+        parent: container,
+        width: container.clientWidth,
+        data: datahub.data.mergeTimeseries(dataMulti)
+    })
 
     var dataMulti = {
         timestamp: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1).timestamps,
@@ -401,6 +401,7 @@
         estimateData: datahub.data.generateTimeSeries(4, 1, '2016-09-01', 'month', 1),
         lineData: datahub.data.generateTimeSeries(12, 2, '2016-01-01', 'month', 1),
         areaData: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1),
+        stackedAreaData: datahub.data.generateTimeSeries(12, 3, '2016-01-01', 'month', 1),
         referenceData: datahub.data.generateTimeSeries(8, 1, '2016-01-01', 'month', 1),
         thresholdData: datahub.data.generateTimeSeries(1, 1, '2016-01-01', 'month', 12)
     }
@@ -427,375 +428,375 @@
     .setData(data)
     .setConfig({chartTitle: 'Title2'})
 
-    // var dataMulti = {
-    //     timestamp: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1).timestamps,
-    //     stackedBarData: datahub.data.generateTimeSeries(8, 3, '2016-01-01', 'month', 1),
-    //     estimateBarData: datahub.data.generateTimeSeries(4, 1, '2016-09-01', 'month', 1)
-    // }
+    var dataMulti = {
+        timestamp: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1).timestamps,
+        stackedBarData: datahub.data.generateTimeSeries(8, 3, '2016-01-01', 'month', 1),
+        estimateData: datahub.data.generateTimeSeries(4, 1, '2016-09-01', 'month', 1)
+    }
 
-    // var container = document.querySelector('.chart-types')
-    // datahub.chart.multi({
-    //     parent: container,
-    //     width: container.clientWidth,
-    //     data: datahub.data.mergeTimeseries(dataMulti)
-    // })
+    var container = document.querySelector('.chart-types')
+    datahub.chart.multi({
+        parent: container,
+        width: container.clientWidth,
+        data: datahub.data.mergeTimeseries(dataMulti)
+    })
 
-    // var dataMulti = {
-    //     timestamp: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1).timestamps,
-    //     barData: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1),
-    //     referenceData: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1),
-    //     thresholdData: datahub.data.generateTimeSeries(1, 1, '2016-01-01', 'month', 12)
-    // }
+    var dataMulti = {
+        timestamp: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1).timestamps,
+        barData: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1),
+        referenceData: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1),
+        thresholdData: datahub.data.generateTimeSeries(1, 1, '2016-01-01', 'month', 12)
+    }
 
-    // var container = document.querySelector('.chart-features')
-    // datahub.chart.multi({
-    //     parent: container,
-    //     width: container.clientWidth,
-    //     data: datahub.data.mergeTimeseries(dataMulti)
-    // })
+    var container = document.querySelector('.chart-features')
+    datahub.chart.multi({
+        parent: container,
+        width: container.clientWidth,
+        data: datahub.data.mergeTimeseries(dataMulti)
+    })
 
-    // var container = document.querySelector('.multiline-chart-empty')
-    // datahub.chart.multi({
-    //     parent: container,
-    //     width: container.clientWidth
-    // })
+    var container = document.querySelector('.multiline-chart-empty')
+    datahub.chart.multi({
+        parent: container,
+        width: container.clientWidth
+    })
 
-    // var dataMulti = {
-    //     timestamp: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1).timestamps,
-    //     barData: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1),
-    // }
+    var dataMulti = {
+        timestamp: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1).timestamps,
+        barData: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1),
+    }
 
-    // var container = document.querySelector('.chart-dummy')
-    // datahub.chart.multi({
-    //     parent: container,
-    //     width: container.clientWidth,
-    //     data: datahub.data.mergeTimeseries(dataMulti)
-    // })
+    var container = document.querySelector('.chart-dummy')
+    datahub.chart.multi({
+        parent: container,
+        width: container.clientWidth,
+        data: datahub.data.mergeTimeseries(dataMulti)
+    })
 
-    // var sliderChartContainer = document.querySelector('.slider-chart')
+    var sliderChartContainer = document.querySelector('.slider-chart')
 
-    // function renderMainChart(timeseries) {
-    //     datahub.chart.multi({
-    //         parent: sliderChartContainer,
-    //         width: sliderChartContainer.clientWidth,
-    //         data: timeseries
-    //     })
-    // }
+    function renderMainChart(timeseries) {
+        datahub.chart.multi({
+            parent: sliderChartContainer,
+            width: sliderChartContainer.clientWidth,
+            data: timeseries
+        })
+    }
 
-    // var dataMulti = {
-    //     timestamp: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1).timestamps,
-    //     lineData: datahub.data.generateTimeSeries(12, 2, '2016-01-01', 'month', 1)
-    // }
+    var dataMulti = {
+        timestamp: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1).timestamps,
+        lineData: datahub.data.generateTimeSeries(12, 2, '2016-01-01', 'month', 1)
+    }
 
-    // var timeseries = datahub.data.mergeTimeseries(dataMulti)
+    var timeseries = datahub.data.mergeTimeseries(dataMulti)
 
-    // var timeSliderContainer = document.querySelector('.time-slider')
-    // var timeSlider = datahub.widget.timeSlider({
-    //     parent: timeSliderContainer,
-    //     timeRange: ['2016-01-01', '2017-01-01'],
-    //     initialTimeRange: ['2016-01-01', '2017-01-01'],
-    //     width: timeSliderContainer.clientWidth,
-    //     height: 40,
-    //     margin: {
-    //         top: 4,
-    //         right: 60,
-    //         bottom: 4,
-    //         left: 60
-    //     }
-    // })
+    var timeSliderContainer = document.querySelector('.time-slider')
+    var timeSlider = datahub.widget.timeSlider({
+        parent: timeSliderContainer,
+        timeRange: ['2016-01-01', '2017-01-01'],
+        initialTimeRange: ['2016-01-01', '2017-01-01'],
+        width: timeSliderContainer.clientWidth,
+        height: 40,
+        margin: {
+            top: 4,
+            right: 60,
+            bottom: 4,
+            left: 60
+        }
+    })
 
-    // timeSlider.events.on('brush', function(d) {
-    //     // var timestamps = timeseries.map(function(d, i){ return d.timestamp })
-    //     // var startIndex = datahub.utils.bisection(timestamps, d.brushExtent.start)
-    //     // var endIndex = datahub.utils.bisection(timestamps, d.brushExtent.end)
-    //     // var timeseriesSlice = {
-    //     //     values: dataMulti.values.map(function(d, i) {
-    //     //         return d.slice(startIndex, endIndex)
-    //     //     }),
-    //     //     timestamps: dataMulti.timestamps.slice(startIndex, endIndex)
-    //     // }
+    timeSlider.events.on('brush', function(d) {
+        // var timestamps = timeseries.map(function(d, i){ return d.timestamp })
+        // var startIndex = datahub.utils.bisection(timestamps, d.brushExtent.start)
+        // var endIndex = datahub.utils.bisection(timestamps, d.brushExtent.end)
+        // var timeseriesSlice = {
+        //     values: dataMulti.values.map(function(d, i) {
+        //         return d.slice(startIndex, endIndex)
+        //     }),
+        //     timestamps: dataMulti.timestamps.slice(startIndex, endIndex)
+        // }
 
-    //     // renderMainChart(timeseriesSlice)
-    // })
+        // renderMainChart(timeseriesSlice)
+    })
 
-    // renderMainChart(timeseries)
+    renderMainChart(timeseries)
 
-    // var number = datahub.widget.number({
-    //         parent: document.querySelector('.number-widget.big'),
-    //         title: 'title',
-    //         value: 'value',
-    //         info: 'info'
-    //     })
-    //     .on('click', function(d){ console.log(d) })
+    var number = datahub.widget.number({
+            parent: document.querySelector('.number-widget.big'),
+            title: 'title',
+            value: 'value',
+            info: 'info'
+        })
+        .on('click', function(d){ console.log(d) })
 
-    // number.setTitle('NET PRODUCTION')
-    //     .setValue('236,43GWh<div class="dh-tag">3,10%</div>')
-    //     .setInfo('Plan: 231,64GWh')
+    number.setTitle('NET PRODUCTION')
+        .setValue('236,43GWh<div class="dh-tag">3,10%</div>')
+        .setInfo('Plan: 231,64GWh')
 
-    // datahub.widget.number({
-    //     parent: document.querySelector('.number-widget.medium'),
-    //     value: '236,43GWh',
-    //     info: 'Net Production'
-    // })
+    datahub.widget.number({
+        parent: document.querySelector('.number-widget.medium'),
+        value: '236,43GWh',
+        info: 'Net Production'
+    })
 
-    // datahub.widget.number({
-    //     parent: document.querySelector('.number-widget.small'),
-    //     value: '16,00%',
-    //     info: 'MTD Actual'
-    // })
+    datahub.widget.number({
+        parent: document.querySelector('.number-widget.small'),
+        value: '16,00%',
+        info: 'MTD Actual'
+    })
 
-    // var numberGroup = datahub.group.number({
-    //     parent: document.querySelector('.number-group'),
-    //     values: ['235,43GWh', '235,43GWh', '15,00%'],
-    //     infos: ['Net Production', 'Plan: 231,64GWh', 'MTD Actual'],
-    //     titles: ['Title 1', 'Title 2', 'Title 3']
-    // })
+    var numberGroup = datahub.group.number({
+        parent: document.querySelector('.number-group'),
+        values: ['235,43GWh', '235,43GWh', '15,00%'],
+        infos: ['Net Production', 'Plan: 231,64GWh', 'MTD Actual'],
+        titles: ['Title 1', 'Title 2', 'Title 3']
+    })
 
-    // numberGroup.setValues(['236,43GWh', '236,43GWh', '16,00%'])
+    numberGroup.setValues(['236,43GWh', '236,43GWh', '16,00%'])
 
-    // var table = datahub.widget.table({
-    //     parent: document.querySelector('.table-widget'),
-    //     header: [{
-    //         key: 'header1',
-    //         label: 'Header 1',
-    //         sortable: true
-    //     }],
-    //     elements: [['Element 1']]
-    // })
+    var table = datahub.widget.table({
+        parent: document.querySelector('.table-widget'),
+        header: [{
+            key: 'header1',
+            label: 'Header 1',
+            sortable: true
+        }],
+        elements: [['Element 1']]
+    })
 
-    // table.setHeader([{
-    //     key: 'country',
-    //     label: 'Country',
-    //     sortable: true
-    // }, {
-    //     key: 'production',
-    //     label: 'Production',
-    //     sortable: true
-    // }, {
-    //     key: 'revenues',
-    //     label: 'Revenues',
-    // }])
+    table.setHeader([{
+        key: 'country',
+        label: 'Country',
+        sortable: true
+    }, {
+        key: 'production',
+        label: 'Production',
+        sortable: true
+    }, {
+        key: 'revenues',
+        label: 'Revenues',
+    }])
 
-    // table.setElements([
-    //     ['Spain', '1<span class="dh-tag">3,10%</span>', '<span class="dh-negative">(2)</span>'],
-    //     ['Germany', '7 <span class="dh-negative-arrow"></span>', '8 <span class="dh-positive-arrow"></span>'],
-    //     ['United Kingdom', '<span class="dh-positive-cell">1<span>', 2],
-    //     ['Poland', '95% <span class="dh-dim">/ 80%</span>', 8],
-    //     ['Netherlands', 1, 2],
-    //     ['Italy', 7, 8],
-    // ])
+    table.setElements([
+        ['Spain', '1<span class="dh-tag">3,10%</span>', '<span class="dh-negative">(2)</span>'],
+        ['Germany', '7 <span class="dh-negative-arrow"></span>', '8 <span class="dh-positive-arrow"></span>'],
+        ['United Kingdom', '<span class="dh-positive-cell">1<span>', 2],
+        ['Poland', '95% <span class="dh-dim">/ 80%</span>', 8],
+        ['Netherlands', 1, 2],
+        ['Italy', 7, 8],
+    ])
 
-    // var heightSelector = datahub.widget.buttonGroup({
-    //     parent: document.querySelector('.button-group.vertical'),
-    //     elements: [{
-    //         label: 'All',
-    //         key: 'all'
-    //     }, {
-    //         label: '200',
-    //         key: '200'
-    //     }, {
-    //         label: '180',
-    //         key: '180'
-    //     }, {
-    //         label: '160',
-    //         key: '160'
-    //     }],
-    //     defaultElementKey: 'all',
-    //     isExclusive: true
-    // })
+    var heightSelector = datahub.widget.buttonGroup({
+        parent: document.querySelector('.button-group.vertical'),
+        elements: [{
+            label: 'All',
+            key: 'all'
+        }, {
+            label: '200',
+            key: '200'
+        }, {
+            label: '180',
+            key: '180'
+        }, {
+            label: '160',
+            key: '160'
+        }],
+        defaultElementKey: 'all',
+        isExclusive: true
+    })
 
-    // heightSelector.events.on('click', function(d) {
-    //     console.log(d)
-    // })
+    heightSelector.events.on('click', function(d) {
+        console.log(d)
+    })
 
-    // datahub.widget.buttonGroup({
-    //     parent: document.querySelector('.button-group.horizontal'),
-    //     elements: [{
-    //         label: 'All',
-    //         key: 'all'
-    //     }, {
-    //         label: '200',
-    //         key: '200'
-    //     }, {
-    //         label: '180',
-    //         key: '180'
-    //     }, {
-    //         label: '160',
-    //         key: '160'
-    //     }],
-    //     defaultElementKey: 'all'
-    // })
+    datahub.widget.buttonGroup({
+        parent: document.querySelector('.button-group.horizontal'),
+        elements: [{
+            label: 'All',
+            key: 'all'
+        }, {
+            label: '200',
+            key: '200'
+        }, {
+            label: '180',
+            key: '180'
+        }, {
+            label: '160',
+            key: '160'
+        }],
+        defaultElementKey: 'all'
+    })
 
-    // datahub.widget.buttonGroup({
-    //     parent: document.querySelector('.button-group.exclusive'),
-    //     elements: [{
-    //         label: 'All',
-    //         key: 'all'
-    //     }, {
-    //         label: '200',
-    //         key: '200'
-    //     }, {
-    //         label: '180',
-    //         key: '180'
-    //     }, {
-    //         label: '160',
-    //         key: '160'
-    //     }],
-    //     defaultElementKey: 'all',
-    //     isExclusive: true
-    // })
+    datahub.widget.buttonGroup({
+        parent: document.querySelector('.button-group.exclusive'),
+        elements: [{
+            label: 'All',
+            key: 'all'
+        }, {
+            label: '200',
+            key: '200'
+        }, {
+            label: '180',
+            key: '180'
+        }, {
+            label: '160',
+            key: '160'
+        }],
+        defaultElementKey: 'all',
+        isExclusive: true
+    })
 
-    // datahub.widget.buttonGroup({
-    //     parent: document.querySelector('.legend'),
-    //     elements: [{
-    //         label: 'Legend element 1 <span class="units">(MWh)</span>',
-    //         key: 'element1',
-    //         className: 'color-1'
-    //     }, {
-    //         label: 'Legend element 2 <span class="units">(MWh)</span>',
-    //         key: 'element2',
-    //         className: 'color-2'
-    //     }],
-    //     defaultElementKey: 'element1'
-    // })
+    datahub.widget.buttonGroup({
+        parent: document.querySelector('.legend'),
+        elements: [{
+            label: 'Legend element 1 <span class="units">(MWh)</span>',
+            key: 'element1',
+            className: 'color-1'
+        }, {
+            label: 'Legend element 2 <span class="units">(MWh)</span>',
+            key: 'element2',
+            className: 'color-2'
+        }],
+        defaultElementKey: 'element1'
+    })
 
-    // var alert = datahub.widget.alertMessage({
-    //     parent: document.querySelector('.alert-message1'),
-    //     level: 'low',
-    //     message: 'Alert message'
-    // })
+    var alert = datahub.widget.alertMessage({
+        parent: document.querySelector('.alert-message1'),
+        level: 'low',
+        message: 'Alert message'
+    })
 
-    // alert.setLevel('low')
-    // alert.setMessage('Alert message, low')
+    alert.setLevel('low')
+    alert.setMessage('Alert message, low')
 
-    // datahub.widget.alertMessage({
-    //     parent: document.querySelector('.alert-message2'),
-    //     level: 'medium',
-    //     message: 'Alert message, medium'
-    // })
+    datahub.widget.alertMessage({
+        parent: document.querySelector('.alert-message2'),
+        level: 'medium',
+        message: 'Alert message, medium'
+    })
 
-    // datahub.widget.alertMessage({
-    //     parent: document.querySelector('.alert-message3'),
-    //     level: 'high',
-    //     message: 'Alert message, high'
-    // })
+    datahub.widget.alertMessage({
+        parent: document.querySelector('.alert-message3'),
+        level: 'high',
+        message: 'Alert message, high'
+    })
 
-    // var monthCalendar = datahub.widget.monthCalendar({
-    //         parent: document.querySelector('.month-calendar'),
-    //         defaultDate: (new Date()).toString(),
-    //     })
-    //     .on('change', setDate)
+    var monthCalendar = datahub.widget.monthCalendar({
+            parent: document.querySelector('.month-calendar'),
+            defaultDate: (new Date()).toString(),
+        })
+        .on('change', setDate)
 
-    // monthCalendar.setDate('2015-10-01T04:00:00.000Z')
+    monthCalendar.setDate('2015-10-01T04:00:00.000Z')
 
-    // function setDate(d) {
-    //     console.log(monthCalendar.getFormattedDate('%Y/%m/%d %H:%M'));
-    //     document.querySelector('.selected-date').innerText = d.iso
-    // }
+    function setDate(d) {
+        console.log(monthCalendar.getFormattedDate('%Y/%m/%d %H:%M'));
+        document.querySelector('.selected-date').innerText = d.iso
+    }
 
-    // var dropdown = datahub.widget.dropdown({
-    //     parent: document.querySelector('.dropdown1'),
-    //     elements: [{
-    //         label: 'Element 1',
-    //         key: 'element1'
-    //     }],
-    //     selected: 'Element 1',
-    //     title: 'title1'
-    // })
-    // .on('change', function(d){ console.log(d) })
+    var dropdown = datahub.widget.dropdown({
+        parent: document.querySelector('.dropdown1'),
+        elements: [{
+            label: 'Element 1',
+            key: 'element1'
+        }],
+        selected: 'Element 1',
+        title: 'title1'
+    })
+    .on('change', function(d){ console.log(d) })
 
-    // dropdown.setElements([
-    //     {
-    //         label: 'Element 1',
-    //         key: 'element1'
-    //     }, {
-    //         label: 'Element 2',
-    //         key: 'element2'
-    //     }
-    // ])
-    // dropdown.setSelected('Element 2')
+    dropdown.setElements([
+        {
+            label: 'Element 1',
+            key: 'element1'
+        }, {
+            label: 'Element 2',
+            key: 'element2'
+        }
+    ])
+    dropdown.setSelected('Element 2')
 
-    // datahub.widget.dropdownCalendar({
-    //     parent: document.querySelector('.dropdown-calendar'),
-    //     defaultDate: (new Date()).toString()
-    // })
-    // .on('change', function(d){ console.log(d) })
+    datahub.widget.dropdownCalendar({
+        parent: document.querySelector('.dropdown-calendar'),
+        defaultDate: (new Date()).toString()
+    })
+    .on('change', function(d){ console.log(d) })
 
-    // datahub.data.setApiKey('0f58fe2540fa4cf19a4aa68f290fd148')
+    datahub.data.setApiKey('0f58fe2540fa4cf19a4aa68f290fd148')
 
-    // datahub.map.rasterMap({
-    //         parent: document.querySelector('.map-light'),
-    //         showLabels: false,
-    //         mapConfig: {
-    //             zoomControl: false
-    //         },
-    //         showTooltip: false
-    //     })
-    //     .init()
+    datahub.map.rasterMap({
+            parent: document.querySelector('.map-light'),
+            showLabels: false,
+            mapConfig: {
+                zoomControl: false
+            },
+            showTooltip: false
+        })
+        .init()
 
-    // datahub.map.rasterMap({
-    //         parent: document.querySelector('.map-dark'),
-    //         basemapName: 'basemapLight',
-    //         showLabels: false,
-    //         mapConfig: {
-    //             zoomControl: false
-    //         },
-    //         showTooltip: false
-    //     })
-    //     .init()
+    datahub.map.rasterMap({
+            parent: document.querySelector('.map-dark'),
+            basemapName: 'basemapLight',
+            showLabels: false,
+            mapConfig: {
+                zoomControl: false
+            },
+            showTooltip: false
+        })
+        .init()
 
 
-    // var datasetName = 'noaa_gfs_global_sflux_0.12d'
-    // var variableName = 'Temperature_hybrid'
-    // datahub.data.getPreview(datasetName, variableName, null, function(response) {
-    //     rasterMap.renderRaster(response.json)
-    //     rasterMapGrayscale.renderRaster(response.json)
-    //     rasterMapBig.renderRaster(response.json)
-    // })
+    var datasetName = 'noaa_gfs_global_sflux_0.12d'
+    var variableName = 'Temperature_hybrid'
+    datahub.data.getPreview(datasetName, variableName, null, function(response) {
+        rasterMap.renderRaster(response.json)
+        rasterMapGrayscale.renderRaster(response.json)
+        rasterMapBig.renderRaster(response.json)
+    })
 
-    // var rasterMap = datahub.map.rasterMap({
-    //         parent: document.querySelector('.map-grayscale'),
-    //         colorScale: datahub.palette.grayscale,
-    //         showLabels: false,
-    //         mapConfig: {
-    //             zoomControl: false
-    //         },
-    //         showTooltip: false
-    //     })
-    //     .init()
+    var rasterMap = datahub.map.rasterMap({
+            parent: document.querySelector('.map-grayscale'),
+            colorScale: datahub.palette.grayscale,
+            showLabels: false,
+            mapConfig: {
+                zoomControl: false
+            },
+            showTooltip: false
+        })
+        .init()
 
-    // var rasterMapGrayscale = datahub.map.rasterMap({
-    //         parent: document.querySelector('.map-rainbow'),
-    //         colorScale: datahub.palette.equalizedSpectral,
-    //         showLabels: false,
-    //         mapConfig: {
-    //             zoomControl: false
-    //         },
-    //         showTooltip: false
-    //     })
-    //     .init()
+    var rasterMapGrayscale = datahub.map.rasterMap({
+            parent: document.querySelector('.map-rainbow'),
+            colorScale: datahub.palette.equalizedSpectral,
+            showLabels: false,
+            mapConfig: {
+                zoomControl: false
+            },
+            showTooltip: false
+        })
+        .init()
 
-    // var rasterMapBig = datahub.map.rasterMap({
-    //         parent: document.querySelector('.map-raster'),
-    //         colorScale: datahub.palette.equalizedSpectral
-    //     })
-    //     .init()
+    var rasterMapBig = datahub.map.rasterMap({
+            parent: document.querySelector('.map-raster'),
+            colorScale: datahub.palette.equalizedSpectral
+        })
+        .init()
 
-    // datahub.data.getWorldVector(function(geojson) {
-    //     vectorMap.renderPolygon(geojson)
-    // })
+    datahub.data.getWorldVector(function(geojson) {
+        vectorMap.renderPolygon(geojson)
+    })
 
-    // var pointsGeojson = datahub.data.generateGeojsonPoints()
+    var pointsGeojson = datahub.data.generateGeojsonPoints()
 
-    // var vectorMap = datahub.map.rasterMap({
-    //         parent: document.querySelector('.map-vector')
-    //     })
-    //     .init()
-    //     .renderPolygon(pointsGeojson)
+    var vectorMap = datahub.map.rasterMap({
+            parent: document.querySelector('.map-vector')
+        })
+        .init()
+        .renderPolygon(pointsGeojson)
 
-    // datahub.map.selectorMap({
-    //     parent: document.querySelector('.map-selector')
-    // })
+    datahub.map.selectorMap({
+        parent: document.querySelector('.map-selector')
+    })
 
     </script>
 </body>

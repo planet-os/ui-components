@@ -44,12 +44,16 @@
                             + '<text class="chart-title"></text>'
                         + '</g>'
                         + '<g class="message-group"></g>'
+                        + '<g class="events"></g>'
                     + '</g>'
                 + '</svg>'
             + '</div>'
 
             containerNode = utils.appendHtmlToNode(template, config.parent)
         }
+        var chartWidth = config.width - config.margin.left - config.margin.right
+        var chartHeight = config.height - config.margin.top - config.margin.bottom
+
         var container = d3.select(containerNode)
 
         container.select('svg')
@@ -59,8 +63,15 @@
         container.select('.panel')
             .attr('transform', 'translate(' + config.margin.left + ',' + config.margin.top + ')')
 
+        container.select('.events rect')
+            .attr('width', chartWidth)
+            .attr('height', chartHeight)
+            .attr('opacity', 0)
+
         return {
-            container: container
+            container: container,
+            chartWidth: chartWidth,
+            chartHeight: chartHeight
         }
     }
 
@@ -86,11 +97,9 @@
     }
 
     var scaleX = function(config) {
-        var chartWidth = config.width - config.margin.left - config.margin.right
         var dataX = config.dataIsEmpty ? 0 : config.data.timestamp
-        var scaleX = d3.scaleBand().domain(dataX).rangeRound([0, chartWidth])
+        var scaleX = d3.scaleBand().domain(dataX).rangeRound([0, config.chartWidth])
             .paddingInner(0.4).paddingOuter(0.2)
-
         var referenceScaleX = scaleX.copy().paddingInner(0.1).paddingOuter(0)
         var stripeScaleX = scaleX.copy().paddingInner(0).paddingOuter(0)
         var lineScaleX = scaleX.copy().paddingInner(1).paddingOuter(0.5)
@@ -99,14 +108,11 @@
             scaleX: scaleX,
             referenceScaleX: referenceScaleX,
             stripeScaleX: stripeScaleX,
-            lineScaleX: lineScaleX,
-            chartWidth: chartWidth
+            lineScaleX: lineScaleX
         }
     }
 
     var scaleY = function(config) {
-        var chartHeight = config.height - config.margin.top - config.margin.bottom
-
         var maxs = []
         if (config.data.barData) {
             maxs.push(d3.max(config.data.barData.map(function(d) {
@@ -156,17 +162,20 @@
         }
         var max = d3.max(maxs)
 
-        var scaleY = d3.scaleLinear().domain([0, max]).range([chartHeight, 0])
+        var scaleY = d3.scaleLinear().domain([0, max]).range([config.chartHeight, 0])
 
         return {
-            scaleY: scaleY,
-            chartHeight: chartHeight
+            scaleY: scaleY
         }
     }
 
     var findData = function(data, key, timestamp) {
-        var index = utils.bisection(data[key].map(function(d, i) { return d.timestamp}), timestamp) - 1
+        var index = data[key].map(function(d) { return d.timestamp.getTime()}).indexOf(timestamp.getTime())
         return index > -1 ? data[key][index].value : null
+    }
+
+    var findThresholdData = function(data, key, timestamp) {
+        return data[key][0] ? data[key][0].value : null
     }
 
     var getValuesAtTimestamp = function(timestamp, data) {
@@ -174,10 +183,44 @@
             referenceData: findData(data, 'referenceData', timestamp),
             estimateData: findData(data, 'estimateData', timestamp),
             barData: findData(data, 'barData', timestamp),
+            stackedBarData: findData(data, 'stackedBarData', timestamp),
+            lineData: findData(data, 'lineData', timestamp),
             areaData: findData(data, 'areaData', timestamp),
-            thresholdData: findData(data, 'areaData', timestamp),
+            stackedAreaData: findData(data, 'stackedAreaData', timestamp),
+            thresholdData: findThresholdData(data, 'thresholdData', timestamp),
         }
+
         return values
+    }
+
+    var eventsPanel = function(config) {
+        var eventPanel = config.container.select('.events')
+            .selectAll('rect.event-panel')
+            .data([0])
+        eventPanel.enter().append('rect')
+            .attr('class', 'event-panel')
+            .merge(eventPanel)
+            .on('mousemove', function(d) {
+                var mouseX = d3.mouse(this)[0]
+                var w = config.stripeScaleX.bandwidth()
+                var domain = config.stripeScaleX.domain()
+                var domainLength = domain.length
+                var index = Math.min(~~(mouseX / w), domainLength - 1)
+                var timestamp = domain[index]
+
+                var values = getValuesAtTimestamp(timestamp, config.data)
+                config.events.call('hover', null, {
+                    index: index,
+                    timestamp: timestamp,
+                    data: values,
+                    config: config,
+                    event: d3.event
+                })
+            })
+        eventPanel.exit().remove()
+        return {
+            eventPanel: eventPanel
+        }
     }
 
     var stackedBarShapes = function(config) {
@@ -213,24 +256,7 @@
                 return d
             })
         bar.enter().append('rect')
-            .on('mouseover', function(d) {
-                config.events.call('stackedBarHover', null, {
-                    timestamp: d.data.x,
-                    value: d.data['y'+d.index],
-                    config: config,
-                    event: d3.event
-                })
-
-                var timestamp = d.data.x
-                var values = getValuesAtTimestamp(timestamp, config.data)
-
-                config.events.call('hover', null, {
-                    timestamp: d.data.x,
-                    value: d.data['y'+d.index],
-                    config: config,
-                    event: d3.event
-                })
-            })
+            .attr('class', 'stacked-bar')
             .merge(bar)
             .attr('class', function(d) {
                 return 'stacked-bar layer' + d.index
@@ -257,14 +283,6 @@
             .data(config.data.barData)
         shapes.enter().append('rect')
             .attr('class', 'bar')
-            .on('mouseover', function(d) {
-                config.events.call('barHover', null, {
-                    timestamp: d.timestamp,
-                    value: d.value,
-                    config: config,
-                    event: d3.event
-                })
-            })
             .merge(shapes)
             .attr('x', function(d, i) {
                 return config.scaleX(d.timestamp) || 0
@@ -289,14 +307,6 @@
             .data(config.data.estimateData)
         shapes.enter().append('rect')
             .attr('class', 'estimate-bar')
-            .on('mouseover', function(d) {
-                config.events.call('estimateBarHover', null, {
-                    timestamp: d.timestamp,
-                    value: d.value,
-                    config: config,
-                    event: d3.event
-                })
-            })
             .merge(shapes)
             .attr('x', function(d, i) {
                 return config.scaleX(d.timestamp) || 0
@@ -352,14 +362,6 @@
             .data(config.data.referenceData)
         shapes.enter().append('rect')
             .attr('class', 'reference-bar')
-            .on('mouseover', function(d) {
-                config.events.call('referenceBarHover', null, {
-                    timestamp: d.timestamp,
-                    value: d.value,
-                    config: config,
-                    event: d3.event
-                })
-            })
             .merge(shapes)
             .attr('x', function(d, i) {
                 return config.referenceScaleX(d.timestamp) || 0
@@ -444,7 +446,7 @@
             return {}
         }
 
-        var line = d3.area()
+        var areaGenerator = d3.area()
             // .defined(function(d) {
             //     return d.value != null
             // })
@@ -477,7 +479,7 @@
                 return 'area layer' + i
             })
             .merge(shapes)
-            .attr('d', line)
+            .attr('d', areaGenerator)
         shapes.exit().remove()
 
         return {}
@@ -491,7 +493,7 @@
             return 'y' + i
         })
 
-        var area = d3.area()
+        var areaGenerator = d3.area()
             // .defined(function(d) {
             //     return d.value != null
             // })
@@ -534,9 +536,7 @@
             .attr('class', function(d) {
                 return 'stacked-area layer' + d.index
             })
-            .attr('d', function(d, i) {
-                return area(d, i)
-            })
+            .attr('d', areaGenerator)
         area.exit().remove()
         stackedArea.exit().remove()
 
@@ -549,14 +549,6 @@
             .data(config.data.thresholdData)
         line.enter().append('line')
             .attr('class', 'reference-line')
-            .on('mouseover', function(d) {
-                config.events.call('thresholdLineHover', null, {
-                    timestamp: d.timestamp,
-                    value: d.value,
-                    config: config,
-                    event: d3.event
-                })
-            })
             .merge(line)
             .attr('x1', 0)
             .attr('y1', function(d) {
@@ -577,12 +569,13 @@
     var multi = utils.pipeline(
         common.defaultConfig,
         dataAdapter,
+        template,
         scaleX,
         scaleY,
+        eventsPanel,
         // chart.axesFormatAutoconfig,
         common.axisX,
         common.axisY,
-        template,
         stripes,
         areaShapes,
         referenceBarShapes,
