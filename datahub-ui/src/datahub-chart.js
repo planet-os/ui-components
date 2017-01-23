@@ -65,17 +65,18 @@
     }
 
     var dataAdapter = function(config) {
+        var d = config.data || {}
         return {
-            dataIsEmpty: !config.data || !config.data.timestamp.length,
-            data: config.data || {
-                barData: [],
-                timestamp: [],
-                stackedBarData: [],
-                lineData: [],
-                referenceData: [],
-                estimatedData: [],
-                thresholdData: [],
-                areaData: []
+            dataIsEmpty: !d || !d.timestamp || !d.timestamp.length,
+            data:  {
+                barData: d.barData || [],
+                timestamp: d.timestamp || [],
+                stackedBarData: d.stackedBarData || [],
+                lineData: d.lineData || [],
+                referenceData: d.referenceData || [],
+                estimateData: d.estimateData || [],
+                thresholdData: d.thresholdData || [],
+                areaData: d.areaData || []
             }
         }
     }
@@ -117,8 +118,8 @@
                 return d.value
             })))
         }
-        if (config.data.estimatedData) {
-            maxs.push(d3.max(config.data.estimatedData.map(function(d, i) {
+        if (config.data.estimateData) {
+            maxs.push(d3.max(config.data.estimateData.map(function(d, i) {
                 return d.value
             })))
         }
@@ -163,6 +164,22 @@
         }
     }
 
+    var findData = function(data, key, timestamp) {
+        var index = utils.bisection(data[key].map(function(d, i) { return d.timestamp}), timestamp) - 1
+        return index > -1 ? data[key][index].value : null
+    }
+
+    var getValuesAtTimestamp = function(timestamp, data) {
+        var values = {
+            referenceData: findData(data, 'referenceData', timestamp),
+            estimateData: findData(data, 'estimateData', timestamp),
+            barData: findData(data, 'barData', timestamp),
+            areaData: findData(data, 'areaData', timestamp),
+            thresholdData: findData(data, 'areaData', timestamp),
+        }
+        return values
+    }
+
     var stackedBarShapes = function(config) {
         if (!config.data.stackedBarData || !config.data.stackedBarData.length) {
             return {}
@@ -196,6 +213,24 @@
                 return d
             })
         bar.enter().append('rect')
+            .on('mouseover', function(d) {
+                config.events.call('stackedBarHover', null, {
+                    timestamp: d.data.x,
+                    value: d.data['y'+d.index],
+                    config: config,
+                    event: d3.event
+                })
+
+                var timestamp = d.data.x
+                var values = getValuesAtTimestamp(timestamp, config.data)
+
+                config.events.call('hover', null, {
+                    timestamp: d.data.x,
+                    value: d.data['y'+d.index],
+                    config: config,
+                    event: d3.event
+                })
+            })
             .merge(bar)
             .attr('class', function(d) {
                 return 'stacked-bar layer' + d.index
@@ -222,6 +257,14 @@
             .data(config.data.barData)
         shapes.enter().append('rect')
             .attr('class', 'bar')
+            .on('mouseover', function(d) {
+                config.events.call('barHover', null, {
+                    timestamp: d.timestamp,
+                    value: d.value,
+                    config: config,
+                    event: d3.event
+                })
+            })
             .merge(shapes)
             .attr('x', function(d, i) {
                 return config.scaleX(d.timestamp) || 0
@@ -243,9 +286,17 @@
     var estimateBarShapes = function(config) {
         var shapes = config.container.select('.estimate-bar-group')
             .selectAll('rect.estimate-bar')
-            .data(config.data.estimatedData)
+            .data(config.data.estimateData)
         shapes.enter().append('rect')
             .attr('class', 'estimate-bar')
+            .on('mouseover', function(d) {
+                config.events.call('estimateBarHover', null, {
+                    timestamp: d.timestamp,
+                    value: d.value,
+                    config: config,
+                    event: d3.event
+                })
+            })
             .merge(shapes)
             .attr('x', function(d, i) {
                 return config.scaleX(d.timestamp) || 0
@@ -301,6 +352,14 @@
             .data(config.data.referenceData)
         shapes.enter().append('rect')
             .attr('class', 'reference-bar')
+            .on('mouseover', function(d) {
+                config.events.call('referenceBarHover', null, {
+                    timestamp: d.timestamp,
+                    value: d.value,
+                    config: config,
+                    event: d3.event
+                })
+            })
             .merge(shapes)
             .attr('x', function(d, i) {
                 return config.referenceScaleX(d.timestamp) || 0
@@ -457,12 +516,12 @@
             }
         })
 
-        var stackedBar = config.container.select('.stacked-area-group')
+        var stackedArea = config.container.select('.stacked-area-group')
             .selectAll('g.stack-area')
             .data(d3.stack().keys(keys)(data))
-        var bar = stackedBar.enter().append('g')
+        var area = stackedArea.enter().append('g')
             .attr('class', 'stack-area')
-            .merge(stackedBar)
+            .merge(stackedArea)
             .selectAll('path.stacked-area')
             .data(function(d, i) {
                 d.forEach(function(dB) {
@@ -470,16 +529,16 @@
                 })
                 return [d]
             })
-        bar.enter().append('path')
-            .merge(bar)
+        area.enter().append('path')
+            .merge(area)
             .attr('class', function(d) {
                 return 'stacked-area layer' + d.index
             })
             .attr('d', function(d, i) {
                 return area(d, i)
             })
-        bar.exit().remove()
-        stackedBar.exit().remove()
+        area.exit().remove()
+        stackedArea.exit().remove()
 
         return {}
     }
@@ -490,6 +549,14 @@
             .data(config.data.thresholdData)
         line.enter().append('line')
             .attr('class', 'reference-line')
+            .on('mouseover', function(d) {
+                config.events.call('thresholdLineHover', null, {
+                    timestamp: d.timestamp,
+                    value: d.value,
+                    config: config,
+                    event: d3.event
+                })
+            })
             .merge(line)
             .attr('x1', 0)
             .attr('y1', function(d) {
@@ -534,8 +601,48 @@
         common.chartTitleComponent
     )
 
+    var multiChart = function(config) {
+        var configCache,
+            events = d3.dispatch(
+                'barHover', 
+                'estimateBarHover', 
+                'referenceBarHover',
+                'stackedBarHover',
+                'thresholdLineHover',
+                'hover'),
+            chartCache
+
+        var render = function() {
+            chartCache = multi(configCache)
+        }
+
+        var setData = function(data) {
+            configCache = utils.mergeAll(configCache, {data: data})
+            render()
+            return this
+        }
+
+        var setConfig = function(config) {
+            configCache = utils.mergeAll(configCache, config)
+            render()
+            return this
+        }
+
+        var init = function(config, events) {
+            setConfig(utils.mergeAll(config, {events: events}))
+        }
+
+        init(config, events)
+
+        return {
+            on: utils.rebind(events),
+            setConfig: setConfig,
+            setData: setData
+        }
+    }
+
     exports.chart = {
-        multi: multi
+        multi: multiChart
     }
 
 }))

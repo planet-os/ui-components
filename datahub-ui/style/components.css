@@ -19,6 +19,10 @@
     stroke: lime;
 }
 
+.datahub-chart .axis.y .tick line{
+    pointer-events: none;
+}
+
 .datahub-button-group {
     display: flex;
 }
