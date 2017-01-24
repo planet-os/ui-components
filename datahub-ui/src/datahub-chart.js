@@ -87,7 +87,7 @@
                 barData: d.barData ? d.barData.map(function(d) {
                     return {
                         timestamp: new Date(d.timestamp),
-                        value: d.value,
+                        value: Array.isArray(d.value) ? d.value[0] : d.value,
                         id: d.id
                     }
                 }) : [],
@@ -108,35 +108,35 @@
                 lineData: d.lineData ? d.lineData.map(function(d) {
                     return {
                         timestamp: new Date(d.timestamp),
-                        value: d.value,
+                        value: Array.isArray(d.value) ? d.value[0] : d.value,
                         id: d.id
                     }
                 }) : [],
                 referenceData: d.referenceData ? d.referenceData.map(function(d) {
                     return {
                         timestamp: new Date(d.timestamp),
-                        value: d.value,
+                        value: Array.isArray(d.value) ? d.value[0] : d.value,
                         id: d.id
                     }
                 }) : [],
                 estimateData: d.estimateData ? d.estimateData.map(function(d) {
                     return {
                         timestamp: new Date(d.timestamp),
-                        value: d.value,
+                        value: Array.isArray(d.value) ? d.value[0] : d.value,
                         id: d.id
                     }
                 }) : [],
                 thresholdData: d.thresholdData ? d.thresholdData.map(function(d) {
                     return {
                         timestamp: new Date(d.timestamp),
-                        value: d.value,
+                        value: Array.isArray(d.value) ? d.value[0] : d.value,
                         id: d.id
                     }
                 }) : [],
                 areaData: d.areaData ? d.areaData.map(function(d) {
                     return {
                         timestamp: new Date(d.timestamp),
-                        value: d.value,
+                        value: Array.isArray(d.value) ? d.value[0] : d.value,
                         id: d.id
                     }
                 }) : []
@@ -228,8 +228,8 @@
             .indexOf(timestamp.getTime())
         if(index > -1) {
             return {
-                value: data[key][index].value,
-                id: data[key][index].id
+                value: [].concat(data[key][index].value),
+                id: [].concat(data[key][index].id)
             }
         }
         else {
@@ -238,7 +238,15 @@
     }
 
     var findThresholdData = function(data, key, timestamp) {
-        return data[key][0] ? data[key][0].value : null
+        if(data[key][0]) {
+            return {
+                value: [].concat(data[key][0].value),
+                id: [].concat(data[key][0].id)
+            }
+        }
+        else {
+            return null
+        }
     }
 
     var getValuesAtTimestamp = function(timestamp, data) {
