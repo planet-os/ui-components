@@ -332,6 +332,9 @@
             .attr('class', function(d) {
                 return 'stacked-bar layer' + d.index
             })
+            .filter(function(d) {
+                return !Number.isNaN(d[0]) && !Number.isNaN(d[1])
+            })
             .attr('x', function(d) {
                 return config.scaleX(d.data.x)
             })
@@ -565,9 +568,9 @@
         })
 
         var areaGenerator = d3.area()
-            // .defined(function(d) {
-            //     return d.value != null
-            // })
+            .defined(function(d) {
+                return !Number.isNaN(d[0]) && !Number.isNaN(d[1])
+            })
             .x(function(d) {
                 return config.lineScaleX(d.data.x)
             })
