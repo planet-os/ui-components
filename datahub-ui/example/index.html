@@ -156,6 +156,14 @@
     </div>
     <div class="row section">
         <div class="col-xs-12 col-md-7">
+            <div class="gaps"></div>
+        </div>
+        <div class="col-xs-12 col-md-5">
+            <div class="description">Most charts handle irregular data with gaps.</div>
+        </div>
+    </div>
+    <div class="row section">
+        <div class="col-xs-12 col-md-7">
             <div class="multiline-chart-empty"></div>
         </div>
         <div class="col-xs-12 col-md-5">
@@ -472,6 +480,20 @@
         width: container.clientWidth,
         data: datahub.data.mergeTimeseries(dataMulti)
     })
+
+    var dataMulti = {
+        timestamp: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1).timestamps,
+        stackedAreaData: datahub.data.generateTimeSeries(12, 3, '2016-01-01', 'month', 1)
+    }
+
+    var data = datahub.data.mergeTimeseries(dataMulti)
+    data.stackedAreaData[10].value = data.stackedAreaData[10].value.slice(0, 2)
+    data.stackedAreaData[6].value = data.stackedAreaData[6].value.slice(1, 2)
+
+    datahub.chart.multi({
+        parent: document.querySelector('.gaps'),
+    })
+    .setData(data)
 
     var sliderChartContainer = document.querySelector('.slider-chart')
 
