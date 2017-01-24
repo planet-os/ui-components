@@ -150,43 +150,43 @@
                 return d && d.timestamp
             })
             .map(function(d) {
-                return d.timestamp
+                return d3.isoFormat(d.timestamp)
             })
         var barData = data.filter(function(d) {
                 return d && d.barData
             })
             .map(function(d) {
-                return { timestamp: d.timestamp, value: d.barData }
+                return { timestamp: d3.isoFormat(d.timestamp), value: d.barData }
             })
         var stackedBarData = data.filter(function(d) {
                 return d && d.stackedBarData
             })
             .map(function(d) {
-                return { timestamp: d.timestamp, value: d.stackedBarData }
+                return { timestamp: d3.isoFormat(d.timestamp), value: d.stackedBarData }
             })
         var lineData = data.filter(function(d) {
                 return d && d.lineData
             })
             .map(function(d) {
-                return { timestamp: d.timestamp, value: d.lineData }
+                return { timestamp: d3.isoFormat(d.timestamp), value: d.lineData }
             })
         var referenceData = data.filter(function(d) {
                 return d && d.referenceData
             })
             .map(function(d) {
-                return { timestamp: d.timestamp, value: d.referenceData }
+                return { timestamp: d3.isoFormat(d.timestamp), value: d.referenceData }
             })
         var estimateData = data.filter(function(d) {
                 return d && d.estimateData
             })
             .map(function(d) {
-                return { timestamp: d.timestamp, value: d.estimateData }
+                return { timestamp: d3.isoFormat(d.timestamp), value: d.estimateData }
             })
         var thresholdData = data.filter(function(d) {
                 return d && d.thresholdData
             })
             .map(function(d) {
-                return { timestamp: d.timestamp, value: d.thresholdData }
+                return { timestamp: d3.isoFormat(d.timestamp), value: d.thresholdData }
             })
         var areaData = data.filter(function(d) {
                 return d && d.areaData

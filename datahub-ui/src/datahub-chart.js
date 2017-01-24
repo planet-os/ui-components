@@ -76,18 +76,70 @@
     }
 
     var dataAdapter = function(config) {
-        var d = config.data || {}
+        var d = config.data ||  {}
+
         return {
             dataIsEmpty: !d || !d.timestamp || !d.timestamp.length,
-            data:  {
-                barData: d.barData || [],
-                timestamp: d.timestamp || [],
-                stackedBarData: d.stackedBarData || [],
-                lineData: d.lineData || [],
-                referenceData: d.referenceData || [],
-                estimateData: d.estimateData || [],
-                thresholdData: d.thresholdData || [],
-                areaData: d.areaData || []
+            data: {
+                timestamp: d.timestamp ? d.timestamp.map(function(d) {
+                    return new Date(d)
+                }) : [],
+                barData: d.barData ? d.barData.map(function(d) {
+                    return {
+                        timestamp: new Date(d.timestamp),
+                        value: d.value,
+                        id: d.id
+                    }
+                }) : [],
+                stackedBarData: d.stackedBarData ? d.stackedBarData.map(function(d) {
+                    return {
+                        timestamp: new Date(d.timestamp),
+                        value: d.value,
+                        id: d.id
+                    }
+                }) : [],
+                stackedAreaData: d.stackedAreaData ? d.stackedAreaData.map(function(d) {
+                    return {
+                        timestamp: new Date(d.timestamp),
+                        value: d.value,
+                        id: d.id
+                    }
+                }) : [],
+                lineData: d.lineData ? d.lineData.map(function(d) {
+                    return {
+                        timestamp: new Date(d.timestamp),
+                        value: d.value,
+                        id: d.id
+                    }
+                }) : [],
+                referenceData: d.referenceData ? d.referenceData.map(function(d) {
+                    return {
+                        timestamp: new Date(d.timestamp),
+                        value: d.value,
+                        id: d.id
+                    }
+                }) : [],
+                estimateData: d.estimateData ? d.estimateData.map(function(d) {
+                    return {
+                        timestamp: new Date(d.timestamp),
+                        value: d.value,
+                        id: d.id
+                    }
+                }) : [],
+                thresholdData: d.thresholdData ? d.thresholdData.map(function(d) {
+                    return {
+                        timestamp: new Date(d.timestamp),
+                        value: d.value,
+                        id: d.id
+                    }
+                }) : [],
+                areaData: d.areaData ? d.areaData.map(function(d) {
+                    return {
+                        timestamp: new Date(d.timestamp),
+                        value: d.value,
+                        id: d.id
+                    }
+                }) : []
             }
         }
     }
@@ -170,8 +222,19 @@
     }
 
     var findData = function(data, key, timestamp) {
-        var index = data[key].map(function(d) { return d.timestamp.getTime()}).indexOf(timestamp.getTime())
-        return index > -1 ? data[key][index].value : null
+        var index = data[key].map(function(d) {
+                return d.timestamp.getTime()
+            })
+            .indexOf(timestamp.getTime())
+        if(index > -1) {
+            return {
+                value: data[key][index].value,
+                id: data[key][index].id
+            }
+        }
+        else {
+            return null
+        }
     }
 
     var findThresholdData = function(data, key, timestamp) {
@@ -569,6 +632,7 @@
     var multi = utils.pipeline(
         common.defaultConfig,
         dataAdapter,
+        // printer,
         template,
         scaleX,
         scaleY,
@@ -610,7 +674,8 @@
         }
 
         var setData = function(data) {
-            configCache = utils.mergeAll(configCache, {data: data})
+            var d = data ? JSON.parse(JSON.stringify(data)) : {}
+            configCache = utils.mergeAll({}, configCache, {data: d})
             render()
             return this
         }
