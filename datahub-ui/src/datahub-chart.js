@@ -272,6 +272,9 @@
             .attr('class', 'event-panel')
             .merge(eventPanel)
             .on('mousemove', function(d) {
+                if(config.dataIsEmpty) {
+                    return
+                }
                 var mouseX = d3.mouse(this)[0]
                 var w = config.stripeScaleX.bandwidth()
                 var domain = config.stripeScaleX.domain()
@@ -309,6 +312,7 @@
                 d.value.forEach(function(dB, iB) {
                     datum['y' + iB] = dB
                 })
+                datum.id = d.id
                 data.push(datum)
             }
         })
@@ -323,6 +327,7 @@
             .data(function(d, i) {
                 d.forEach(function(dB) {
                     dB.index = d.index
+                    dB.id = dB.data.id[d.index]
                 })
                 return d
             })
@@ -330,7 +335,7 @@
             .attr('class', 'stacked-bar')
             .merge(bar)
             .attr('class', function(d) {
-                return 'stacked-bar layer' + d.index
+                return 'stacked-bar layer' + d.index + ' ' + d.id
             })
             .filter(function(d) {
                 return !Number.isNaN(d[0]) && !Number.isNaN(d[1])
@@ -505,7 +510,7 @@
             .data(data)
         shapes.enter().append('path')
             .attr('class', function(d, i) {
-                return 'line layer' + i
+                return 'line layer' + i + ' ' + d[0].id
             })
             .style('fill', 'none')
             .merge(shapes)
@@ -588,6 +593,7 @@
                 d.value.forEach(function(dB, iB) {
                     datum['y' + iB] = dB
                 })
+                datum.id = d.id
                 data.push(datum)
             }
         })
@@ -602,13 +608,14 @@
             .data(function(d, i) {
                 d.forEach(function(dB) {
                     dB.index = d.index
+                    dB.id = dB.data.id[d.index]
                 })
                 return [d]
             })
         area.enter().append('path')
             .merge(area)
             .attr('class', function(d) {
-                return 'stacked-area layer' + d.index
+                return 'stacked-area layer' + d.index + ' ' + d[0].id
             })
             .attr('d', areaGenerator)
         area.exit().remove()
