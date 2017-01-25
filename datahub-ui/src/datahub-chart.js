@@ -12,12 +12,7 @@
 
     /*
         TODO:
-        -retained mode?
-        -verify scale stack vs bar
         -chart resize
-        -legend
-        -legend interaction
-        -line with second scale (how to match with the rest? as multiple?)
     */
 
     var template = function(config) {
@@ -75,71 +70,37 @@
         }
     }
 
+    var validateData = function(d, key, is2D) {
+        return d[key] ? d[key].map(function(d) {
+            return {
+                timestamp: new Date(d.timestamp),
+                value: (Array.isArray(d.value) && !is2D) ? d.value[0] : d.value,
+                id: d.id
+            }
+        }) : []
+    }
+
+    var validateTimestamp = function(d) {
+        return d.timestamp ? d.timestamp.map(function(d) {
+            return new Date(d)
+        }) : []
+    }
+
     var dataAdapter = function(config) {
         var d = config.data ||  {}
 
         return {
             dataIsEmpty: !d || !d.timestamp || !d.timestamp.length,
             data: {
-                timestamp: d.timestamp ? d.timestamp.map(function(d) {
-                    return new Date(d)
-                }) : [],
-                barData: d.barData ? d.barData.map(function(d) {
-                    return {
-                        timestamp: new Date(d.timestamp),
-                        value: Array.isArray(d.value) ? d.value[0] : d.value,
-                        id: d.id
-                    }
-                }) : [],
-                stackedBarData: d.stackedBarData ? d.stackedBarData.map(function(d) {
-                    return {
-                        timestamp: new Date(d.timestamp),
-                        value: d.value,
-                        id: d.id
-                    }
-                }) : [],
-                stackedAreaData: d.stackedAreaData ? d.stackedAreaData.map(function(d) {
-                    return {
-                        timestamp: new Date(d.timestamp),
-                        value: d.value,
-                        id: d.id
-                    }
-                }) : [],
-                lineData: d.lineData ? d.lineData.map(function(d) {
-                    return {
-                        timestamp: new Date(d.timestamp),
-                        value: Array.isArray(d.value) ? d.value[0] : d.value,
-                        id: d.id
-                    }
-                }) : [],
-                referenceData: d.referenceData ? d.referenceData.map(function(d) {
-                    return {
-                        timestamp: new Date(d.timestamp),
-                        value: Array.isArray(d.value) ? d.value[0] : d.value,
-                        id: d.id
-                    }
-                }) : [],
-                estimateData: d.estimateData ? d.estimateData.map(function(d) {
-                    return {
-                        timestamp: new Date(d.timestamp),
-                        value: Array.isArray(d.value) ? d.value[0] : d.value,
-                        id: d.id
-                    }
-                }) : [],
-                thresholdData: d.thresholdData ? d.thresholdData.map(function(d) {
-                    return {
-                        timestamp: new Date(d.timestamp),
-                        value: Array.isArray(d.value) ? d.value[0] : d.value,
-                        id: d.id
-                    }
-                }) : [],
-                areaData: d.areaData ? d.areaData.map(function(d) {
-                    return {
-                        timestamp: new Date(d.timestamp),
-                        value: Array.isArray(d.value) ? d.value[0] : d.value,
-                        id: d.id
-                    }
-                }) : []
+                timestamp: validateTimestamp(d),
+                stackedBarData: validateData(d, 'stackedBarData', true),
+                stackedAreaData: validateData(d, 'stackedAreaData', true),
+                lineData: validateData(d, 'lineData', true),
+                barData: validateData(d, 'barData'),
+                referenceData: validateData(d, 'referenceData'),
+                estimateData: validateData(d, 'estimateData'),
+                thresholdData: validateData(d, 'thresholdData'),
+                areaData: validateData(d, 'areaData')
             }
         }
     }
@@ -164,54 +125,49 @@
         }
     }
 
-    var scaleY = function(config) {
-        var maxs = []
-        if (config.data.barData) {
-            maxs.push(d3.max(config.data.barData.map(function(d) {
+    var getMax = function(d) {
+        if (d) {
+            return d3.max(d.map(function(d) {
                 return d.value
-            })))
+            }))
         }
-        if (config.data.referenceData) {
-            maxs.push(d3.max(config.data.referenceData.map(function(d, i) {
-                return d.value
-            })))
+        return null
+    }
+
+    var getStackMax = function(d) {
+        if (d && d.length) {
+            var sums = d.map(function(d) {
+                return d3.sum(d.value)
+            })
+            return d3.max(sums)
         }
-        if (config.data.estimateData) {
-            maxs.push(d3.max(config.data.estimateData.map(function(d, i) {
-                return d.value
-            })))
-        }
-        if (config.data.thresholdData) {
-            maxs.push(d3.max(config.data.thresholdData.map(function(d, i) {
-                return d.value
-            })))
-        }
-        if (config.data.areaData) {
-            maxs.push(d3.max(config.data.areaData.map(function(d, i) {
-                return d.value
-            })))
-        }
-        if (config.data.lineData && config.data.lineData.length) {
-            var data = config.data.lineData.map(function(d, i) {
+        return null
+    }
+
+    var getMultiMax = function(d) {
+        if (d && d.length) {
+            var data = d.map(function(d, i) {
                 return d.value
             })
             if (data[0].length) {
                 data = d3.merge(data)
             }
-            maxs.push(d3.max(data))
+            return d3.max(data)
         }
-        if (config.data.stackedBarData && config.data.stackedBarData.length) {
-            var sums = config.data.stackedBarData.map(function(d) {
-                return d3.sum(d.value)
-            })
-            maxs.push(d3.max(sums))
-        }
-        if (config.data.stackedAreaData && config.data.stackedAreaData.length) {
-            var sums = config.data.stackedAreaData.map(function(d) {
-                return d3.sum(d.value)
-            })
-            maxs.push(d3.max(sums))
-        }
+        return null
+    }
+
+    var scaleY = function(config) {
+        var maxs = []
+        maxs.push(getMax(config.data.barData))
+        maxs.push(getMax(config.data.referenceData))
+        maxs.push(getMax(config.data.estimateData))
+        maxs.push(getMax(config.data.thresholdData))
+        maxs.push(getMax(config.data.areaData))
+        maxs.push(getStackMax(config.data.stackedBarData))
+        maxs.push(getStackMax(config.data.stackedAreaData))
+        maxs.push(getMultiMax(config.data.lineData))
+
         var max = d3.max(maxs)
 
         var scaleY = d3.scaleLinear().domain([0, max]).range([config.chartHeight, 0])
@@ -327,7 +283,7 @@
             .data(function(d, i) {
                 d.forEach(function(dB) {
                     dB.index = d.index
-                    dB.id = dB.data.id[d.index]
+                    dB.id = dB.data.id && dB.data.id.length ? dB.data.id[d.index] : null
                 })
                 return d
             })
@@ -608,7 +564,7 @@
             .data(function(d, i) {
                 d.forEach(function(dB) {
                     dB.index = d.index
-                    dB.id = dB.data.id[d.index]
+                    dB.id = dB.data.id && dB.data.id.length ? dB.data.id[d.index] : null
                 })
                 return [d]
             })
