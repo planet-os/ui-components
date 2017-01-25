@@ -115,7 +115,8 @@
         var merged = timestamps.map(function(d, i) {
             return {
                 timestamp: d3.isoFormat(d),
-                value: values[i]
+                value: values[i],
+                id: values[i].map(function(d) { return ~~(Math.random()*1000) })
             }
         })
 
