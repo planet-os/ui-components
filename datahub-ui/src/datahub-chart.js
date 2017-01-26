@@ -72,11 +72,10 @@
 
     var validateData = function(d, key, is2D) {
         return d[key] ? d[key].map(function(d) {
-            return {
-                timestamp: new Date(d.timestamp),
-                value: (Array.isArray(d.value) && !is2D) ? d.value[0] : d.value,
-                id: d.id
-            }
+            d.timestamp = new Date(d.timestamp)
+            d.value = (Array.isArray(d.value) && !is2D) ? d.value[0] : d.value
+
+            return d
         }) : []
     }
 
@@ -183,10 +182,10 @@
             })
             .indexOf(timestamp.getTime())
         if(index > -1) {
-            return {
-                value: [].concat(data[key][index].value),
-                id: [].concat(data[key][index].id)
-            }
+            var datum = utils.mergeAll({}, data[key][index])
+            datum.value = [].concat(data[key][index].value)
+            datum.id = [].concat(data[key][index].id)
+            return datum
         }
         else {
             return null
@@ -195,10 +194,10 @@
 
     var findThresholdData = function(data, key, timestamp) {
         if(data[key][0]) {
-            return {
-                value: [].concat(data[key][0].value),
-                id: [].concat(data[key][0].id)
-            }
+            var datum = utils.mergeAll({}, data[key][0])
+            datum.value = [].concat(data[key][0].value)
+            datum.id = [].concat(data[key][0].id)
+            return datum
         }
         else {
             return null
@@ -263,12 +262,11 @@
 
         var data = []
         config.data.stackedBarData.forEach(function(d, i) {
-            var datum = { x: d.timestamp }
+            var datum = utils.mergeAll({}, d)
             if (d.value && d.value.length) {
                 d.value.forEach(function(dB, iB) {
                     datum['y' + iB] = dB
                 })
-                datum.id = d.id
                 data.push(datum)
             }
         })
@@ -283,21 +281,23 @@
             .data(function(d, i) {
                 d.forEach(function(dB) {
                     dB.index = d.index
-                    dB.id = dB.data.id && dB.data.id.length ? dB.data.id[d.index] : null
+                    // dB.id = dB.data.id && dB.data.id.length ? dB.data.id[d.index] : null
                 })
                 return d
             })
         bar.enter().append('rect')
             .attr('class', 'stacked-bar')
             .merge(bar)
-            .attr('class', function(d) {
-                return 'stacked-bar layer' + d.index + ' ' + (d.id || '')
+            .attr('class', function(d, a, b) {
+                var id = d.data.id ? d.data.id[d.index] : null
+                var className = d.data.className ? d.data.className[d.index] : null
+                return ['stacked-bar', 'layer' + d.index, id, className].join(' ')
             })
             .filter(function(d) {
                 return !Number.isNaN(d[0]) && !Number.isNaN(d[1])
             })
             .attr('x', function(d) {
-                return config.scaleX(d.data.x)
+                return config.scaleX(d.data.timestamp)
             })
             .attr('y', function(d) {
                 return config.scaleY(d[1])
@@ -319,7 +319,7 @@
         shapes.enter().append('rect')
             .merge(shapes)
             .attr('class', function(d) {
-                return 'bar ' + (d.id || '')
+                return ['bar', d.id, d.className].join(' ')
             })
             .attr('x', function(d, i) {
                 return config.scaleX(d.timestamp) || 0
@@ -345,7 +345,7 @@
         shapes.enter().append('rect')
             .merge(shapes)
             .attr('class', function(d) {
-                return 'estimate-bar ' + (d.id || '')
+                return ['estimate-bar', d.id, d.className].join(' ')
             })
             .attr('x', function(d, i) {
                 return config.scaleX(d.timestamp) || 0
@@ -402,7 +402,7 @@
         shapes.enter().append('rect')
             .merge(shapes)
             .attr('class', function(d) {
-                return 'reference-bar ' + (d.id || '')
+                return ['reference-bar', d.id, d.className].join(' ')
             })
             .attr('x', function(d, i) {
                 return config.referenceScaleX(d.timestamp) || 0
@@ -464,7 +464,8 @@
                     return {
                         timestamp: dB.timestamp,
                         value: dB.value[i],
-                        id: dB.id[i]
+                        id: dB.id && dB.id[i],
+                        className: dB.className && dB.className[i],
                     }
                 })
                 data.push(layer)
@@ -478,7 +479,7 @@
             .style('fill', 'none')
             .merge(shapes)
             .attr('class', function(d, i) {
-                return 'line layer' + i + ' ' + (d[0].id || '')
+                return ['line', 'layer' + i, d[0].id, d[0].className].join(' ')
             })
             .attr('d', line)
         shapes.exit().remove()
@@ -508,7 +509,7 @@
             .data([config.data.areaData])
         shapes.enter().append('path')
             .attr('class', function(d, i) {
-                return 'area layer' + i + ' ' + (d[0].id || '')
+                return ['area', 'layer' + i, d[0].id, d[0].className].join(' ')
             })
             .merge(shapes)
             .attr('d', areaGenerator)
@@ -530,7 +531,7 @@
                 return !Number.isNaN(d[0]) && !Number.isNaN(d[1])
             })
             .x(function(d) {
-                return config.lineScaleX(d.data.x)
+                return config.lineScaleX(d.data.timestamp)
             })
             .y0(function(d) {
                 return config.scaleY(d[0])
@@ -541,12 +542,11 @@
 
         var data = []
         config.data.stackedAreaData.forEach(function(d, i) {
-            var datum = { x: d.timestamp }
+            var datum = utils.mergeAll({}, d)
             if (d.value && d.value.length) {
                 d.value.forEach(function(dB, iB) {
                     datum['y' + iB] = dB
                 })
-                datum.id = d.id
                 data.push(datum)
             }
         })
@@ -561,14 +561,15 @@
             .data(function(d, i) {
                 d.forEach(function(dB) {
                     dB.index = d.index
-                    dB.id = dB.data.id && dB.data.id.length ? dB.data.id[d.index] : null
                 })
                 return [d]
             })
         area.enter().append('path')
             .merge(area)
             .attr('class', function(d) {
-                return 'stacked-area layer' + d.index + ' ' + (d[0].id || '')
+                var id = d[0].data.id ? d[0].data.id[d.index] : null
+                var className = d[0].data.className ? d[0].data.className[d.index] : null
+                return ['stacked-area', 'layer' + d.index, id, className].join(' ')
             })
             .attr('d', areaGenerator)
         area.exit().remove()
@@ -584,7 +585,7 @@
         line.enter().append('line')
             .merge(line)
             .attr('class', function(d) {
-                return 'reference-line ' + (d.id || '')
+                return ['threshold-line', d.id, d.className].join(' ')
             })
             .attr('x1', 0)
             .attr('y1', function(d) {

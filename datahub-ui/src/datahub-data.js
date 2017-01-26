@@ -116,7 +116,8 @@
             return {
                 timestamp: d3.isoFormat(d),
                 value: values[i],
-                id: values[i].map(function(d) { return ~~(Math.random()*1000) })
+                id: values[i].map(function(d) { return ~~(Math.random()*1000) }),
+                className: values[i].map(function(d) { return Math.random().toString(36).substring(4, 8) })
             }
         })
 
