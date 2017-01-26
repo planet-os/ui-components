@@ -84,7 +84,7 @@
 
     var axisX = function(config) {
         var format = config.axisXFormat || '%b'
-        var axisXFormat = d3.timeFormat(format) || function(d) {
+        var axisXFormat = d3.utcFormat(format) || function(d) {
             return d.toString()
         }
         var axisX = d3.axisBottom().scale(config.scaleX)

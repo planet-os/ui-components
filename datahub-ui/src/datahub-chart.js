@@ -12,12 +12,7 @@
 
     /*
         TODO:
-        -retained mode?
-        -verify scale stack vs bar
         -chart resize
-        -legend
-        -legend interaction
-        -line with second scale (how to match with the rest? as multiple?)
     */
 
     var template = function(config) {
@@ -27,14 +22,14 @@
                 + '<svg class="datahub-chart">'
                     + '<g class="panel">'
                         + '<g class="stripe-group"></g>'
+                        + '<g class="area-group"></g>'
+                        + '<g class="stacked-area-group"></g>'
                         + '<g class="reference-bar-group"></g>'
                         + '<g class="reference-line-group"></g>'                    
                         + '<g class="bar-group"></g>'
                         + '<g class="stacked-bar-group"></g>'
                         + '<g class="estimate-bar-group"></g>'
                         + '<g class="line-group"></g>'
-                        + '<g class="area-group"></g>'
-                        + '<g class="stacked-area-group"></g>'
                         + '<g class="threshold-line-group"></g>'
                         + '<g class="y axis"></g>'
                         + '<g class="x axis"></g>'
@@ -75,71 +70,36 @@
         }
     }
 
+    var validateData = function(d, key, is2D) {
+        return d[key] ? d[key].map(function(d) {
+            d.timestamp = new Date(d.timestamp)
+            d.value = (Array.isArray(d.value) && !is2D) ? d.value[0] : d.value
+
+            return d
+        }) : []
+    }
+
+    var validateTimestamp = function(d) {
+        return d.timestamp ? d.timestamp.map(function(d) {
+            return new Date(d)
+        }) : []
+    }
+
     var dataAdapter = function(config) {
         var d = config.data ||  {}
 
         return {
             dataIsEmpty: !d || !d.timestamp || !d.timestamp.length,
             data: {
-                timestamp: d.timestamp ? d.timestamp.map(function(d) {
-                    return new Date(d)
-                }) : [],
-                barData: d.barData ? d.barData.map(function(d) {
-                    return {
-                        timestamp: new Date(d.timestamp),
-                        value: Array.isArray(d.value) ? d.value[0] : d.value,
-                        id: d.id
-                    }
-                }) : [],
-                stackedBarData: d.stackedBarData ? d.stackedBarData.map(function(d) {
-                    return {
-                        timestamp: new Date(d.timestamp),
-                        value: d.value,
-                        id: d.id
-                    }
-                }) : [],
-                stackedAreaData: d.stackedAreaData ? d.stackedAreaData.map(function(d) {
-                    return {
-                        timestamp: new Date(d.timestamp),
-                        value: d.value,
-                        id: d.id
-                    }
-                }) : [],
-                lineData: d.lineData ? d.lineData.map(function(d) {
-                    return {
-                        timestamp: new Date(d.timestamp),
-                        value: Array.isArray(d.value) ? d.value[0] : d.value,
-                        id: d.id
-                    }
-                }) : [],
-                referenceData: d.referenceData ? d.referenceData.map(function(d) {
-                    return {
-                        timestamp: new Date(d.timestamp),
-                        value: Array.isArray(d.value) ? d.value[0] : d.value,
-                        id: d.id
-                    }
-                }) : [],
-                estimateData: d.estimateData ? d.estimateData.map(function(d) {
-                    return {
-                        timestamp: new Date(d.timestamp),
-                        value: Array.isArray(d.value) ? d.value[0] : d.value,
-                        id: d.id
-                    }
-                }) : [],
-                thresholdData: d.thresholdData ? d.thresholdData.map(function(d) {
-                    return {
-                        timestamp: new Date(d.timestamp),
-                        value: Array.isArray(d.value) ? d.value[0] : d.value,
-                        id: d.id
-                    }
-                }) : [],
-                areaData: d.areaData ? d.areaData.map(function(d) {
-                    return {
-                        timestamp: new Date(d.timestamp),
-                        value: Array.isArray(d.value) ? d.value[0] : d.value,
-                        id: d.id
-                    }
-                }) : []
+                timestamp: validateTimestamp(d),
+                stackedBarData: validateData(d, 'stackedBarData', true),
+                stackedAreaData: validateData(d, 'stackedAreaData', true),
+                lineData: validateData(d, 'lineData', true),
+                barData: validateData(d, 'barData'),
+                referenceData: validateData(d, 'referenceData'),
+                estimateData: validateData(d, 'estimateData'),
+                thresholdData: validateData(d, 'thresholdData'),
+                areaData: validateData(d, 'areaData')
             }
         }
     }
@@ -164,54 +124,49 @@
         }
     }
 
-    var scaleY = function(config) {
-        var maxs = []
-        if (config.data.barData) {
-            maxs.push(d3.max(config.data.barData.map(function(d) {
+    var getMax = function(d) {
+        if (d) {
+            return d3.max(d.map(function(d) {
                 return d.value
-            })))
+            }))
         }
-        if (config.data.referenceData) {
-            maxs.push(d3.max(config.data.referenceData.map(function(d, i) {
-                return d.value
-            })))
+        return null
+    }
+
+    var getStackMax = function(d) {
+        if (d && d.length) {
+            var sums = d.map(function(d) {
+                return d3.sum(d.value)
+            })
+            return d3.max(sums)
         }
-        if (config.data.estimateData) {
-            maxs.push(d3.max(config.data.estimateData.map(function(d, i) {
-                return d.value
-            })))
-        }
-        if (config.data.thresholdData) {
-            maxs.push(d3.max(config.data.thresholdData.map(function(d, i) {
-                return d.value
-            })))
-        }
-        if (config.data.areaData) {
-            maxs.push(d3.max(config.data.areaData.map(function(d, i) {
-                return d.value
-            })))
-        }
-        if (config.data.lineData && config.data.lineData.length) {
-            var data = config.data.lineData.map(function(d, i) {
+        return null
+    }
+
+    var getMultiMax = function(d) {
+        if (d && d.length) {
+            var data = d.map(function(d, i) {
                 return d.value
             })
             if (data[0].length) {
                 data = d3.merge(data)
             }
-            maxs.push(d3.max(data))
+            return d3.max(data)
         }
-        if (config.data.stackedBarData && config.data.stackedBarData.length) {
-            var sums = config.data.stackedBarData.map(function(d) {
-                return d3.sum(d.value)
-            })
-            maxs.push(d3.max(sums))
-        }
-        if (config.data.stackedAreaData && config.data.stackedAreaData.length) {
-            var sums = config.data.stackedAreaData.map(function(d) {
-                return d3.sum(d.value)
-            })
-            maxs.push(d3.max(sums))
-        }
+        return null
+    }
+
+    var scaleY = function(config) {
+        var maxs = []
+        maxs.push(getMax(config.data.barData))
+        maxs.push(getMax(config.data.referenceData))
+        maxs.push(getMax(config.data.estimateData))
+        maxs.push(getMax(config.data.thresholdData))
+        maxs.push(getMax(config.data.areaData))
+        maxs.push(getStackMax(config.data.stackedBarData))
+        maxs.push(getStackMax(config.data.stackedAreaData))
+        maxs.push(getMultiMax(config.data.lineData))
+
         var max = d3.max(maxs)
 
         var scaleY = d3.scaleLinear().domain([0, max]).range([config.chartHeight, 0])
@@ -227,10 +182,10 @@
             })
             .indexOf(timestamp.getTime())
         if(index > -1) {
-            return {
-                value: [].concat(data[key][index].value),
-                id: [].concat(data[key][index].id)
-            }
+            var datum = utils.mergeAll({}, data[key][index])
+            datum.value = [].concat(data[key][index].value)
+            datum.id = [].concat(data[key][index].id)
+            return datum
         }
         else {
             return null
@@ -239,10 +194,10 @@
 
     var findThresholdData = function(data, key, timestamp) {
         if(data[key][0]) {
-            return {
-                value: [].concat(data[key][0].value),
-                id: [].concat(data[key][0].id)
-            }
+            var datum = utils.mergeAll({}, data[key][0])
+            datum.value = [].concat(data[key][0].value)
+            datum.id = [].concat(data[key][0].id)
+            return datum
         }
         else {
             return null
@@ -307,12 +262,11 @@
 
         var data = []
         config.data.stackedBarData.forEach(function(d, i) {
-            var datum = { x: d.timestamp }
+            var datum = utils.mergeAll({}, d)
             if (d.value && d.value.length) {
                 d.value.forEach(function(dB, iB) {
                     datum['y' + iB] = dB
                 })
-                datum.id = d.id
                 data.push(datum)
             }
         })
@@ -327,21 +281,23 @@
             .data(function(d, i) {
                 d.forEach(function(dB) {
                     dB.index = d.index
-                    dB.id = dB.data.id[d.index]
+                    // dB.id = dB.data.id && dB.data.id.length ? dB.data.id[d.index] : null
                 })
                 return d
             })
         bar.enter().append('rect')
             .attr('class', 'stacked-bar')
             .merge(bar)
-            .attr('class', function(d) {
-                return 'stacked-bar layer' + d.index + ' ' + d.id
+            .attr('class', function(d, a, b) {
+                var id = d.data.id ? d.data.id[d.index] : null
+                var className = d.data.className ? d.data.className[d.index] : null
+                return ['stacked-bar', 'layer' + d.index, id, className].join(' ')
             })
             .filter(function(d) {
                 return !Number.isNaN(d[0]) && !Number.isNaN(d[1])
             })
             .attr('x', function(d) {
-                return config.scaleX(d.data.x)
+                return config.scaleX(d.data.timestamp)
             })
             .attr('y', function(d) {
                 return config.scaleY(d[1])
@@ -361,8 +317,10 @@
             .selectAll('rect.bar')
             .data(config.data.barData)
         shapes.enter().append('rect')
-            .attr('class', 'bar')
             .merge(shapes)
+            .attr('class', function(d) {
+                return ['bar', d.id, d.className].join(' ')
+            })
             .attr('x', function(d, i) {
                 return config.scaleX(d.timestamp) || 0
             })
@@ -385,8 +343,10 @@
             .selectAll('rect.estimate-bar')
             .data(config.data.estimateData)
         shapes.enter().append('rect')
-            .attr('class', 'estimate-bar')
             .merge(shapes)
+            .attr('class', function(d) {
+                return ['estimate-bar', d.id, d.className].join(' ')
+            })
             .attr('x', function(d, i) {
                 return config.scaleX(d.timestamp) || 0
             })
@@ -440,8 +400,10 @@
             .selectAll('rect.reference-bar')
             .data(config.data.referenceData)
         shapes.enter().append('rect')
-            .attr('class', 'reference-bar')
             .merge(shapes)
+            .attr('class', function(d) {
+                return ['reference-bar', d.id, d.className].join(' ')
+            })
             .attr('x', function(d, i) {
                 return config.referenceScaleX(d.timestamp) || 0
             })
@@ -482,9 +444,9 @@
         }
 
         var line = d3.line()
-            // .defined(function(d) {
-            //     return d.value != null
-            // })
+            .defined(function(d) {
+                return d.value != null
+            })
             .x(function(d) {
                 return config.lineScaleX(d.timestamp)
             })
@@ -499,7 +461,12 @@
         } else {
             for (var i = 0; i < valueLength; i++) {
                 var layer = config.data.lineData.map(function(dB) {
-                    return { timestamp: dB.timestamp, value: dB.value[i] }
+                    return {
+                        timestamp: dB.timestamp,
+                        value: dB.value[i],
+                        id: dB.id && dB.id[i],
+                        className: dB.className && dB.className[i],
+                    }
                 })
                 data.push(layer)
             }
@@ -509,11 +476,11 @@
             .selectAll('path.line')
             .data(data)
         shapes.enter().append('path')
-            .attr('class', function(d, i) {
-                return 'line layer' + i + ' ' + d[0].id
-            })
             .style('fill', 'none')
             .merge(shapes)
+            .attr('class', function(d, i) {
+                return ['line', 'layer' + i, d[0].id, d[0].className].join(' ')
+            })
             .attr('d', line)
         shapes.exit().remove()
 
@@ -526,9 +493,9 @@
         }
 
         var areaGenerator = d3.area()
-            // .defined(function(d) {
-            //     return d.value != null
-            // })
+            .defined(function(d) {
+                return d.value != null
+            })
             .x(function(d) {
                 return config.lineScaleX(d.timestamp)
             })
@@ -537,25 +504,12 @@
                 return config.scaleY(d.value)
             })
 
-        var data = []
-        var valueLength = config.data.areaData[0].value.length
-        if (typeof valueLength === 'undefined') {
-            data.push(config.data.areaData)
-        } else {
-            for (var i = 0; i < valueLength; i++) {
-                var layer = config.data.areaData.map(function(dB) {
-                    return { timestamp: dB.timestamp, value: dB.value[i] }
-                })
-                data.push(layer)
-            }
-        }
-
         var shapes = config.container.select('.area-group')
             .selectAll('path.area')
-            .data(data)
+            .data([config.data.areaData])
         shapes.enter().append('path')
             .attr('class', function(d, i) {
-                return 'area layer' + i
+                return ['area', 'layer' + i, d[0].id, d[0].className].join(' ')
             })
             .merge(shapes)
             .attr('d', areaGenerator)
@@ -577,7 +531,7 @@
                 return !Number.isNaN(d[0]) && !Number.isNaN(d[1])
             })
             .x(function(d) {
-                return config.lineScaleX(d.data.x)
+                return config.lineScaleX(d.data.timestamp)
             })
             .y0(function(d) {
                 return config.scaleY(d[0])
@@ -588,12 +542,11 @@
 
         var data = []
         config.data.stackedAreaData.forEach(function(d, i) {
-            var datum = { x: d.timestamp }
+            var datum = utils.mergeAll({}, d)
             if (d.value && d.value.length) {
                 d.value.forEach(function(dB, iB) {
                     datum['y' + iB] = dB
                 })
-                datum.id = d.id
                 data.push(datum)
             }
         })
@@ -608,14 +561,15 @@
             .data(function(d, i) {
                 d.forEach(function(dB) {
                     dB.index = d.index
-                    dB.id = dB.data.id[d.index]
                 })
                 return [d]
             })
         area.enter().append('path')
             .merge(area)
             .attr('class', function(d) {
-                return 'stacked-area layer' + d.index + ' ' + d[0].id
+                var id = d[0].data.id ? d[0].data.id[d.index] : null
+                var className = d[0].data.className ? d[0].data.className[d.index] : null
+                return ['stacked-area', 'layer' + d.index, id, className].join(' ')
             })
             .attr('d', areaGenerator)
         area.exit().remove()
@@ -629,8 +583,10 @@
             .selectAll('line.reference-line')
             .data(config.data.thresholdData)
         line.enter().append('line')
-            .attr('class', 'reference-line')
             .merge(line)
+            .attr('class', function(d) {
+                return ['threshold-line', d.id, d.className].join(' ')
+            })
             .attr('x1', 0)
             .attr('y1', function(d) {
                 return config.scaleY(d.value) || 0

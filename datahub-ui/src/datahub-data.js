@@ -101,125 +101,34 @@
 
     var generateTimeSeries = function(n, _layerCount, _timeStart, _timeIncrement, _step) {
         var layerCount = _layerCount || 1
-        var value = ~~(Math.random() * 100)
-        var array2D = generateArray(layerCount, function() {
-            return generateArray(n, function(d) {
-                value += (Math.random() * 2 - 1) * 10
-                value = Math.max(value, 0)
-                return value
+        var startValue = ~~(Math.random() * 100)
+        var values = generateArray(n, function() {
+            return generateArray(layerCount, function(d) {
+                startValue += (Math.random() * 2 - 1) * 10
+                startValue = Math.max(startValue, 0)
+                return startValue
             })
         })
 
-        var timestamps = generateTimestamps(_timeStart, n, _timeIncrement, _step)
+        var timestamps = generateTimestamps(n, _layerCount, _timeStart, _timeIncrement, _step)
 
-        return {
-            values: array2D,
-            timestamps: timestamps
-        }
-    }
-
-    var mergeTimeseries = function(data) {
-        if (!data.timestamp) {
-            return []
-        }
-        var dataConverted = data.timestamp.map(function(d, i) {
-            var point = { timestamp: d }
-            for (var x in data) {
-                if (x === 'timestamp') {
-                    continue
-                }
-                var index = data[x].timestamps.map(Number).indexOf(+d)
-                var values = data[x].values
-                if (index === -1) {
-                    // point[x] = null
-                } else {
-                    point[x] = values.length > 1 ? values.map(function(d) {
-                        return d[index]
-                    }) : values[0][index]
-                }
+        var merged = timestamps.map(function(d, i) {
+            return {
+                timestamp: d3.isoFormat(d),
+                value: values[i],
+                id: values[i].map(function(d) { return ~~(Math.random()*1000) }),
+                className: values[i].map(function(d) { return Math.random().toString(36).substring(4, 8) })
             }
-            return point
         })
 
-        return splitTimeseries(dataConverted)
-    }
-
-    var splitTimeseries = function(data) {
-        var data = [].concat(data)
-        var timestamp = data.filter(function(d) {
-                return d && d.timestamp
-            })
-            .map(function(d) {
-                return d3.isoFormat(d.timestamp)
-            })
-        var barData = data.filter(function(d) {
-                return d && d.barData
-            })
-            .map(function(d) {
-                return { timestamp: d3.isoFormat(d.timestamp), value: d.barData }
-            })
-        var stackedBarData = data.filter(function(d) {
-                return d && d.stackedBarData
-            })
-            .map(function(d) {
-                return { timestamp: d3.isoFormat(d.timestamp), value: d.stackedBarData }
-            })
-        var lineData = data.filter(function(d) {
-                return d && d.lineData
-            })
-            .map(function(d) {
-                return { timestamp: d3.isoFormat(d.timestamp), value: d.lineData }
-            })
-        var referenceData = data.filter(function(d) {
-                return d && d.referenceData
-            })
-            .map(function(d) {
-                return { timestamp: d3.isoFormat(d.timestamp), value: d.referenceData }
-            })
-        var estimateData = data.filter(function(d) {
-                return d && d.estimateData
-            })
-            .map(function(d) {
-                return { timestamp: d3.isoFormat(d.timestamp), value: d.estimateData }
-            })
-        var thresholdData = data.filter(function(d) {
-                return d && d.thresholdData
-            })
-            .map(function(d) {
-                return { timestamp: d3.isoFormat(d.timestamp), value: d.thresholdData }
-            })
-        var areaData = data.filter(function(d) {
-                return d && d.areaData
-            })
-            .map(function(d) {
-                return { timestamp: d.timestamp, value: d.areaData }
-            })
-
-        var stackedAreaData = data.filter(function(d) {
-                return d && d.stackedAreaData
-            })
-            .map(function(d) {
-                return { timestamp: d.timestamp, value: d.stackedAreaData }
-            })
-
-        return {
-            barData: barData,
-            timestamp: timestamp,
-            stackedBarData: stackedBarData,
-            lineData: lineData,
-            referenceData: referenceData,
-            estimateData: estimateData,
-            thresholdData: thresholdData,
-            areaData: areaData,
-            stackedAreaData: stackedAreaData
-        }
+        return merged
     }
 
     function capitalize(string) {
         return string.charAt(0).toUpperCase() + string.slice(1)
     }
 
-    var generateTimestamps = function(_timeStart, _n, _timeIncrement, _step) {
+    var generateTimestamps = function(_n, _layerCount, _timeStart, _timeIncrement, _step) {
         var timeIncrement = _timeIncrement || 'hour'
         var intervalFuncName = 'time' + capitalize(timeIncrement) || 'timeHour'
         var step = _step || 3
@@ -472,7 +381,7 @@
         generateRaster: generateRaster,
         generateGeojson: generateGeojson,
         generateTimeSeries: generateTimeSeries,
-        mergeTimeseries: mergeTimeseries,
+        generateTimestamps: generateTimestamps,
         getDatasetDetails: getDatasetDetails,
         getVariables: getVariables,
         getTimestamps: getTimestamps,

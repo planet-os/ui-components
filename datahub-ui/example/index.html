@@ -343,7 +343,7 @@
     <script>
 
     var dataMulti = {
-        timestamp: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1).timestamps,
+        timestamp: datahub.data.generateTimestamps(12, 1, '2016-01-01', 'month', 1),
         barData: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1)
     }
 
@@ -351,11 +351,11 @@
     datahub.chart.multi({
         parent: container,
         width: container.clientWidth,
-        data: datahub.data.mergeTimeseries(dataMulti)
+        data: dataMulti
     })
 
     var dataMulti = {
-        timestamp: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1).timestamps,
+        timestamp: datahub.data.generateTimestamps(12, 1, '2016-01-01', 'month', 1),
         stackedBarData: datahub.data.generateTimeSeries(12, 3, '2016-01-01', 'month', 1)
     }
 
@@ -363,11 +363,11 @@
     datahub.chart.multi({
         parent: container,
         width: container.clientWidth,
-        data: datahub.data.mergeTimeseries(dataMulti)
+        data: dataMulti
     })
 
     var dataMulti = {
-        timestamp: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1).timestamps,
+        timestamp: datahub.data.generateTimestamps(12, 1, '2016-01-01', 'month', 1),
         lineData: datahub.data.generateTimeSeries(12, 2, '2016-01-01', 'month', 1)
     }
 
@@ -375,11 +375,11 @@
     datahub.chart.multi({
         parent: container,
         width: container.clientWidth,
-        data: datahub.data.mergeTimeseries(dataMulti)
+        data: dataMulti
     })
 
     var dataMulti = {
-        timestamp: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1).timestamps,
+        timestamp: datahub.data.generateTimestamps(12, 1, '2016-01-01', 'month', 1),
         areaData: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1)
     }
 
@@ -387,11 +387,11 @@
     datahub.chart.multi({
         parent: container,
         width: container.clientWidth,
-        data: datahub.data.mergeTimeseries(dataMulti)
+        data: dataMulti
     })
 
     var dataMulti = {
-        timestamp: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1).timestamps,
+        timestamp: datahub.data.generateTimestamps(12, 1, '2016-01-01', 'month', 1),
         stackedAreaData: datahub.data.generateTimeSeries(12, 3, '2016-01-01', 'month', 1)
     }
 
@@ -399,11 +399,11 @@
     datahub.chart.multi({
         parent: container,
         width: container.clientWidth,
-        data: datahub.data.mergeTimeseries(dataMulti)
+        data: dataMulti
     })
 
     var dataMulti = {
-        timestamp: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1).timestamps,
+        timestamp: datahub.data.generateTimestamps(12, 1, '2016-01-01', 'month', 1),
         barData: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1),
         stackedBarData: datahub.data.generateTimeSeries(8, 3, '2016-01-01', 'month', 1),
         estimateData: datahub.data.generateTimeSeries(4, 1, '2016-09-01', 'month', 1),
@@ -413,8 +413,6 @@
         referenceData: datahub.data.generateTimeSeries(8, 1, '2016-01-01', 'month', 1),
         thresholdData: datahub.data.generateTimeSeries(1, 1, '2016-01-01', 'month', 12)
     }
-
-    var data = datahub.data.mergeTimeseries(dataMulti)
 
     var container = document.querySelector('.multi-chart')
     datahub.chart.multi({
@@ -433,11 +431,11 @@
         chartTitle: 'Title'
     })
     .on('hover', function(d) { console.log(d) })
-    .setData(data)
+    .setData(dataMulti)
     .setConfig({chartTitle: 'Title2'})
 
     var dataMulti = {
-        timestamp: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1).timestamps,
+        timestamp: datahub.data.generateTimestamps(12, 1, '2016-01-01', 'month', 1),
         stackedBarData: datahub.data.generateTimeSeries(8, 3, '2016-01-01', 'month', 1),
         estimateData: datahub.data.generateTimeSeries(4, 1, '2016-09-01', 'month', 1)
     }
@@ -446,11 +444,11 @@
     datahub.chart.multi({
         parent: container,
         width: container.clientWidth,
-        data: datahub.data.mergeTimeseries(dataMulti)
+        data: dataMulti
     })
 
     var dataMulti = {
-        timestamp: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1).timestamps,
+        timestamp: datahub.data.generateTimestamps(12, 1, '2016-01-01', 'month', 1),
         barData: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1),
         referenceData: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1),
         thresholdData: datahub.data.generateTimeSeries(1, 1, '2016-01-01', 'month', 12)
@@ -460,7 +458,7 @@
     datahub.chart.multi({
         parent: container,
         width: container.clientWidth,
-        data: datahub.data.mergeTimeseries(dataMulti)
+        data: dataMulti
     })
 
     var container = document.querySelector('.multiline-chart-empty')
@@ -470,7 +468,7 @@
     })
 
     var dataMulti = {
-        timestamp: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1).timestamps,
+        timestamp: datahub.data.generateTimestamps(12, 1, '2016-01-01', 'month', 1),
         barData: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1),
     }
 
@@ -478,39 +476,36 @@
     datahub.chart.multi({
         parent: container,
         width: container.clientWidth,
-        data: datahub.data.mergeTimeseries(dataMulti)
+        data: dataMulti
     })
 
     var dataMulti = {
-        timestamp: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1).timestamps,
+        timestamp: datahub.data.generateTimestamps(12, 1, '2016-01-01', 'month', 1),
         stackedAreaData: datahub.data.generateTimeSeries(12, 3, '2016-01-01', 'month', 1)
     }
 
-    var data = datahub.data.mergeTimeseries(dataMulti)
-    data.stackedAreaData[10].value = data.stackedAreaData[10].value.slice(0, 2)
-    data.stackedAreaData[6].value = data.stackedAreaData[6].value.slice(1, 2)
+    dataMulti.stackedAreaData[10].value = dataMulti.stackedAreaData[10].value.slice(0, 2)
+    dataMulti.stackedAreaData[6].value = dataMulti.stackedAreaData[6].value.slice(1, 2)
 
     datahub.chart.multi({
         parent: document.querySelector('.gaps'),
     })
-    .setData(data)
-
-    var sliderChartContainer = document.querySelector('.slider-chart')
-
-    function renderMainChart(timeseries) {
-        datahub.chart.multi({
-            parent: sliderChartContainer,
-            width: sliderChartContainer.clientWidth,
-            data: timeseries
-        })
-    }
+    .setData(dataMulti)
 
     var dataMulti = {
-        timestamp: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1).timestamps,
+        timestamp: datahub.data.generateTimestamps(12, 1, '2016-01-01', 'month', 1),
         lineData: datahub.data.generateTimeSeries(12, 2, '2016-01-01', 'month', 1)
     }
 
-    var timeseries = datahub.data.mergeTimeseries(dataMulti)
+    var sliderChartContainer = document.querySelector('.slider-chart')
+
+    function renderMainChart(dataMulti) {
+        datahub.chart.multi({
+            parent: sliderChartContainer,
+            width: sliderChartContainer.clientWidth,
+            data: dataMulti
+        })
+    }
 
     var timeSliderContainer = document.querySelector('.time-slider')
     var timeSlider = datahub.widget.timeSlider({
@@ -541,7 +536,7 @@
         // renderMainChart(timeseriesSlice)
     })
 
-    renderMainChart(timeseries)
+    renderMainChart(dataMulti)
 
     var number = datahub.widget.number({
             parent: document.querySelector('.number-widget.big'),
