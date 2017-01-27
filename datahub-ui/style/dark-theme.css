@@ -213,6 +213,104 @@ body {
     background-color: #5f6773;
 }
 
+.datahub-table-chart {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    border: 1px solid #666;
+}
+
+.datahub-table-chart div {
+    display: flex;
+    /*border: 1px solid silver;*/
+    /*margin: -1px;*/
+}
+
+.datahub-table-chart .table-container {
+    flex-direction: column;
+    flex: 1;
+    color: white;
+}
+
+.datahub-table-chart .table-container .content {
+    border-bottom: 1px solid #adb7c5;
+}
+
+.datahub-table-chart .chart-container{
+    min-width: 350px;
+    flex-direction: column;
+}
+
+.datahub-table-chart .chart-container .content {
+    border-bottom: 1px solid #adb7c5;
+}
+
+.datahub-table-chart .chart-container .chart {
+    position: absolute;
+    width: 350px;
+    height: 192px;
+}
+
+.datahub-table-chart .header,
+.datahub-table-chart .content {
+    flex-direction: column;
+}
+
+.datahub-table-chart .header {
+    background-color: #5f6773;
+}
+
+.datahub-table-chart .content .row:nth-child(even) {
+    background-color: #2E3F4B;
+}
+
+.datahub-table-chart .rows {
+    flex-direction: column;
+}
+
+.datahub-table-chart .row { 
+    flex-direction: row;
+    width: 100%;
+    height: 48px;
+    margin: 0;
+}
+
+.datahub-table-chart .column {
+    flex: 1;
+    align-items: center;
+    padding: 0 0 0 8px;
+}
+
+.datahub-table-chart svg .value-bar {
+    fill: #05BDFF;
+}
+
+.datahub-table-chart svg .reference-bar {
+    fill: black;
+}
+
+.datahub-table-chart svg .reference-line {
+    fill: #F6A623;
+}
+
+.datahub-table-chart svg .axis text {
+    fill: #adb7c5;
+}
+
+.datahub-table-chart svg .axis line,
+.datahub-table-chart svg .axis path.domain {
+    stroke: #adb7c5;
+}
+
+.datahub-table-chart svg .stripe {
+    fill: black;
+    opacity: 0.2;
+}
+
+.datahub-table-chart svg .grid {
+    stroke: #adb7c5;
+}
+
 /* non-component styling */
 .section {
     background-color: #233541;
