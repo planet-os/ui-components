@@ -10,7 +10,7 @@
 }(this, function(exports, d3, utils) {
 
     var template = function(config) {
-        var containerNode = config.parent.querySelector('.widget-container')
+        var containerNode = config.parent.querySelector('.datahub-table-chart')
         if(!containerNode) {
             var template = '<div class="datahub-table-chart">' +
                 '<div class="table-container">' +
@@ -40,36 +40,52 @@
             containerNode = utils.appendHtmlToNode(template, config.parent)
         }
 
+        var dataIsEmpty = !(config.elements && config.elements.length)
+
         var defaultMargin = {
-            right: 10,
-            left: 10
+            top: 0,
+            bottom: 24,
+            right: 24,
+            left: 24
         }
         var margin = config.margin || defaultMargin
+        var rowHeight = config.rowHeight || 48
 
         var container = d3.select(containerNode)
         var chartContainer = container.select('.chart-container')
-        var chartWidth = chartContainer.node().clientWidth - margin.left - margin.right
-        var chartHeight = chartContainer.node().clientHeight
+        var width = chartContainer.node().clientWidth
+        var chartWidth = width - margin.left - margin.right
+
+        var height = dataIsEmpty 
+            ? rowHeight
+            : (config.elements.length * rowHeight) + margin.bottom
+        var chartHeight = height - margin.bottom
 
         return {
             container: container,
+            width: width,
+            height: height,
             chartWidth: chartWidth,
             chartHeight: chartHeight,
-            margin: margin
+            rowHeight: rowHeight,
+            margin: margin,
+            dataIsEmpty: dataIsEmpty
         }
     }
 
     var scaleX = function(config) {
-        console.log(config.elements)
-        var values = config.elements.filter(function(d) {
-                return d.key === config.valueKey
-                    || d.key === config.referenceKey
-            })
-            .map(function(d) {
-                return d.value
-            })
+        var domain = config.domain || [0, 0]
 
-        var domain = config.domain || d3.extent(values)
+        if(!config.domain && config.elements) {
+            var values = d3.merge(config.elements).filter(function(d) {
+                    return d.key === config.valueKey
+                        || d.key === config.referenceKey
+                })
+                .map(function(d) {
+                    return d.value
+                })
+                domain = d3.extent(values)
+        }
 
         var linearScaleX = d3.scaleLinear().domain(domain).range([0, config.chartWidth])
 
@@ -82,7 +98,8 @@
         var axisXComponent = d3.axisBottom().scale(config.scaleX)
 
         var axis = config.container.select('.axis')
-            .attr('transform', 'translate(' + [0, config.chartHeight - 1] + ')')
+            .attr('transform', 'translate(' + [0, config.chartHeight] + ')')
+            .attr('display', config.dataIsEmpty ? 'none' : 'block')
             .call(axisXComponent)
 
         return {
@@ -90,11 +107,10 @@
         }
     }
 
-
     var header = function(config) {
         var headerColumns = config.container.select('.header .row')
             .selectAll('div.column')
-            .data(config.header)
+            .data(config.header|| [])
         headerColumns.enter().append('div')
             .merge(headerColumns)
             .attr('class', function(d) {
@@ -111,7 +127,7 @@
     var body = function(config) {
         var tableContentRows = config.container.select('.table-container .content')
             .selectAll('div.row')
-            .data(config.elements)
+            .data(config.elements || [])
         var tableContentRowsUpdate = tableContentRows.enter().append('div')
             .merge(tableContentRows)
             .attr('class', 'row')
@@ -131,7 +147,7 @@
         
         var chartContentRows = config.container.select('.chart-container .rows')
             .selectAll('div.row')
-            .data(config.elements)
+            .data(config.elements || [])
         chartContentRows.enter().append('div')
             .attr('class', 'row')
             .append('div')
@@ -142,21 +158,19 @@
     }
 
     var bars = function(config) {
-        var height = 48
-
         var barGroups = config.container.select('svg')
-            .attr('width', '100%')
-            .attr('height', '100%')
+            .attr('width', config.width)
+            .attr('height', config.height)
             .select('.panel')
             .attr('transform', 'translate(' + config.margin.left + ' 0)')
             .select('.bars')
             .selectAll('g.bar-group')
-            .data(config.elements)
+            .data(config.elements || [])
         var barGroupsUpdate = barGroups.enter().append('g')
             .merge(barGroups)
             .attr('class', 'bar-group')
             .attr('transform', function(d, i) {
-                return 'translate(0 ' + (i * height) + ')'
+                return 'translate(0 ' + (i * config.rowHeight) + ')'
             })
         barGroups.exit().remove()
 
@@ -174,13 +188,13 @@
                 return Math.abs(config.scaleX(d.value) - config.scaleX(0))
             })
             .attr('height', function(d) {
-                return height / 2
+                return config.rowHeight / 2
             })
             .attr('x', function(d) {
                 return d.value < 0 ? x = config.scaleX(d.value) : config.scaleX(0)
             })
             .attr('y', function(d) {
-                return height / 4
+                return config.rowHeight / 4
             })
         referenceBars.exit().remove()
 
@@ -200,7 +214,7 @@
             })
             .attr('width', referenceLineWidth)
             .attr('height', function(d) {
-                return height / 2
+                return config.rowHeight / 2
             })
             .attr('x', function(d) {
                 var offset = referenceLineWidth
@@ -210,7 +224,7 @@
                 return config.scaleX(d.value) + offset
             })
             .attr('y', function(d) {
-                return height / 4
+                return config.rowHeight / 4
             })
         referenceLines.exit().remove()
 
@@ -228,13 +242,13 @@
                 return Math.abs(config.scaleX(d.value) - config.scaleX(0))
             })
             .attr('height', function(d) {
-                return height / 4
+                return config.rowHeight / 4
             })
             .attr('x', function(d) {
                 return d.value < 0 ? x = config.scaleX(d.value) : config.scaleX(0)
             })
             .attr('y', function(d) {
-                return height * 3 / 8
+                return config.rowHeight * 3 / 8
             })
         valueBars.exit().remove()
         
@@ -296,6 +310,7 @@
         lines.enter().append('line')
             .attr('class', 'grid')
             .merge(lines)
+            .attr('display', config.dataIsEmpty ? 'none' : 'block')
             .attr('x1', function(d) {
                 return config.scaleX(d) + 0.5
             })
