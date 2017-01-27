@@ -248,7 +248,6 @@ body {
 .datahub-table-chart .chart-container .chart {
     position: absolute;
     width: 350px;
-    height: 192px;
 }
 
 .datahub-table-chart .header,

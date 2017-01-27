@@ -549,27 +549,50 @@
 
     var table = datahub.tableChart({
         parent: document.querySelector('.table-chart'),
-        header: [
-            {key: 'name', label: 'Name'},
-            {key: 'actual', label: 'Actual'},
-            {key: 'plan', label: 'Plan'}
-        ], 
-        elements: [
-            [
-                {key: 'name', value: 'Spain', label: 'Spain' },
-                {key: 'actual', value: -20, label: -20 },
-                {key: 'plan', value: -30, label: -30 }
-            ],
-            [
-                {key: 'name', value: 'germany', label: 'Germany' },
-                {key: 'actual', value: 10, label: 10 },
-                {key: 'plan', value: 40, label: 40 }
-            ]
-        ],
-        valueKey: 'actual',
-        referenceKey: 'plan',
-        domain: [-40, 160]
+        // header: [
+        //     {key: 'name', label: 'Name'},
+        //     {key: 'actual', label: 'Actual'},
+        //     {key: 'plan', label: 'Plan'}
+        // ], 
+        // elements: [
+        //     [
+        //         {key: 'name', value: 'Spain', label: 'Spain' },
+        //         {key: 'actual', value: -20, label: -20 },
+        //         {key: 'plan', value: -30, label: -30 }
+        //     ],
+        //     [
+        //         {key: 'name', value: 'germany', label: 'Germany' },
+        //         {key: 'actual', value: 10, label: 10 },
+        //         {key: 'plan', value: 40, label: 40 }
+        //     ]
+        // ],
+        // valueKey: 'actual',
+        // referenceKey: 'plan',
+        // domain: [-40, 160]
     })
+
+    this.table.setConfig({
+            header: [
+                {key: 'name', label: 'Name'},
+                {key: 'actual', label: 'Actual'},
+                {key: 'plan', label: 'Plan'}
+            ],
+            elements: [
+                [
+                    {key: 'name', value: 'Spain', label: 'Spain' },
+                    {key: 'actual', value: -20, label: -20 },
+                    {key: 'plan', value: -30, label: -30 }
+                ],
+                [
+                    {key: 'name', value: 'germany', label: 'Germany' },
+                    {key: 'actual', value: 10, label: 10 },
+                    {key: 'plan', value: 40, label: 40 }
+                ]
+            ],
+            valueKey: 'actual',
+            referenceKey: 'plan',
+            domain: [-40, 160]
+        })
 
     var number = datahub.widget.number({
             parent: document.querySelector('.number-widget.big'),
