@@ -33,6 +33,7 @@
                         + '<g class="threshold-line-group"></g>'
                         + '<g class="y axis"></g>'
                         + '<g class="x axis"></g>'
+                        + '<g class="active-group"></g>'
                         + '<g class="title-container">'
                             + '<text class="y axis-title"></text>'
                             + '<text class="x axis-title"></text>'
@@ -177,8 +178,11 @@
     }
 
     var findData = function(data, key, timestamp) {
+        if(!timestamp) {
+            return null
+        }
         var index = data[key].map(function(d) {
-                return d.timestamp.getTime()
+                return d.timestamp && d.timestamp.getTime()
             })
             .indexOf(timestamp.getTime())
         if(index > -1) {
@@ -245,6 +249,13 @@
                     config: config,
                     event: d3.event
                 })
+            })
+            .on('mouseout', function(d) {
+                if(config.dataIsEmpty) {
+                    return
+                }
+
+                config.events.call('mouseout', null, {})
             })
         eventPanel.exit().remove()
         return {
@@ -365,16 +376,56 @@
     }
 
     var stripes = function(config) {
-        var timestamps = config.data.timestamp
-            .filter(function(d, i) {
-                return i % 2
-            })
         var shapes = config.container.select('.stripe-group')
             .selectAll('rect.stripe')
-            .data(timestamps)
+            .data(config.data.timestamp)
         shapes.enter().append('rect')
             .attr('class', 'stripe')
             .merge(shapes)
+            .classed('even', function(d, i) {
+                return i % 2
+            })
+            .attr('x', function(d, i) {
+                return config.stripeScaleX(d) || 0
+            })
+            .attr('y', function(d) {
+                return 0
+            })
+            .attr('width', function(d) {
+                return config.stripeScaleX.bandwidth()
+            })
+            .attr('height', function(d) {
+                return config.chartHeight
+            })
+        shapes.exit().remove()
+
+        return {}
+    }
+
+    var active = function(config) {
+        var selectedTimestamp = config.data.timestamp.filter(function(d) {
+            return d.toISOString() === new Date(config.activeDate).toISOString()
+        })
+
+        var shapes = config.container.select('.active-group')
+            .selectAll('rect.active')
+            .data(selectedTimestamp)
+        shapes.enter().append('rect')
+            .attr('class', 'active')
+            .merge(shapes)
+            .each(function(d) {
+                if(config.dataIsEmpty) {
+                    return
+                }
+
+                var values = getValuesAtTimestamp(d, config.data)
+                config.events.call('active', null, {
+                    timestamp: d,
+                    data: values,
+                    config: config,
+                    event: d3.event
+                })
+            })
             .attr('x', function(d, i) {
                 return config.stripeScaleX(d) || 0
             })
@@ -615,6 +666,7 @@
         common.axisX,
         common.axisY,
         stripes,
+        active,
         areaShapes,
         referenceBarShapes,
         stackedBarShapes,
@@ -634,13 +686,7 @@
 
     var multiChart = function(config) {
         var configCache,
-            events = d3.dispatch(
-                'barHover', 
-                'estimateBarHover', 
-                'referenceBarHover',
-                'stackedBarHover',
-                'thresholdLineHover',
-                'hover'),
+            events = d3.dispatch('hover', 'mouseout', 'active'),
             chartCache
 
         var render = function() {

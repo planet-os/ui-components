@@ -39,8 +39,18 @@ body {
     opacity: 0.5;
 }
 
-.datahub-chart .stripe {
+.datahub-chart .stripe:not(.even) {
+    opacity: 0;
+}
+
+.datahub-chart .stripe.even {
     fill: #1A2730;
+}
+
+.datahub-chart .active {
+    stroke: #adb7c5;
+    fill: none;
+    opacity: 1;
 }
 
 .datahub-chart .reference-line {
