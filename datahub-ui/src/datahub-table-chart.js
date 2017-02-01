@@ -291,6 +291,7 @@
             .attr('width', function(d, i) {
                 var previousTick = ticks[Math.max(i-1, 0)]
                 var width = (config.scaleX(d) - config.scaleX(previousTick)) / 2
+                width = Math.max(width, 0)
                 return width
             })
             .attr('height', function(d) {
