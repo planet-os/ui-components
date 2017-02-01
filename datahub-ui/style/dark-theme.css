@@ -18,8 +18,14 @@ body {
     font-family: 'Roboto', sans-serif;
 }
 
-.datahub-chart text {
+.datahub-chart text,
+.datahub-table-chart text {
     fill: #adb7c5;
+}
+
+.datahub-chart .message-group text,
+.datahub-table-chart .message-group text {
+    fill: #F6A623;
 }
 
 .datahub-chart line {

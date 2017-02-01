@@ -246,7 +246,7 @@
     var message = function(config) {
         var message = ''
         if (config.dataIsEmpty) {
-            message = 'No data available'
+            message = '(Data Unavailable)'
         } else if (config.dataIsAllNulls) {
             message = 'Values are all null'
         }
@@ -257,7 +257,9 @@
         text.enter().append('text')
             .merge(text)
             .attr('x', (config.scaleX.range()[1] - config.scaleX.range()[0]) / 2)
-            .attr('y', (config.scaleY.range()[0] - config.scaleY.range()[1]) / 2)
+            .attr('y', function() {
+                return config.height / 2 - this.getBBox().height / 2
+            })
             .text(function(d) {
                 return d
             })

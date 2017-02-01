@@ -404,7 +404,7 @@
 
     var active = function(config) {
         var selectedTimestamp = config.data.timestamp.filter(function(d) {
-            return d.toISOString() === new Date(config.activeDate).toISOString()
+            return config.activeDate && d.toISOString() === new Date(config.activeDate).toISOString()
         })
 
         var shapes = config.container.select('.active-group')

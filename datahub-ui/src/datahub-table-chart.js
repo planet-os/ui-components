@@ -2,12 +2,13 @@
     if (typeof module === 'object' && module.exports) {
         factory(module.exports,
             require('d3'),
-            require('./datahub-utils.js').utils
+            require('./datahub-utils.js').utils,
+            require('./datahub-common.js').common
         )
     } else {
-        factory((root.datahub = root.datahub || {}), root.d3, root.datahub.utils)
+        factory((root.datahub = root.datahub || {}), root.d3, root.datahub.utils, root.datahub.common)
     }
-}(this, function(exports, d3, utils) {
+}(this, function(exports, d3, utils, common) {
 
     var template = function(config) {
         var containerNode = config.parent.querySelector('.datahub-table-chart')
@@ -29,6 +30,7 @@
                                     '<g class="stripes"></g>' +
                                     '<g class="bars"></g>' +
                                     '<g class="axis"></g>' +
+                                    '<g class="message-group"></g>' +
                                 '</g>' +
                             '</svg>' +
                         '</div>' +
@@ -325,6 +327,34 @@
         return {}
     }
 
+    var message = function(config) {
+        var message = ''
+        if (config.dataIsEmpty) {
+            message = '(Data unavailable)'
+        } else if (config.dataIsAllNulls) {
+            message = 'Values are all null'
+        }
+
+        var text = config.container.select('.message-group')
+            .selectAll('text')
+            .data([message])
+        text.enter().append('text')
+            .merge(text)
+            .text(function(d) {
+                return d
+            })
+            .attr('x', (config.scaleX.range()[1] - config.scaleX.range()[0]) / 2)
+            .attr('y', function() {
+                return config.chartHeight / 2 + this.getBBox().height / 2
+            })
+            .attr('dx', function(d) {
+                return -this.getBBox().width / 2
+            })
+        text.exit().remove()
+
+        return {}
+    }
+
     var multi = utils.pipeline(
         template,
         header,
@@ -333,7 +363,8 @@
         stripes,
         verticalLines,
         axisX,
-        bars
+        bars,
+        common.message
     )
 
     var tableChart = function(config) {
