@@ -363,8 +363,7 @@
         stripes,
         verticalLines,
         axisX,
-        bars,
-        common.message
+        bars
     )
 
     var tableChart = function(config) {

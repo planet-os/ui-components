@@ -193,3 +193,95 @@
 .datahub-calendar .datahub-button-group {
     display: block;
 }
+
+.datahub-table-chart .rows {
+    flex-direction: column;
+}
+
+.datahub-table-chart .row { 
+    flex-direction: row;
+    width: 100%;
+    height: 48px;
+    margin: 0;
+}
+
+.datahub-table-chart .column {
+    flex: 1;
+    align-items: center;
+    padding: 0 0 0 8px;
+}
+
+.datahub-table-chart .chart-container .chart {
+    position: absolute;
+    width: 350px;
+}
+
+.datahub-table-chart .header,
+.datahub-table-chart .content {
+    flex-direction: column;
+}
+
+.datahub-table-chart .chart-container{
+    min-width: 350px;
+    flex-direction: column;
+}
+
+.datahub-table-chart div {
+    display: flex;
+}
+
+.datahub-table-chart {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
+
+/*.datahub-vertical-chart div {
+    border: 1px solid silver;
+    margin: -1px;
+}*/
+
+.datahub-vertical-chart {
+    height: 250px;
+    display: flex;
+    flex-direction: column;
+    text-transform: uppercase;
+}
+
+.datahub-vertical-chart .header {
+    display: flex;
+    flex: 1;
+    justify-content: center;
+    align-items: center;
+}
+
+.datahub-vertical-chart .chart-container {
+    display: flex;
+    flex: 2;
+    align-items: center;
+}
+
+.datahub-vertical-chart .chart-wrapper {
+    height: 80px;
+}
+
+.datahub-vertical-chart .number-container {
+    display: flex;
+    flex: 2;
+    flex-direction: row;
+}
+
+.datahub-vertical-chart .number-container .number {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+}
+
+.datahub-vertical-chart .number-container .number div {
+    display: flex;
+    flex: 1;
+    justify-content: center;
+}
+.datahub-vertical-chart .number-container .number .label {
+    align-items: center;
+}

@@ -16,6 +16,7 @@
     <script src="../src/datahub-group.js"></script>
     <script src="../src/datahub-chart.js"></script>
     <script src="../src/datahub-table-chart.js"></script>
+    <script src="../src/datahub-vertical-chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.2/leaflet.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.7/leaflet.draw.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flexboxgrid/6.3.1/flexboxgrid.min.css" />
@@ -185,6 +186,14 @@
         </div>
         <div class="col-xs-12 col-md-5">
             <div class="description">A table chart.</div>
+        </div>
+    </div>
+    <div class="row section">
+        <div class="col-xs-12 col-md-7">
+            <div class="vertical-chart"></div>
+        </div>
+        <div class="col-xs-12 col-md-5">
+            <div class="description">A vertical bar chart with reference bar and summary numbers.</div>
         </div>
     </div>
     <div class="row section">
@@ -571,7 +580,7 @@
         // domain: [-40, 160]
     })
 
-    this.table.setConfig({
+    table.setConfig({
             header: [
                 {key: 'name', label: 'Name'},
                 {key: 'actual', label: 'Actual'},
@@ -593,6 +602,21 @@
             referenceKey: 'plan',
             domain: [-40, 160]
         })
+
+    var vertical = datahub.verticalChart({
+        parent: document.querySelector('.vertical-chart')
+    })
+
+    vertical.setConfig({
+        title: 'Title',
+        elements:[
+            {key: 'approved', label: 'Approved', value: 125},
+            {key: 'written', label: 'Written', value: 16},
+            {key: 'remains', label: 'Remains', value: -79}
+        ],
+        referenceBarSize: 100,
+        unit: '%'
+    })
 
     var number = datahub.widget.number({
             parent: document.querySelector('.number-widget.big'),
