@@ -125,26 +125,29 @@
         }
     }
 
-    var getMax = function(d) {
+    var getExtent = function(d, isMin) {
+        var func = isMin ? 'min' : 'max'
         if (d) {
-            return d3.max(d.map(function(d) {
+            return d3[func](d.map(function(d) {
                 return d.value
             }))
         }
         return null
     }
 
-    var getStackMax = function(d) {
+    var getStackExtent = function(d, isMin) {
+        var func = isMin ? 'min' : 'max'
         if (d && d.length) {
             var sums = d.map(function(d) {
                 return d3.sum(d.value)
             })
-            return d3.max(sums)
+            return d3[func](sums)
         }
         return null
     }
 
-    var getMultiMax = function(d) {
+    var getMultiExtent = function(d, isMin) {
+        var func = isMin ? 'min' : 'max'
         if (d && d.length) {
             var data = d.map(function(d, i) {
                 return d.value
@@ -152,25 +155,37 @@
             if (data[0].length) {
                 data = d3.merge(data)
             }
-            return d3.max(data)
+            return d3[func](data)
         }
         return null
     }
 
     var scaleY = function(config) {
         var maxs = []
-        maxs.push(getMax(config.data.barData))
-        maxs.push(getMax(config.data.referenceData))
-        maxs.push(getMax(config.data.estimateData))
-        maxs.push(getMax(config.data.thresholdData))
-        maxs.push(getMax(config.data.areaData))
-        maxs.push(getStackMax(config.data.stackedBarData))
-        maxs.push(getStackMax(config.data.stackedAreaData))
-        maxs.push(getMultiMax(config.data.lineData))
+        maxs.push(getExtent(config.data.barData))
+        maxs.push(getExtent(config.data.referenceData))
+        maxs.push(getExtent(config.data.estimateData))
+        maxs.push(getExtent(config.data.thresholdData))
+        maxs.push(getExtent(config.data.areaData))
+        maxs.push(getStackExtent(config.data.stackedBarData))
+        maxs.push(getStackExtent(config.data.stackedAreaData))
+        maxs.push(getMultiExtent(config.data.lineData))
+
+        var mins = []
+        var isMin = true
+        mins.push(getExtent(config.data.barData, isMin))
+        mins.push(getExtent(config.data.referenceData, isMin))
+        mins.push(getExtent(config.data.estimateData, isMin))
+        mins.push(getExtent(config.data.thresholdData, isMin))
+        mins.push(getExtent(config.data.areaData, isMin))
+        mins.push(getStackExtent(config.data.stackedBarData, isMin))
+        mins.push(getStackExtent(config.data.stackedAreaData, isMin))
+        mins.push(getMultiExtent(config.data.lineData, isMin))
 
         var max = d3.max(maxs)
+        var min = Math.min(d3.min(mins), 0)
 
-        var scaleY = d3.scaleLinear().domain([0, max]).range([config.chartHeight, 0])
+        var scaleY = d3.scaleLinear().domain([min, max]).range([config.chartHeight, 0])
 
         return {
             scaleY: scaleY
@@ -263,6 +278,122 @@
         }
     }
 
+    var barShapes = function(config) {
+        var shapes = config.container.select('.bar-group')
+            .selectAll('rect.bar')
+            .data(config.data.barData)
+        shapes.enter().append('rect')
+            .merge(shapes)
+            .attr('class', function(d) {
+                return ['bar', d.id, d.className].join(' ')
+            })
+            .attr('x', function(d, i) {
+                return config.scaleX(d.timestamp) || 0
+            })
+            .attr('y', function(d) {
+                if(d.value >= 0){
+                    return config.scaleY(0) - Math.abs(config.scaleY(d.value) - config.scaleY(0))
+                }
+                else {
+                    return config.scaleY(0)
+                }
+            })
+            .attr('width', function(d) {
+                return config.scaleX.bandwidth()
+            })
+            .attr('height', function(d) {
+                return Math.abs(config.scaleY(d.value) - config.scaleY(0))
+            })
+        shapes.exit().remove()
+
+        return {}
+    }
+
+    var estimateBarShapes = function(config) {
+        var shapes = config.container.select('.estimate-bar-group')
+            .selectAll('rect.estimate-bar')
+            .data(config.data.estimateData)
+        shapes.enter().append('rect')
+            .merge(shapes)
+            .attr('class', function(d) {
+                return ['estimate-bar', d.id, d.className].join(' ')
+            })
+            .attr('x', function(d, i) {
+                return config.scaleX(d.timestamp) || 0
+            })
+            .attr('y', function(d) {
+                return (config.scaleY(d.value) || 0)
+            })
+            .attr('width', function(d) {
+                return config.scaleX.bandwidth()
+            })
+            .attr('height', function(d) {
+                return config.chartHeight - config.scaleY(d.value) || 0
+            })
+        shapes.exit().remove()
+
+        return {}
+    }
+
+    var referenceBarShapes = function(config) {
+        if (!config.data.referenceData) {
+            return {}
+        }
+        var shapes = config.container.select('.reference-bar-group')
+            .selectAll('rect.reference-bar')
+            .data(config.data.referenceData)
+        shapes.enter().append('rect')
+            .merge(shapes)
+            .attr('class', function(d) {
+                return ['reference-bar', d.id, d.className].join(' ')
+            })
+            .attr('x', function(d, i) {
+                return config.referenceScaleX(d.timestamp) || 0
+            })
+            .attr('y', function(d) {
+                if(d.value >= 0){
+                    return config.scaleY(0) - Math.abs(config.scaleY(d.value) - config.scaleY(0))
+                }
+                else {
+                    return config.scaleY(0)
+                }
+            })
+            .attr('width', function(d) {
+                return config.referenceScaleX.bandwidth()
+            })
+            .attr('height', function(d) {
+                return Math.abs(config.scaleY(d.value) - config.scaleY(0))
+            })
+        shapes.exit().remove()
+
+        var lines = config.container.select('.reference-line-group')
+            .selectAll('path.reference-top')
+            .data(config.data.referenceData)
+        lines.enter().append('path')
+            .attr('class', 'reference-top')
+            .merge(lines)
+            .attr('d', function(d, i) {
+                var x = config.referenceScaleX(d.timestamp) || 0
+
+                var y = 0
+                if(d.value >= 0){
+                    y = config.scaleY(0) - Math.abs(config.scaleY(d.value) - config.scaleY(0))
+                }
+                else {
+                    y = config.scaleY(0)
+                }
+
+                var width = config.referenceScaleX.bandwidth()
+                return 'M' + [
+                    [x, y],
+                    [x + width, y]
+                ]
+            })
+        lines.exit().remove()
+
+        return {}
+    }
+
     var stackedBarShapes = function(config) {
         if (!config.data.stackedBarData || !config.data.stackedBarData.length) {
             return {}
@@ -323,172 +454,6 @@
         return {}
     }
 
-    var barShapes = function(config) {
-        var shapes = config.container.select('.bar-group')
-            .selectAll('rect.bar')
-            .data(config.data.barData)
-        shapes.enter().append('rect')
-            .merge(shapes)
-            .attr('class', function(d) {
-                return ['bar', d.id, d.className].join(' ')
-            })
-            .attr('x', function(d, i) {
-                return config.scaleX(d.timestamp) || 0
-            })
-            .attr('y', function(d) {
-                return (config.scaleY(d.value) || 0)
-            })
-            .attr('width', function(d) {
-                return config.scaleX.bandwidth()
-            })
-            .attr('height', function(d) {
-                return config.chartHeight - config.scaleY(d.value) || 0
-            })
-        shapes.exit().remove()
-
-        return {}
-    }
-
-    var estimateBarShapes = function(config) {
-        var shapes = config.container.select('.estimate-bar-group')
-            .selectAll('rect.estimate-bar')
-            .data(config.data.estimateData)
-        shapes.enter().append('rect')
-            .merge(shapes)
-            .attr('class', function(d) {
-                return ['estimate-bar', d.id, d.className].join(' ')
-            })
-            .attr('x', function(d, i) {
-                return config.scaleX(d.timestamp) || 0
-            })
-            .attr('y', function(d) {
-                return (config.scaleY(d.value) || 0)
-            })
-            .attr('width', function(d) {
-                return config.scaleX.bandwidth()
-            })
-            .attr('height', function(d) {
-                return config.chartHeight - config.scaleY(d.value) || 0
-            })
-        shapes.exit().remove()
-
-        return {}
-    }
-
-    var stripes = function(config) {
-        var shapes = config.container.select('.stripe-group')
-            .selectAll('rect.stripe')
-            .data(config.data.timestamp)
-        shapes.enter().append('rect')
-            .attr('class', 'stripe')
-            .merge(shapes)
-            .classed('even', function(d, i) {
-                return i % 2
-            })
-            .attr('x', function(d, i) {
-                return config.stripeScaleX(d) || 0
-            })
-            .attr('y', function(d) {
-                return 0
-            })
-            .attr('width', function(d) {
-                return config.stripeScaleX.bandwidth()
-            })
-            .attr('height', function(d) {
-                return config.chartHeight
-            })
-        shapes.exit().remove()
-
-        return {}
-    }
-
-    var active = function(config) {
-        var selectedTimestamp = config.data.timestamp.filter(function(d) {
-            return config.activeDate && d.toISOString() === new Date(config.activeDate).toISOString()
-        })
-
-        var shapes = config.container.select('.active-group')
-            .selectAll('rect.active')
-            .data(selectedTimestamp)
-        shapes.enter().append('rect')
-            .attr('class', 'active')
-            .merge(shapes)
-            .each(function(d) {
-                if(config.dataIsEmpty) {
-                    return
-                }
-
-                var values = getValuesAtTimestamp(d, config.data)
-                config.events.call('active', null, {
-                    timestamp: d,
-                    data: values,
-                    config: config,
-                    event: d3.event
-                })
-            })
-            .attr('x', function(d, i) {
-                return config.stripeScaleX(d) || 0
-            })
-            .attr('y', function(d) {
-                return 0
-            })
-            .attr('width', function(d) {
-                return config.stripeScaleX.bandwidth()
-            })
-            .attr('height', function(d) {
-                return config.chartHeight
-            })
-        shapes.exit().remove()
-
-        return {}
-    }
-
-    var referenceBarShapes = function(config) {
-        if (!config.data.referenceData) {
-            return {}
-        }
-        var shapes = config.container.select('.reference-bar-group')
-            .selectAll('rect.reference-bar')
-            .data(config.data.referenceData)
-        shapes.enter().append('rect')
-            .merge(shapes)
-            .attr('class', function(d) {
-                return ['reference-bar', d.id, d.className].join(' ')
-            })
-            .attr('x', function(d, i) {
-                return config.referenceScaleX(d.timestamp) || 0
-            })
-            .attr('y', function(d) {
-                return (config.scaleY(d.value) || 0)
-            })
-            .attr('width', function(d) {
-                return config.referenceScaleX.bandwidth()
-            })
-            .attr('height', function(d) {
-                return config.chartHeight - config.scaleY(d.value) || 0
-            })
-        shapes.exit().remove()
-
-        var lines = config.container.select('.reference-line-group')
-            .selectAll('path.reference-top')
-            .data(config.data.referenceData)
-        lines.enter().append('path')
-            .attr('class', 'reference-top')
-            .merge(lines)
-            .attr('d', function(d, i) {
-                var x = config.referenceScaleX(d.timestamp) || 0
-                var y = config.scaleY(d.value) || 0
-                var width = config.referenceScaleX.bandwidth()
-                return 'M' + [
-                    [x, y],
-                    [x + width, y]
-                ]
-            })
-        lines.exit().remove()
-
-        return {}
-    }
-
     var lineShapes = function(config) {
         if (!config.data.lineData.length) {
             return {}
@@ -534,6 +499,31 @@
             })
             .attr('d', line)
         shapes.exit().remove()
+
+        return {}
+    }
+
+    var thresholdLineShape = function(config) {
+        var line = config.container.select('.threshold-line-group')
+            .selectAll('line.reference-line')
+            .data(config.data.thresholdData)
+        line.enter().append('line')
+            .merge(line)
+            .attr('class', function(d) {
+                return ['threshold-line', d.id, d.className].join(' ')
+            })
+            .attr('x1', 0)
+            .attr('y1', function(d) {
+                return config.scaleY(d.value) || 0
+            })
+            .attr('x2', config.chartWidth)
+            .attr('y2', function(d) {
+                return config.scaleY(d.value) || 0
+            })
+            .attr('display', function(d) {
+                return d ? null : 'none'
+            })
+        line.exit().remove()
 
         return {}
     }
@@ -629,27 +619,70 @@
         return {}
     }
 
-    var thresholdLineShape = function(config) {
-        var line = config.container.select('.threshold-line-group')
-            .selectAll('line.reference-line')
-            .data(config.data.thresholdData)
-        line.enter().append('line')
-            .merge(line)
-            .attr('class', function(d) {
-                return ['threshold-line', d.id, d.className].join(' ')
+    var stripes = function(config) {
+        var shapes = config.container.select('.stripe-group')
+            .selectAll('rect.stripe')
+            .data(config.data.timestamp)
+        shapes.enter().append('rect')
+            .attr('class', 'stripe')
+            .merge(shapes)
+            .classed('even', function(d, i) {
+                return i % 2
             })
-            .attr('x1', 0)
-            .attr('y1', function(d) {
-                return config.scaleY(d.value) || 0
+            .attr('x', function(d, i) {
+                return config.stripeScaleX(d) || 0
             })
-            .attr('x2', config.chartWidth)
-            .attr('y2', function(d) {
-                return config.scaleY(d.value) || 0
+            .attr('y', function(d) {
+                return 0
             })
-            .attr('display', function(d) {
-                return d ? null : 'none'
+            .attr('width', function(d) {
+                return config.stripeScaleX.bandwidth()
             })
-        line.exit().remove()
+            .attr('height', function(d) {
+                return config.chartHeight
+            })
+        shapes.exit().remove()
+
+        return {}
+    }
+
+    var active = function(config) {
+        var selectedTimestamp = config.data.timestamp.filter(function(d) {
+            return config.activeDate && d.toISOString() === new Date(config.activeDate).toISOString()
+        })
+
+        var shapes = config.container.select('.active-group')
+            .selectAll('rect.active')
+            .data(selectedTimestamp)
+        shapes.enter().append('rect')
+            .attr('class', 'active')
+            .merge(shapes)
+            .each(function(d) {
+                if(config.dataIsEmpty) {
+                    return
+                }
+
+                var values = getValuesAtTimestamp(d, config.data)
+                config.events.call('active', null, {
+                    timestamp: d,
+                    data: values,
+                    config: config,
+                    event: d3.event
+                })
+            })
+            .attr('x', function(d, i) {
+                return config.stripeScaleX(d) || 0
+            })
+            .attr('y', function(d) {
+                return 0
+            })
+            .attr('width', function(d) {
+                return config.stripeScaleX.bandwidth()
+            })
+            .attr('height', function(d) {
+                return config.chartHeight
+            })
+        shapes.exit().remove()
 
         return {}
     }

@@ -139,6 +139,9 @@
             .merge(axisY)
             .transition()
             .call(config.axisY)
+            .attr('text-anchor', 'start')
+            .selectAll('text')
+            .attr('dx', -config.margin.left + 10)
         axisY.exit().remove()
 
         return {}
@@ -167,8 +170,9 @@
             .attr('class', 'y axis-title')
             .merge(axisTitleY)
             .text(config.axisTitleY || '')
-            .attr('x', -40)
+            .attr('x', -config.margin.left)
             .attr('y', -10)
+            .attr('text-anchor', 'start')
         axisTitleY.exit().remove()
 
         return {}

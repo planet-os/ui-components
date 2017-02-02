@@ -93,6 +93,14 @@
     </div>
     <div class="row section">
         <div class="col-xs-12 col-md-7">
+            <div class="negative-bar-chart"></div>
+        </div>
+        <div class="col-xs-12 col-md-5">
+            <div class="description">A bar chart can handle negative values.</div>
+        </div>
+    </div>
+    <div class="row section">
+        <div class="col-xs-12 col-md-7">
             <div class="stacked-bar-chart"></div>
         </div>
         <div class="col-xs-12 col-md-5">
@@ -366,6 +374,24 @@
     }
 
     var container = document.querySelector('.bar-chart')
+    datahub.chart.multi({
+        parent: container,
+        width: container.clientWidth,
+        data: dataMulti
+    })
+
+    var dataMulti = {
+        timestamp: datahub.data.generateTimestamps(12, 1, '2016-01-01', 'month', 1),
+        barData: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1)
+    }
+
+    dataMulti.barData.forEach(function(d) {
+        if(Math.random()>0.5){
+            d.value = d.value * -1
+        }
+    })
+
+    var container = document.querySelector('.negative-bar-chart')
     datahub.chart.multi({
         parent: container,
         width: container.clientWidth,
