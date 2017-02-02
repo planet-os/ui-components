@@ -113,18 +113,37 @@
     var axisComponentX = function(config) {
         var axisX = config.container.selectAll('g.axis.x')
             .data([0])
-        axisX.enter().append('g')
+        var axis = axisX.enter().append('g')
             .attr('class', 'x axis')
             .attr('transform', 'translate(' + [0, config.chartHeight] + ')')
             .merge(axisX)
             .attr('display', function(d) {
                 return config.dataIsEmpty ? 'none' : null
             })
-            .transition()
-            .duration(0)
             .attr('transform', 'translate(' + [0, config.chartHeight] + ')')
-            .call(config.axisX)
+        
+        axis.call(config.axisX)
+            
         axisX.exit().remove()
+
+        var labelsW = []
+        var texts = axis.selectAll('.tick')
+            .select('text')
+            .each(function(d, i) {
+                var w = this.getBBox().width
+                if(w) {
+                    labelsW.push(w)
+                }
+            })
+
+        var skipCount = Math.floor(d3.max(labelsW) / config.stripeScaleX.bandwidth())
+
+        if(skipCount) {
+            axis.selectAll('.tick text')
+                .attr('display', function(d, i) {
+                    return !!(i % (skipCount + 1)) ? 'none' : 'block'
+                })
+        }
 
         return {}
     }

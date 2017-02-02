@@ -112,8 +112,8 @@
     var scaleX = function(config) {
         var dataX = config.dataIsEmpty ? 0 : config.data.timestamp
         var scaleX = d3.scaleBand().domain(dataX).rangeRound([0, config.chartWidth])
-            .paddingInner(0.4).paddingOuter(0.2)
-        var referenceScaleX = scaleX.copy().paddingInner(0.1).paddingOuter(0)
+            .paddingInner(0.4).paddingOuter(0.4)
+        var referenceScaleX = scaleX.copy().paddingInner(0.1).paddingOuter(0.1)
         var stripeScaleX = scaleX.copy().paddingInner(0).paddingOuter(0)
         var lineScaleX = scaleX.copy().paddingInner(1).paddingOuter(0.5)
 
