@@ -310,12 +310,24 @@ body {
     color: #5ECF52;
 }
 
+.datahub-vertical-chart .bar0 {
+    fill: #5ECF52;
+}
+
 .datahub-vertical-chart .number1 .label {
     color: #F8E81C;
 }
 
+.datahub-vertical-chart .bar1 {
+    fill: #F8E81C;
+}
+
 .datahub-vertical-chart .number2 .label {
     color: #05BDFF;
+}
+
+.datahub-vertical-chart .bar2 {
+    fill: #05BDFF;
 }
 
 .datahub-vertical-chart .axis .vertical {

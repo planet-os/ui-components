@@ -143,7 +143,12 @@
             .merge(tableContentColumns)
             .attr('class', 'column')
             .html(function(d) {
-                return d.label
+                if(typeof d.label === 'number') {
+                    return Math.floor(d.label*100)/100
+                }
+                else {
+                    return d.label
+                }
             })
         tableContentColumns.exit().remove()
         

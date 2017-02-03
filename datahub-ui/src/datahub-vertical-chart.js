@@ -133,8 +133,10 @@
             .selectAll('.bar')
             .data(config.elements || [])
         bars.enter().append('rect')
-            .attr('class', 'bar')
             .merge(bars)
+            .attr('class', function(d, i) {
+                return ['bar', d.label.toLowerCase(), 'bar' + i].join(' ')
+            })
             .attr('x', function(d) {
                 var width = config.scaleX(d.value)
                 if(width < 0) {
