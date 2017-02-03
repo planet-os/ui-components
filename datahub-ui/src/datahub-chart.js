@@ -187,7 +187,7 @@
         if(config.autoScaleY) {
             min = d3.min(mins)
             var padding = (max - min) / 10
-            min -= padding
+            min = Math.max(min - padding, 0)
             max += padding
         }
         else {
