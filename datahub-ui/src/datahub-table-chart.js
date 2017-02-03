@@ -86,18 +86,24 @@
                 .map(function(d) {
                     return d.value
                 })
-                domain = d3.extent(values)
+                domain = values.length ? d3.extent(values) : [0, 0]
         }
 
-        var linearScaleX = d3.scaleLinear().domain(domain).range([0, config.chartWidth])
+        domain[0] = Math.min(domain[0], 0)
 
+        var largest = Math.max(Math.abs(domain[0]), Math.abs(domain[1]))
+        domain = [-largest, largest]
+
+        var linearScaleX = d3.scaleLinear().domain(domain).range([0, config.chartWidth])
         return {
             scaleX: linearScaleX
         }
     }
 
     var axisX = function(config) {
-        var axisXComponent = d3.axisBottom().scale(config.scaleX)
+        var axisXComponent = d3.axisBottom()
+            .scale(config.scaleX)
+            .tickFormat(d3.format('.2s'))
 
         var axis = config.container.select('.axis')
             .attr('transform', 'translate(' + [0, config.chartHeight] + ')')
@@ -314,17 +320,17 @@
 
         var lines = config.container.select('.stripes')
             .selectAll('line.grid')
-            .data([config.scaleX.domain()[0], 0])
+            .data([0])
         lines.enter().append('line')
             .attr('class', 'grid')
             .merge(lines)
             .attr('display', config.dataIsEmpty ? 'none' : 'block')
             .attr('x1', function(d) {
-                return config.scaleX(d) + 0.5
+                return config.scaleX(0) + 0.5
             })
             .attr('y1', 0)
             .attr('x2', function(d) {
-                return config.scaleX(d) + 0.5
+                return config.scaleX(0) + 0.5
             })
             .attr('y2', config.chartHeight)
         lines.exit().remove()
