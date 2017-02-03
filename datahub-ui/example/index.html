@@ -101,6 +101,14 @@
     </div>
     <div class="row section">
         <div class="col-xs-12 col-md-7">
+            <div class="autoscale-bar-chart"></div>
+        </div>
+        <div class="col-xs-12 col-md-5">
+            <div class="description">A bar chart can autoscale it's Y axis.</div>
+        </div>
+    </div>
+    <div class="row section">
+        <div class="col-xs-12 col-md-7">
             <div class="stacked-bar-chart"></div>
         </div>
         <div class="col-xs-12 col-md-5">
@@ -396,6 +404,25 @@
         parent: container,
         width: container.clientWidth,
         data: dataMulti
+    })
+
+    var dataMulti = {
+        timestamp: datahub.data.generateTimestamps(12, 1, '2016-01-01', 'month', 1),
+        barData: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1)
+    }
+
+    dataMulti.barData.map(function(d) {
+        return d.value.map(function(dB) {
+            return Math.random()*50+50
+        })
+    })
+
+    var container = document.querySelector('.autoscale-bar-chart')
+    datahub.chart.multi({
+        parent: container,
+        width: container.clientWidth,
+        data: dataMulti,
+        autoScaleY: true
     })
 
     var dataMulti = {

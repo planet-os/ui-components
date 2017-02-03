@@ -183,7 +183,16 @@
         mins.push(getMultiExtent(config.data.lineData, isMin))
 
         var max = d3.max(maxs)
-        var min = Math.min(d3.min(mins), 0)
+        var min
+        if(config.autoScaleY) {
+            min = d3.min(mins)
+            var padding = (max - min) / 10
+            min -= padding
+            max += padding
+        }
+        else {
+            min = Math.min(d3.min(mins), 0)
+        }
 
         var scaleY = d3.scaleLinear().domain([min, max]).range([config.chartHeight, 0])
 
@@ -291,8 +300,12 @@
                 return config.scaleX(d.timestamp) || 0
             })
             .attr('y', function(d) {
+                if(config.autoScaleY) {
+                    return config.chartHeight - (config.chartHeight - Math.abs(config.scaleY(d.value)))
+                }
                 if(d.value >= 0){
                     return config.scaleY(0) - Math.abs(config.scaleY(d.value) - config.scaleY(0))
+
                 }
                 else {
                     return config.scaleY(0)
@@ -302,6 +315,9 @@
                 return config.scaleX.bandwidth()
             })
             .attr('height', function(d) {
+                if(config.autoScaleY) {
+                    return config.chartHeight - Math.abs(config.scaleY(d.value))
+                }
                 return Math.abs(config.scaleY(d.value) - config.scaleY(0))
             })
         shapes.exit().remove()
@@ -351,6 +367,9 @@
                 return config.referenceScaleX(d.timestamp) || 0
             })
             .attr('y', function(d) {
+                 if(config.autoScaleY) {
+                    return config.chartHeight - (config.chartHeight - Math.abs(config.scaleY(d.value)))
+                }
                 if(d.value >= 0){
                     return config.scaleY(0) - Math.abs(config.scaleY(d.value) - config.scaleY(0))
                 }
@@ -362,6 +381,9 @@
                 return config.referenceScaleX.bandwidth()
             })
             .attr('height', function(d) {
+                if(config.autoScaleY) {
+                    return config.chartHeight - Math.abs(config.scaleY(d.value))
+                }
                 return Math.abs(config.scaleY(d.value) - config.scaleY(0))
             })
         shapes.exit().remove()
