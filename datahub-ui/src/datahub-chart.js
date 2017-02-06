@@ -673,6 +673,10 @@
             return d.getTime() === new Date(config.activeDate).getTime()
         })
 
+        if(config.activeDate && config.data.timestamp[0]) {
+            console.log(JSON.stringify(config.data.timestamp), config.activeDate, new Date(config.activeDate).getTime(), new Date(config.activeDate).toISOString(), config.data.timestamp[0], config.data.timestamp[0].getTime(), config.data.timestamp[0].toISOString())
+        }
+
         var shapes = config.container.select('.active-group')
             .selectAll('rect.active')
             .data(selectedTimestamp)
