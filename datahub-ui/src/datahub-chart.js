@@ -670,7 +670,7 @@
 
     var active = function(config) {
         var selectedTimestamp = config.data.timestamp.filter(function(d) {
-            return config.activeDate && d.toISOString() === new Date(config.activeDate).toISOString()
+            return d.getTime() === new Date(config.activeDate).getTime()
         })
 
         var shapes = config.container.select('.active-group')
