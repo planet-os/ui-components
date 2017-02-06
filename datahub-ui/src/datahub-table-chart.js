@@ -150,7 +150,11 @@
             .attr('class', 'column')
             .html(function(d) {
                 if(typeof d.label === 'number') {
-                    return Math.floor(d.label*100)/100
+                    var defaultFormat = function(d) {
+                        return Math.floor(d*100)/100
+                    }
+                    var format = config.valueFormat || defaultFormat
+                    return format(d.label)
                 }
                 else {
                     return d.label
