@@ -527,7 +527,7 @@
 
     var thresholdLineShape = function(config) {
         var line = config.container.select('.threshold-line-group')
-            .selectAll('line.reference-line')
+            .selectAll('line.threshold-line')
             .data(config.data.thresholdData)
         line.enter().append('line')
             .merge(line)
