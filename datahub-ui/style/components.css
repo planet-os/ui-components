@@ -177,6 +177,7 @@
 }
 
 .datahub-dropdown .elements.active {
+    display:block; /* graceful degradation for the IE */
     display: initial;
 }
 
