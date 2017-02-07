@@ -610,33 +610,13 @@
     renderMainChart(dataMulti)
 
     var table = datahub.tableChart({
-        parent: document.querySelector('.table-chart'),
-        // header: [
-        //     {key: 'name', label: 'Name'},
-        //     {key: 'actual', label: 'Actual'},
-        //     {key: 'plan', label: 'Plan'}
-        // ], 
-        // elements: [
-        //     [
-        //         {key: 'name', value: 'Spain', label: 'Spain' },
-        //         {key: 'actual', value: -20, label: -20 },
-        //         {key: 'plan', value: -30, label: -30 }
-        //     ],
-        //     [
-        //         {key: 'name', value: 'germany', label: 'Germany' },
-        //         {key: 'actual', value: 10, label: 10 },
-        //         {key: 'plan', value: 40, label: 40 }
-        //     ]
-        // ],
-        // valueKey: 'actual',
-        // referenceKey: 'plan',
-        // domain: [-40, 160]
+        parent: document.querySelector('.table-chart')
     })
 
     table.setConfig({
             header: [
                 {key: 'name', label: 'Name'},
-                {key: 'actual', label: 'Actual'},
+                {key: 'actual', label: ['Actual', '2nd']},
                 {key: 'plan', label: 'Plan'}
             ],
             elements: [

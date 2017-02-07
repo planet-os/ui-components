@@ -125,6 +125,13 @@
                 return 'column ' + d.key
             })
             .html(function(d) {
+                if(Array.isArray(d.label)) {
+                    var lines = d.label.map(function(dB, iB) {
+                            return '<div>' + dB + '</div>'
+                        })
+                        .join('')
+                    return '<div class="multiline">' + lines + '</div>'
+                }
                 return d.label
             })
         headerColumns.exit().remove()

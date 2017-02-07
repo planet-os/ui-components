@@ -231,6 +231,10 @@
     display: flex;
 }
 
+.datahub-table-chart .multiline {
+    display: block;
+}
+
 .datahub-table-chart {
     display: flex;
     flex-direction: row;
