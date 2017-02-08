@@ -156,7 +156,7 @@
             .attr('class', 'y axis')
             .attr('transform', 'translate(' + [-padding / 2, 0] + ')')
             .merge(axisY)
-            .transition()
+            // .transition()
             .call(config.axisY)
             .attr('text-anchor', 'start')
             .selectAll('text')

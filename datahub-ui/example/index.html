@@ -165,6 +165,22 @@
     </div>
     <div class="row section">
         <div class="col-xs-12 col-md-7">
+            <div class="data-change"></div>
+        </div>
+        <div class="col-xs-12 col-md-5">
+            <div class="description">A chart can update data.</div>
+        </div>
+    </div>
+    <div class="row section">
+        <div class="col-xs-12 col-md-7">
+            <div class="data-empty"></div>
+        </div>
+        <div class="col-xs-12 col-md-5">
+            <div class="description">A chart can clear data.</div>
+        </div>
+    </div>
+    <div class="row section">
+        <div class="col-xs-12 col-md-7">
             <div class="time-slider"></div>
             <div class="slider-chart"></div>
         </div>
@@ -520,6 +536,45 @@
     .on('hover', function(d) { console.log(d) })
     .setData(dataMulti)
     .setConfig({chartTitle: 'Title2'})
+
+    var dataMulti = {
+        timestamp: datahub.data.generateTimestamps(12, 1, '2016-01-01', 'month', 1),
+        barData: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1)
+    }
+
+    var container = document.querySelector('.data-change')
+    var chart = datahub.chart.multi({
+        parent: container,
+        width: container.clientWidth
+    })
+
+    function setData() {
+        var dataMulti = {
+            timestamp: datahub.data.generateTimestamps(12, 1, '2016-01-01', 'month', 1),
+            barData: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1)
+        }
+        chart.setData(dataMulti)
+    }
+
+    setInterval(setData, 1000)
+
+    var dataMulti = {
+        timestamp: datahub.data.generateTimestamps(12, 1, '2016-01-01', 'month', 1),
+        barData: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1)
+    }
+
+    var container = document.querySelector('.data-empty')
+    var chart2 = datahub.chart.multi({
+        parent: container,
+        width: container.clientWidth
+    })
+    .setData(dataMulti)
+
+    var dataMulti = {
+        timestamp: datahub.data.generateTimestamps(12, 1, '2016-01-01', 'month', 1),
+        barData: null
+    }
+    chart2.setData(dataMulti)
 
     var dataMulti = {
         timestamp: datahub.data.generateTimestamps(12, 1, '2016-01-01', 'month', 1),

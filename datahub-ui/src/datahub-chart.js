@@ -353,9 +353,6 @@
     }
 
     var referenceBarShapes = function(config) {
-        if (!config.data.referenceData) {
-            return {}
-        }
         var shapes = config.container.select('.reference-bar-group')
             .selectAll('rect.reference-bar')
             .data(config.data.referenceData)
@@ -419,8 +416,12 @@
 
     var stackedBarShapes = function(config) {
         if (!config.data.stackedBarData || !config.data.stackedBarData.length) {
+            config.container.select('.stacked-bar-group')
+                .selectAll('g.stack')
+                .remove()
             return {}
         }
+
         var keys = config.data.stackedBarData[0].value.map(function(d, i) {
             return 'y' + i
         })
@@ -479,6 +480,9 @@
 
     var lineShapes = function(config) {
         if (!config.data.lineData.length) {
+            config.container.select('.line-group')
+                .selectAll('path.line')
+                .remove()
             return {}
         }
 
@@ -528,6 +532,9 @@
 
     var dotShapes = function(config) {
         if (!config.data.lineData.length) {
+            config.container.select('.dot-group')
+                .selectAll('.dot-layer')
+                .remove()
             return {}
         }
 
@@ -613,6 +620,9 @@
 
     var areaShapes = function(config) {
         if (!config.data.areaData || !config.data.areaData.length) {
+            config.container.select('.area-group')
+                .selectAll('path.area')
+                .remove()
             return {}
         }
 
@@ -644,6 +654,9 @@
 
     var stackedAreaShapes = function(config) {
         if (!config.data.stackedAreaData || !config.data.stackedAreaData.length) {
+            config.container.select('.stacked-area-group')
+                .selectAll('g.stack-area')
+                .remove()
             return {}
         }
         var keys = config.data.stackedAreaData[0].value.map(function(d, i) {
@@ -812,7 +825,8 @@
 
         var setData = function(data) {
             var d = data ? JSON.parse(JSON.stringify(data)) : {}
-            configCache = utils.mergeAll({}, configCache, {data: d})
+            configCache = utils.mergeAll({}, configCache)
+            configCache.data = d
             render()
             return this
         }
