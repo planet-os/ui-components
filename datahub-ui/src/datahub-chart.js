@@ -30,6 +30,7 @@
                         + '<g class="stacked-bar-group"></g>'
                         + '<g class="estimate-bar-group"></g>'
                         + '<g class="line-group"></g>'
+                        + '<g class="dot-group"></g>'
                         + '<g class="threshold-line-group"></g>'
                         + '<g class="y axis"></g>'
                         + '<g class="x axis"></g>'
@@ -525,6 +526,66 @@
         return {}
     }
 
+    var dotShapes = function(config) {
+        if (!config.data.lineData.length) {
+            return {}
+        }
+
+        var data = config.data.lineData
+        var dataCut = []
+        var valueLength = data[0].value.length
+        for (var i = 0; i < valueLength; i++) {
+            var layer = []
+            data.forEach(function(dB, iB) {
+                var prevIdx = Math.max(0, iB - 1)
+                var nextIdx = Math.min(data.length - 1, iB + 1)
+                var currentIdx = iB
+                var prev = data[prevIdx].value[i]
+                var next = data[nextIdx].value[i]
+                var current = dB.value[i]
+
+                if((current !== null && (prev === null || next === null))
+                    || (currentIdx === prevIdx && currentIdx === nextIdx)) {
+                    layer.push({
+                        value: current,
+                        timestamp: dB.timestamp,
+                        layer: i
+                    })
+                }
+            })
+            dataCut.push(layer)
+        }
+
+        var dotLayers = config.container.select('.dot-group')
+            .selectAll('.dot-layer')
+            .data(dataCut)
+        var dotLayersUpdate = dotLayers.enter().append('g')
+            .merge(dotLayers)
+            .attr('class', 'dot-layer')
+        dotLayers.exit().remove()
+
+        var shapes = dotLayersUpdate.selectAll('.dot')
+            .data(function(d, i) {
+                return d
+            })
+        shapes.enter().append('circle')
+            .merge(shapes)
+            .attr('class', function(d, i, a) {
+                // return ['dot', 'layer' + i, d[0].id, d[0].className].join(' ')
+                return ['dot', 'layer' + d.layer].join(' ')
+            })
+            .attr('cx', function(d) {
+                return config.lineScaleX(d.timestamp);
+            })
+            .attr('cy', function(d) {
+                return config.scaleY(d.value)
+            })
+            .attr('r', 2)
+        shapes.exit().remove()
+
+        return {}
+    }
+
     var thresholdLineShape = function(config) {
         var line = config.container.select('.threshold-line-group')
             .selectAll('line.threshold-line')
@@ -729,6 +790,7 @@
         barShapes,
         estimateBarShapes,
         lineShapes,
+        dotShapes,
         thresholdLineShape,
         common.axisComponentY,
         common.message,

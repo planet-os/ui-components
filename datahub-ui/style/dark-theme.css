@@ -117,7 +117,20 @@ body {
 
 .datahub-chart .area {
     fill: #5ECF52;
-    opacity: 0.8;
+    fill-opacity: 0.8;
+    stroke: #5ECF52;
+}
+
+.datahub-chart .dot.layer0 {
+    fill: #5ECF52;
+}
+
+.datahub-chart .dot.layer1 {
+    fill: #F8E81C;
+}
+
+.datahub-chart .dot.layer2 {
+    fill: #F6A623;
 }
 
 .dummy .datahub-chart .bar {
