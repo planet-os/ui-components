@@ -354,6 +354,56 @@ body {
     color: white;
 }
 
+.datahub-waterfall-chart svg .bar0 {
+    fill: #5ECF52;
+}
+
+.datahub-waterfall-chart svg .bar1 {
+    fill: #FF5A6E;
+}
+
+.datahub-waterfall-chart svg .bar2 {
+    fill: #05BDFF;
+}
+
+.datahub-waterfall-chart svg .bar3 {
+    fill: #5ECF52;
+}
+
+.datahub-waterfall-chart svg .bar4 {
+    fill: #05BDFF;
+}
+
+.datahub-waterfall-chart svg .connectors {
+    stroke: #5f6773;
+}
+
+.datahub-waterfall-chart .number-container .label {
+    font-size: 16px;
+    text-transform: uppercase;
+}
+
+.datahub-waterfall-chart .number-container .number1 .label {
+    color: #FF5A6E;
+}
+
+.datahub-waterfall-chart .number-container .number2 .label {
+    color: #05BDFF;
+}
+
+.datahub-waterfall-chart .number-container .number3 .label {
+    color: #5ECF52;
+}
+
+.datahub-waterfall-chart .number-container .number4 .label {
+    color: #05BDFF;
+}
+
+.datahub-waterfall-chart .number-container .value {
+    font-size: 38px;
+    color: white;
+}
+
 /* non-component styling */
 .section {
     background-color: #233541;

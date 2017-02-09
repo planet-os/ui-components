@@ -244,11 +244,6 @@
     width: 100%;
 }
 
-/*.datahub-vertical-chart div {
-    border: 1px solid silver;
-    margin: -1px;
-}*/
-
 .datahub-vertical-chart {
     height: 250px;
     display: flex;
@@ -290,6 +285,26 @@
     flex: 1;
     justify-content: center;
 }
+
 .datahub-vertical-chart .number-container .number .label {
     align-items: center;
+}
+
+.datahub-waterfall-chart .number-container {
+    display: flex;
+}
+
+.datahub-waterfall-chart .number-container .number {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    align-items: center;
+}
+
+.datahub-waterfall-chart .number-container .label {
+    display: flex;
+}
+
+.datahub-waterfall-chart .number-container .value {
+    display: flex;
 }

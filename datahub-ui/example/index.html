@@ -17,6 +17,7 @@
     <script src="../src/datahub-chart.js"></script>
     <script src="../src/datahub-table-chart.js"></script>
     <script src="../src/datahub-vertical-chart.js"></script>
+    <script src="../src/datahub-waterfall-chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.2/leaflet.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.7/leaflet.draw.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flexboxgrid/6.3.1/flexboxgrid.min.css" />
@@ -242,6 +243,14 @@
         </div>
         <div class="col-xs-12 col-md-5">
             <div class="description">A vertical bar chart with reference bar and summary numbers.</div>
+        </div>
+    </div>
+    <div class="row section">
+        <div class="col-xs-12 col-md-7">
+            <div class="waterfall-chart"></div>
+        </div>
+        <div class="col-xs-12 col-md-5">
+            <div class="description">A waterfall chart.</div>
         </div>
     </div>
     <div class="row section">
@@ -797,6 +806,20 @@
         ],
         referenceBarSize: 100,
         unit: '%'
+    })
+
+    var waterfall = datahub.waterfallChart({
+        parent: document.querySelector('.waterfall-chart')
+    })
+
+    waterfall.setConfig({
+        elements:[
+            {key: 'initial', label: 'Initial', value: 53},
+            {key: 'closed', label: 'Closed', value: -30},
+            {key: 'open', label: 'Open', value: 23},
+            {key: 'new', label: 'New', value: 15},
+            {key: 'total', label: 'Total', value: 38}
+        ]
     })
 
     var number = datahub.widget.number({
