@@ -741,11 +741,47 @@
                     {key: 'name', value: 'germany', label: 'Germany' },
                     {key: 'actual', value: 10, label: 10 },
                     {key: 'plan', value: 40, label: 40 }
+                ],
+                [
+                    {key: 'name', value: 'zzz', label: 'zzz' },
+                    {key: 'actual', value: 10, label: 10 },
+                    {key: 'plan', value: 40, label: 40 }
+                ],
+                [
+                    {key: 'name', value: 'mmm', label: 'mmm' },
+                    {key: 'actual', value: 10, label: 10 },
+                    {key: 'plan', value: 40, label: 40 }
                 ]
             ],
             valueKey: 'actual',
             referenceKey: 'plan',
-            domain: [-40, 160]
+            domain: [-40, 160],
+            sortFunc: function(a, b) {
+                var forceTop = 'zzz'
+                var matchA = a.filter(function(d) {
+                    return d.key === 'name'
+                })
+                var nameA = matchA[0].label.toLowerCase()
+
+                var matchB = b.filter(function(d) {
+                    return d.key === 'name'
+                })
+                var nameB = matchB[0].label.toLowerCase()
+
+                if(nameB === forceTop) {
+                    return 1
+                }
+                if(nameA === forceTop) {
+                    return -1
+                }
+                if(nameA < nameB) {
+                    return -1
+                }
+                if(nameA > nameB) {
+                    return 1
+                }
+                return 0
+            }
         })
 
     var vertical = datahub.verticalChart({

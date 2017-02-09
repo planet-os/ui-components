@@ -209,7 +209,7 @@
 .datahub-table-chart .column {
     flex: 1;
     align-items: center;
-    padding: 0 0 0 8px;
+    padding: 0 0 0 18px;
 }
 
 .datahub-table-chart .chart-container .chart {
@@ -217,6 +217,9 @@
     width: 350px;
 }
 
+.datahub-table-chart .header .row {
+    height: 72px;
+}
 .datahub-table-chart .header,
 .datahub-table-chart .content {
     flex-direction: column;

@@ -262,6 +262,8 @@ body {
 
 .datahub-table-chart .header {
     background-color: #5f6773;
+    text-transform: uppercase;
+    font-size: 14px;
 }
 
 .datahub-table-chart .content .row:nth-child(even) {

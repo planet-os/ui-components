@@ -75,6 +75,20 @@
         }
     }
 
+    var sort = function(config) {
+        if(config.elements) {
+            var cloned = config.elements.slice()
+            var sorted = cloned.sort(config.sortFunc)
+
+            return {
+                elements: sorted
+            }
+        }
+        return {
+            
+        }
+    }
+
     var scaleX = function(config) {
         var domain = config.domain || [0, 0]
 
@@ -379,6 +393,7 @@
 
     var multi = utils.pipeline(
         template,
+        sort,
         header,
         body,
         scaleX,
