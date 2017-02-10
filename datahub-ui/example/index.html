@@ -102,6 +102,14 @@
     </div>
     <div class="row section">
         <div class="col-xs-12 col-md-7">
+            <div class="reverse-bar-chart"></div>
+        </div>
+        <div class="col-xs-12 col-md-5">
+            <div class="description">A bar chart reverse its Y axis.</div>
+        </div>
+    </div>
+    <div class="row section">
+        <div class="col-xs-12 col-md-7">
             <div class="autoscale-bar-chart"></div>
         </div>
         <div class="col-xs-12 col-md-5">
@@ -453,6 +461,33 @@
         width: container.clientWidth,
         data: dataMulti
     })
+
+
+
+    var dataMulti = {
+        timestamp: datahub.data.generateTimestamps(12, 1, '2016-01-01', 'month', 1),
+        barData: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1),
+        referenceData: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1)
+    }
+
+    dataMulti.barData.forEach(function(d) {
+        d.value = d.value * -1
+    })
+
+    dataMulti.referenceData.forEach(function(d) {
+        d.value = d.value * -1
+    })
+
+    var container = document.querySelector('.reverse-bar-chart')
+    datahub.chart.multi({
+        parent: container,
+        width: container.clientWidth,
+        data: dataMulti,
+        reverseY: true
+    })
+    .on('hover', function(d) { console.log(d) })
+
+
 
     var dataMulti = {
         timestamp: datahub.data.generateTimestamps(12, 1, '2016-01-01', 'month', 1),

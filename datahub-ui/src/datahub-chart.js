@@ -41,7 +41,7 @@
                             + '<text class="chart-title"></text>'
                         + '</g>'
                         + '<g class="message-group"></g>'
-                        + '<g class="events"></g>'
+                        + '<g class="events"><rect class="event-panel"></rect></g>'
                     + '</g>'
                 + '</svg>'
             + '</div>'
@@ -196,7 +196,13 @@
             max = Math.max(max, 0)
         }
 
-        var scaleY = d3.scaleLinear().domain([min, max]).range([config.chartHeight, 0])
+        var scaleY
+        if(config.reverseY) {
+            scaleY = d3.scaleLinear().domain([max, min]).range([config.chartHeight, 0])
+        }
+        else {
+            scaleY = d3.scaleLinear().domain([min, max]).range([config.chartHeight, 0])
+        }
 
         return {
             scaleY: scaleY
@@ -250,12 +256,7 @@
     }
 
     var eventsPanel = function(config) {
-        var eventPanel = config.container.select('.events')
-            .selectAll('rect.event-panel')
-            .data([0])
-        eventPanel.enter().append('rect')
-            .attr('class', 'event-panel')
-            .merge(eventPanel)
+        var eventPanel = config.container.select('.events .event-panel')
             .on('mousemove', function(d) {
                 if(config.dataIsEmpty) {
                     return
@@ -283,7 +284,7 @@
 
                 config.events.call('mouseout', null, {})
             })
-        eventPanel.exit().remove()
+
         return {
             eventPanel: eventPanel
         }
@@ -305,7 +306,7 @@
                 if(config.autoScaleY) {
                     return config.chartHeight - (config.chartHeight - Math.abs(config.scaleY(d.value)))
                 }
-                if(d.value >= 0){
+                if(d.value >= 0 || config.reverseY){
                     return config.scaleY(0) - Math.abs(config.scaleY(d.value) - config.scaleY(0))
 
                 }
@@ -369,7 +370,7 @@
                 if(config.autoScaleY) {
                     return config.chartHeight - (config.chartHeight - Math.abs(config.scaleY(d.value)))
                 }
-                if(d.value >= 0){
+                if(d.value >= 0 || config.reverseY){
                     return config.scaleY(0) - Math.abs(config.scaleY(d.value) - config.scaleY(0))
                 }
                 else {
@@ -396,7 +397,7 @@
             .attr('d', function(d, i) {
                 var x = config.referenceScaleX(d.timestamp) || 0
                 var y = 0
-                if(d.value >= 0){
+                if(d.value >= 0 || config.reverseY){
                     y = config.scaleY(0) - Math.abs(config.scaleY(d.value) - config.scaleY(0))
                 }
                 else {
