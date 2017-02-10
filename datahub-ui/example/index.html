@@ -105,7 +105,7 @@
             <div class="reverse-bar-chart"></div>
         </div>
         <div class="col-xs-12 col-md-5">
-            <div class="description">A bar chart reverse its Y axis.</div>
+            <div class="description">A bar chart can reverse its Y axis.</div>
         </div>
     </div>
     <div class="row section">
@@ -114,6 +114,14 @@
         </div>
         <div class="col-xs-12 col-md-5">
             <div class="description">A bar chart can autoscale it's Y axis.</div>
+        </div>
+    </div>
+    <div class="row section">
+        <div class="col-xs-12 col-md-7">
+            <div class="domain-bar-chart"></div>
+        </div>
+        <div class="col-xs-12 col-md-5">
+            <div class="description">A bar chart can force a Y domain.</div>
         </div>
     </div>
     <div class="row section">
@@ -506,6 +514,19 @@
         width: container.clientWidth,
         data: dataMulti,
         autoScaleY: true
+    })
+
+    var dataMulti = {
+        timestamp: datahub.data.generateTimestamps(12, 1, '2016-01-01', 'month', 1),
+        barData: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1)
+    }
+
+    var container = document.querySelector('.domain-bar-chart')
+    datahub.chart.multi({
+        parent: container,
+        width: container.clientWidth,
+        data: dataMulti,
+        domain: [0, 1000]
     })
 
     var dataMulti = {

@@ -196,13 +196,18 @@
             max = Math.max(max, 0)
         }
 
-        var scaleY
-        if(config.reverseY) {
-            scaleY = d3.scaleLinear().domain([max, min]).range([config.chartHeight, 0])
+        var domain = [min, max]
+        if(config.domain) {
+            domain = config.domain
         }
         else {
-            scaleY = d3.scaleLinear().domain([min, max]).range([config.chartHeight, 0])
+            domain
         }
+        if(config.reverseY) {
+            domain = [domain[1], domain[0]]
+        }
+
+        var scaleY = d3.scaleLinear().domain(domain).range([config.chartHeight, 0])
 
         return {
             scaleY: scaleY
