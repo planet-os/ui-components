@@ -743,8 +743,13 @@
     }
 
     var active = function(config) {
+        // if config.activeDate is the date Object use it straight, if it's text convert to date object
+        var activeTs = !config.activeDate || (config.activeDate.getTime === undefined)
+                ? new Date(config.activeDate).getTime()
+                : config.activeDate.getTime()
+
         var selectedTimestamp = config.data.timestamp.filter(function(d) {
-            return d.getTime() === new Date(config.activeDate).getTime()
+            return d.getTime() === activeTs
         })
 
         var shapes = config.container.select('.active-group')
