@@ -21,6 +21,7 @@ body {
 .datahub-chart text,
 .datahub-table-chart text {
     fill: #adb7c5;
+    font-size: 14px;
 }
 
 .datahub-chart .message-group text,
@@ -263,7 +264,9 @@ body {
 .datahub-table-chart .header {
     background-color: #5f6773;
     text-transform: uppercase;
-    font-size: 14px;
+    font-weight: 700;
+    font-size: 0.875em;
+    line-height: 16px;
 }
 
 .datahub-table-chart .content .row:nth-child(even) {
