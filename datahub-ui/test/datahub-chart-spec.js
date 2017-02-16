@@ -3,7 +3,7 @@ var expect = chai.expect;
 describe('Chart', function() {
 
     describe('Bar chart', function() {
-        var container;
+        var container, chart;
 
         beforeEach(function() {
             container = document.createElement('div')
@@ -13,10 +13,11 @@ describe('Chart', function() {
 
         afterEach(function() {
             document.body.removeChild(container)
+            chart.destroy()
         })
 
         it('should initialize with a base structure with minimal configuration', function() {
-            datahub.chart.multi({
+            chart = datahub.chart.multi({
                 parent: container
             })
 
@@ -28,7 +29,7 @@ describe('Chart', function() {
         })
 
         it('should use sizes from config', function() {
-            datahub.chart.multi({
+            chart = datahub.chart.multi({
                 parent: container,
                 width: 400,
                 height: 300
@@ -45,7 +46,7 @@ describe('Chart', function() {
                 timestamp: datahub.data.generateTimestamps(12, 1, '2016-01-01', 'month', 1),
                 barData: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1)
             }
-            datahub.chart.multi({
+            chart = datahub.chart.multi({
                 parent: container,
                 data: dataMulti
             })
@@ -62,7 +63,7 @@ describe('Chart', function() {
                 timestamp: datahub.data.generateTimestamps(12, 1, '2016-01-01', 'month', 1),
                 barData: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1)
             }
-            datahub.chart.multi({
+            chart = datahub.chart.multi({
                 parent: container,
                 data: dataMulti
             })
@@ -83,6 +84,188 @@ describe('Chart', function() {
                 clientY: 100
             })
             eventsPanel.dispatchEvent(event)
+        })
+
+        it('should start Y scale at 0 by default', function() {
+            var dataMulti = {
+                "timestamp":["2016-01-01T00:00:00.000Z","2016-02-01T00:00:00.000Z"],
+                "barData":[{
+                        "timestamp":"2016-01-01T00:00:00.000Z",
+                        "value":[10]
+                    },
+                    {
+                        "timestamp":"2016-02-01T00:00:00.000Z",
+                        "value":[20]
+                    }
+                ]}
+            
+            chart = datahub.chart.multi({
+                parent: container,
+                data: dataMulti
+            })
+
+            var tick = container.querySelector('.axis.y .tick text')
+
+            expect(parseFloat(tick.innerHTML)).to.equal(0)
+        })
+
+        it('can auto scale Y axis', function() {
+            var dataMulti = {
+                "timestamp":["2016-01-01T00:00:00.000Z","2016-02-01T00:00:00.000Z"],
+                "barData":[{
+                        "timestamp":"2016-01-01T00:00:00.000Z",
+                        "value":[10]
+                    },
+                    {
+                        "timestamp":"2016-02-01T00:00:00.000Z",
+                        "value":[20]
+                    }
+                ]}
+            
+            chart = datahub.chart.multi({
+                parent: container,
+                data: dataMulti,
+                autoScaleY: true
+            })
+
+            var ticks = container.querySelector('.axis.y')
+                .querySelectorAll('.tick text')
+            var tickLabels = Array.prototype.slice.call(ticks)
+                .map(function(d) {
+                    return parseFloat(d.innerHTML)
+                })
+
+            expect(tickLabels[0]).to.equal(10)
+            expect(tickLabels[tickLabels.length - 1]).to.equal(20)
+        })
+
+        it('can reverse scales', function() {
+            var dataMulti = {
+                "timestamp":["2016-01-01T00:00:00.000Z","2016-02-01T00:00:00.000Z"],
+                "barData":[{
+                        "timestamp":"2016-01-01T00:00:00.000Z",
+                        "value":[-10]
+                    },
+                    {
+                        "timestamp":"2016-02-01T00:00:00.000Z",
+                        "value":[-20]
+                    }
+                ]}
+            
+            chart = datahub.chart.multi({
+                parent: container,
+                data: dataMulti,
+                reverseY: true
+            })
+
+            var ticks = container.querySelector('.axis.y')
+                .querySelectorAll('.tick text')
+            var tickLabels = Array.prototype.slice.call(ticks)
+                .map(function(d) {
+                    return parseFloat(d.innerHTML)
+                })
+
+            expect(tickLabels[0]).to.equal(0)
+            expect(tickLabels[tickLabels.length - 1]).to.equal(-20)
+        })
+
+        it('can use the provided Y domain', function() {
+            var dataMulti = {
+                "timestamp":["2016-01-01T00:00:00.000Z","2016-02-01T00:00:00.000Z"],
+                "barData":[{
+                        "timestamp":"2016-01-01T00:00:00.000Z",
+                        "value":[10]
+                    },
+                    {
+                        "timestamp":"2016-02-01T00:00:00.000Z",
+                        "value":[20]
+                    }
+                ]}
+            
+            chart = datahub.chart.multi({
+                parent: container,
+                data: dataMulti,
+                domain: [0, 1000],
+                axisYFormat: '.2'
+            })
+
+            var ticks = container.querySelector('.axis.y')
+                .querySelectorAll('.tick text')
+            var tickLabels = Array.prototype.slice.call(ticks)
+                .map(function(d) {
+                    return parseFloat(d.innerHTML)
+                })
+
+            expect(tickLabels[0]).to.equal(0)
+            expect(tickLabels[tickLabels.length - 1]).to.equal(1000)
+        })
+
+        it('can use the provided X and Y formatters', function() {
+            var dataMulti = {
+                "timestamp":["2016-01-01T00:00:00.000Z","2016-02-01T00:00:00.000Z"],
+                "barData":[{
+                        "timestamp":"2016-01-01T00:00:00.000Z",
+                        "value":[1000]
+                    },
+                    {
+                        "timestamp":"2016-02-01T00:00:00.000Z",
+                        "value":[2000]
+                    }
+                ]}
+            
+            chart = datahub.chart.multi({
+                parent: container,
+                data: dataMulti,
+                axisYFormat: '.2s',
+                axisXFormat: '%b'
+            })
+
+            var ticks = container.querySelector('.axis.y')
+                .querySelectorAll('.tick text')
+            var tickLabels = Array.prototype.slice.call(ticks)
+                .map(function(d) {
+                    return d.innerHTML
+                })
+
+            var xTicks = container.querySelector('.axis.x')
+                .querySelectorAll('.tick text')
+            var xTickLabels = Array.prototype.slice.call(xTicks)
+                .map(function(d) {
+                    return d.innerHTML
+                })
+
+            expect(tickLabels[tickLabels.length - 1]).to.equal('2.0k')
+            expect(xTickLabels[0]).to.equal('Jan')
+        })
+
+        it('should render titles', function() {
+            var dataMulti = {
+                "timestamp":["2016-01-01T00:00:00.000Z","2016-02-01T00:00:00.000Z"],
+                "barData":[{
+                        "timestamp":"2016-01-01T00:00:00.000Z",
+                        "value":[1000]
+                    },
+                    {
+                        "timestamp":"2016-02-01T00:00:00.000Z",
+                        "value":[2000]
+                    }
+                ]}
+            
+            chart = datahub.chart.multi({
+                parent: container,
+                data: dataMulti,
+                axisTitleX: 'TitleX',
+                axisTitleY: 'TitleY',
+                chartTitle: 'ChartTitle'
+            })
+
+            var chartTitle = container.querySelector('.chart-title')
+            var xAxisTitle = container.querySelector('.axis-title.x')
+            var yAxisTitle = container.querySelector('.axis-title.y')
+
+            expect(chartTitle.innerHTML).to.equal('ChartTitle')
+            expect(xAxisTitle.innerHTML).to.equal('TitleX')
+            expect(yAxisTitle.innerHTML).to.equal('TitleY')
         })
     })
 })

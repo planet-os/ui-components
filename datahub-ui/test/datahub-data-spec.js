@@ -14,6 +14,25 @@ describe('Data', function() {
         expect(dataMulti.barData[0].value).to.be.instanceof(Array)
     })
 
+    it('should generate the right number of data points', function() {
+        var pointCount = 2
+        var dataMulti = {
+            timestamp: datahub.data.generateTimestamps(pointCount, 1, '2016-01-01', 'month', 1),
+            barData: datahub.data.generateTimeSeries(pointCount, 1, '2016-01-01', 'month', 1)
+        }
+
+        expect(dataMulti.timestamp.length).to.equal(pointCount)
+        expect(dataMulti.barData.length).to.equal(pointCount)
+    })
+
+    it('should generate dates as iso strings', function() {
+        var dataMulti = {
+            timestamp: datahub.data.generateTimestamps(1, 1, '2016-01-01', 'month', 1)
+        }
+
+        expect(dataMulti.timestamp[0]).to.equal('2016-01-01T00:00:00.000Z')
+    })
+
     it('should generate optional ids and classNames', function() {
         var dataMulti = {
             timestamp: datahub.data.generateTimestamps(12, 1, '2016-01-01', 'month', 1),
@@ -30,7 +49,7 @@ describe('Data', function() {
             barData: datahub.data.generateTimeSeries(2, 1, '2016-01-01', 'hour', 2)
         }
 
-        var delta = dataMulti.timestamp[1].getTime() - dataMulti.timestamp[0].getTime()
+        var delta = new Date(dataMulti.timestamp[1]).getTime() - new Date(dataMulti.timestamp[0]).getTime()
         var hourInMillis = 1000*60*60
         var deltaHour = delta/hourInMillis
         expect(deltaHour).to.equal(2)
@@ -42,8 +61,8 @@ describe('Data', function() {
             barData: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1)
         }
 
-        expect(dataMulti.timestamp[0].getTime()).to.equal(new Date('2016', 0, 1).getTime())
-        expect(dataMulti.timestamp[0].getTime()).to.equal(new Date(dataMulti.barData[0].timestamp).getTime())
+        expect(dataMulti.timestamp[0]).to.equal('2016-01-01T00:00:00.000Z')
+        expect(dataMulti.timestamp[0]).to.equal(dataMulti.barData[0].timestamp)
         expect(dataMulti.timestamp.length).to.equal(12)
     })
 

@@ -114,7 +114,7 @@
 
         var merged = timestamps.map(function(d, i) {
             return {
-                timestamp: d3.isoFormat(d),
+                timestamp: d,
                 value: values[i],
                 id: values[i].map(function(d) { return ~~(Math.random()*1000) }),
                 className: values[i].map(function(d) { return Math.random().toString(36).substring(4, 8) })
@@ -128,17 +128,33 @@
         return string.charAt(0).toUpperCase() + string.slice(1)
     }
 
+    function createDateAsUTC(date) {
+        return new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes(), date.getSeconds()));
+    }
+
+    function convertDateToUTC(date) { 
+        return new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds()); 
+    }
+
     var generateTimestamps = function(_n, _layerCount, _timeStart, _timeIncrement, _step) {
         var timeIncrement = _timeIncrement || 'hour'
-        var intervalFuncName = 'time' + capitalize(timeIncrement) || 'timeHour'
+        var intervalFuncName = 'utc' + capitalize(timeIncrement) || 'utcHour'
         var step = _step || 3
         var n = _n || 36
         var intervalFunc = d3[intervalFuncName]
         var intervalRangeFunc = d3[intervalFuncName + 's']
-        var dateStart = _timeStart ? new Date(_timeStart) : new Date()
+
+        var dateStart = _timeStart ? new Date(_timeStart)
+            : new Date()
         var dateEnd = intervalFunc.offset(dateStart, n * step)
 
-        return intervalRangeFunc(dateStart, dateEnd, step)
+        var dates = intervalRangeFunc(dateStart, dateEnd, step)
+
+        var datesISOString = dates.map(function(d, i) {
+            return d3.isoFormat(d)
+        })
+
+        return datesISOString
     }
 
     var getJSON = function(url, cb) {
