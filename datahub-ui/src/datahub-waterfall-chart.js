@@ -223,7 +223,15 @@
     var waterfallChart = function(config) {
         var configCache,
             events = d3.dispatch('barHover'),
-            chartCache
+            chartCache,
+            uid = ~~(Math.random()*10000)
+
+        var onResize = utils.throttle(function() {
+            configCache.width = configCache.parent.clientWidth
+            render()
+        }, 200)
+
+        d3.select(window).on('resize.' + uid, onResize)
 
         var render = function() {
             chartCache = multi(configCache)
@@ -246,12 +254,18 @@
             setConfig(utils.mergeAll(config, {events: events}))
         }
 
+        var destroy = function() {
+            d3.select(window).on('resize.' + uid, null)
+            configCache.parent.html = null
+        }
+
         init(config, events)
 
         return {
             on: utils.rebind(events),
             setConfig: setConfig,
-            setData: setData
+            setData: setData,
+            destroy: destroy
         }
     }
 
