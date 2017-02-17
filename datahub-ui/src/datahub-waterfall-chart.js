@@ -256,7 +256,7 @@
 
         var destroy = function() {
             d3.select(window).on('resize.' + uid, null)
-            configCache.parent.html = null
+            configCache.parent.innerHTML = null
         }
 
         init(config, events)

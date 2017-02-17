@@ -41,6 +41,30 @@ describe('Chart', function() {
             expect(datahubChart.clientHeight).to.equal(300)
         })
 
+        it('should apply id and class options as class names', function() {
+            var dummyClassName = 'dummy-class-name'
+            var dummyId = 'dummy-id'
+            var dataMulti = {
+                "timestamp":["2016-01-01T00:00:00.000Z"],
+                "barData":[{
+                    "timestamp":"2016-01-01T00:00:00.000Z",
+                    "value":[12.285486660803384],
+                    "id":[dummyId],
+                    "className":[dummyClassName]
+                }]
+            }
+
+            chart = datahub.chart.multi({
+                parent: container,
+                data: dataMulti
+            })
+
+            var bar = container.querySelector('.bar-group .bar')
+
+            expect(bar.classList.contains(dummyClassName)).to.be.truthy
+            expect(bar.classList.contains(dummyId)).to.be.truthy
+        })
+
         it('should have stripes and bars when passed data', function() {
             var dataMulti = {
                 timestamp: datahub.data.generateTimestamps(12, 1, '2016-01-01', 'month', 1),
@@ -54,8 +78,8 @@ describe('Chart', function() {
             var stripes = container.querySelectorAll('.stripe-group rect')
             var bars = container.querySelectorAll('.bar-group rect.bar')
 
-            expect(stripes.length).to.be.greaterThan(0)
-            expect(bars.length).to.be.greaterThan(0)
+            expect(stripes).to.have.length.above(0)
+            expect(bars).to.have.length.above(0)
         })
 
         it('should expose mousemove events', function(done) {
@@ -266,6 +290,18 @@ describe('Chart', function() {
             expect(chartTitle.innerHTML).to.equal('ChartTitle')
             expect(xAxisTitle.innerHTML).to.equal('TitleX')
             expect(yAxisTitle.innerHTML).to.equal('TitleY')
+        })
+
+        it('should destroy cleanly', function() {
+            chart = datahub.chart.multi({
+                parent: container
+            })
+
+            chart.destroy()
+
+            var datahubChart = container.querySelector('.datahub-chart')
+
+            expect(datahubChart).not.to.exist
         })
     })
 })

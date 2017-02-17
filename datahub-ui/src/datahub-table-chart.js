@@ -229,7 +229,7 @@
                 return config.rowHeight / 2
             })
             .attr('x', function(d) {
-                return d.value < 0 ? x = config.scaleX(d.value) : config.scaleX(0)
+                return d.value < 0 ? config.scaleX(d.value) : config.scaleX(0)
             })
             .attr('y', function(d) {
                 return config.rowHeight / 4
@@ -283,7 +283,7 @@
                 return config.rowHeight / 4
             })
             .attr('x', function(d) {
-                return d.value < 0 ? x = config.scaleX(d.value) : config.scaleX(0)
+                return d.value < 0 ? config.scaleX(d.value) : config.scaleX(0)
             })
             .attr('y', function(d) {
                 return config.rowHeight * 3 / 8
@@ -439,7 +439,7 @@
 
         var destroy = function() {
             d3.select(window).on('resize.' + uid, null)
-            configCache.parent.html = null
+            configCache.parent.innerHTML = null
         }
 
         init(config, events)
