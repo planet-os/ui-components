@@ -115,9 +115,10 @@
     }
 
     var axisX = function(config) {
+        var axisXFormat = config.axisXFormat || '.2s'
         var axisXComponent = d3.axisBottom()
             .scale(config.scaleX)
-            .tickFormat(d3.format('.2s'))
+            .tickFormat(d3.format(axisXFormat))
 
         var axis = config.container.select('.axis')
             .attr('transform', 'translate(' + [0, config.chartHeight] + ')')
@@ -176,6 +177,13 @@
                     }
                     var format = config.valueFormat || defaultFormat
                     return format(d.label)
+                }
+                else if(Array.isArray(d.label)) {
+                    var lines = d.label.map(function(dB, iB) {
+                            return '<div>' + dB + '</div>'
+                        })
+                        .join('')
+                    return '<div class="multiline">' + lines + '</div>'
                 }
                 else {
                     return d.label
