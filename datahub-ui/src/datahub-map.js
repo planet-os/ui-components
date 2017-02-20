@@ -1,10 +1,10 @@
 (function(root, factory) {
     if (typeof module === 'object' && module.exports) {
-        factory(module.exports, require('leaflet'), require('./datahub-utils.js').utils)
+        factory(module.exports, require('leaflet'), require('./datahub-data.js').utils, require('./datahub-utils.js').utils)
     } else {
-        factory((root.datahub = root.datahub || {}), root.L, root.datahub.utils)
+        factory((root.datahub = root.datahub || {}), root.L, root.datahub.data, root.datahub.utils)
     }
-}(this, function(exports, L, utils) {
+}(this, function(exports, L, data, utils) {
 
     var dataGridLayer = function() {
 
@@ -33,9 +33,7 @@
             var pixelOrigin = map.getPixelOrigin()
             var worldBounds = map.getPixelWorldBounds()
             var mapSize = map.getSize()
-            if (pixelOrigin.y < 0) {
-                mapSize.y = worldBounds.max.y - worldBounds.min.y
-            }
+            var mapSizeY = mapSize.y
 
             console.log('Start rendering...')
             console.time('render')
@@ -44,24 +42,21 @@
             var values = data.values
 
             canvas.width = mapSize.x
-            canvas.height = mapSize.y
+            canvas.height = mapSizeY
 
             var ctx = canvas.getContext('2d')
 
             var northIndex = Math.max(utils.bisectionReversed(lat, mapBounds.getNorth()) - 1, 0)
-            var southIndex = Math.min(utils.bisectionReversed(lat, mapBounds.getSouth()) + 1, lat.length - 1)
+            var southIndex = Math.min(utils.bisectionReversed(lat, mapBounds.getSouth()), lat.length - 1)
             var westIndex = Math.max(utils.bisection(lon, mapBounds.getWest()) - 1, 0)
             var eastIndex = Math.min(utils.bisection(lon, mapBounds.getEast()) + 1, lon.length - 1)
 
-            ctx.globalAlpha = 1
-
-            var northWestPoint = map.latLngToContainerPoint(L.latLng(lat[northIndex], lon[Math.max(westIndex, 0)]))
-            var northWestPointNextLon = map.latLngToContainerPoint(L.latLng(lat[northIndex], lon[Math.min(westIndex + 1, lon.length - 1)]))
-            var nextNorthWestPointNextLat = map.latLngToContainerPoint(L.latLng(lat[northIndex + 1], lon[Math.max(westIndex, 0)]))
+            var northWestPoint = map.latLngToContainerPoint([lat[northIndex], lon[Math.max(westIndex, 0)]])
+            var northWestPointNextLon = map.latLngToContainerPoint([lat[northIndex], lon[Math.min(westIndex + 1, lon.length - 1)]])
 
             var w = Math.ceil(Math.max(northWestPointNextLon.x - northWestPoint.x, 1)) + 2
 
-            var imageData = ctx.getImageData(0, 0, mapSize.x, mapSize.y)
+            var imageData = ctx.getImageData(0, 0, mapSize.x, mapSizeY)
             var buf = new ArrayBuffer(imageData.data.length)
             var buf8 = new Uint8ClampedArray(buf)
             var data = new Uint32Array(buf)
@@ -69,14 +64,14 @@
             var colorRGB, colorInt, imgDataIndex, x, y
             var point, value, latIndex, nextLatIndex, lonIndex, nextLongIndex
             for (var i = 0; i < lat.length; i++) {
-                if (i < northIndex || i >= southIndex) {
+                if (i < northIndex || i > southIndex) {
                     continue
                 }
                 latIndex = Math.max(i, 0)
                 nextLatIndex = Math.min(latIndex + 1, lat.length - 1)
 
-                var firstPointAtCurrentLat = map.latLngToContainerPoint(L.latLng(lat[latIndex], lon[westIndex]))
-                var firstPointAtNextLat = map.latLngToContainerPoint(L.latLng(lat[nextLatIndex], lon[westIndex]))
+                var firstPointAtCurrentLat = map.latLngToContainerPoint([lat[latIndex], lon[westIndex]])
+                var firstPointAtNextLat = map.latLngToContainerPoint([lat[nextLatIndex], lon[westIndex]])
 
                 var h = Math.ceil(Math.max(firstPointAtNextLat.y - firstPointAtCurrentLat.y, 1) + 1)
 
@@ -84,11 +79,7 @@
                     if (j >= westIndex && j < eastIndex) {
 
                         lonIndex = Math.max(j, 0)
-                        point = map.latLngToContainerPoint(L.latLng(lat[latIndex], lon[lonIndex]))
-
-                        if (pixelOrigin.y < 0) {
-                            point.y = point.y + pixelOrigin.y
-                        }
+                        point = map.latLngToContainerPoint([lat[latIndex], lon[lonIndex]])
 
                         value = values[latIndex][lonIndex]
 
@@ -106,7 +97,7 @@
                                         (255 << 24) | // alpha
                                         (colorRGB[2] << 16) | // blue
                                         (colorRGB[1] << 8) | // green
-                                        colorRGB[0]; // red
+                                        colorRGB[0] // red
                                 }
                             }
                         }
@@ -123,6 +114,8 @@
 
             imageOverlay = L.imageOverlay(canvas.toDataURL('image/png'), mapBounds)
                 .addTo(map)
+
+            imageOverlay.setOpacity(0.8)
 
             console.timeEnd('render')
 
@@ -375,7 +368,7 @@
                 [90, 180]
             ],
             maxZoom: 13,
-            minZoom: 0,
+            minZoom: 1,
             scrollWheelZoom: false,
             zoomSnap: 0.1,
             // zoomDelta: 1,
@@ -403,8 +396,8 @@
 
             map = L.map(config.container, mapConfig)
                 .on('click', function(e) { events.call('click', this, { lat: e.latlng.lat, lon: e.latlng.lng }) })
-                .on('mousedown', function(e) { config.container.classList.add('grab'); })
-                .on('mouseup', function(e) { config.container.classList.remove('grab'); })
+                .on('mousedown', function(e) { config.container.classList.add('grab') })
+                .on('mouseup', function(e) { config.container.classList.remove('grab') })
                 .on('mousemove', function(e) {
                     if (gridData) {
                         var latIndex = utils.bisectionReversed(gridData.lat, e.latlng.lat)
@@ -632,6 +625,14 @@
             return this
         }
 
+        function renderVectorMap() {
+            data.getWorldVector(function(geojson) {
+                renderPolygon(geojson)
+            })
+
+            return this
+        }
+
         return {
             init: init,
             show: show,
@@ -643,6 +644,7 @@
             renderPolygon: renderPolygon,
             renderImage: renderImage,
             renderRaster: renderRaster,
+            renderVectorMap: renderVectorMap,
             isVisible: states.isVisible,
             hideZoomControl: hideZoomControl,
             events: events,

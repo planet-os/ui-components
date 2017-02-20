@@ -18,6 +18,12 @@ body {
     font-family: 'Roboto', sans-serif;
 }
 
+.datahub-map .leaflet-overlay-pane path {
+    stroke: silver;
+    stroke-width: 1;
+    fill: none;
+}
+
 .datahub-chart text,
 .datahub-table-chart text {
     fill: #adb7c5;

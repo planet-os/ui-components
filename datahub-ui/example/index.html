@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.2/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.3/leaflet.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.7/leaflet.draw.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.4.0/d3.js"></script>
     <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
@@ -1098,13 +1098,11 @@
         })
         .init()
 
-
     var datasetName = 'noaa_gfs_global_sflux_0.12d'
     var variableName = 'Temperature_hybrid'
     datahub.data.getPreview(datasetName, variableName, null, function(response) {
         rasterMap.renderRaster(response.json)
         rasterMapGrayscale.renderRaster(response.json)
-        rasterMapBig.renderRaster(response.json)
     })
 
     var rasterMap = datahub.map.rasterMap({
@@ -1129,15 +1127,16 @@
         })
         .init()
 
+    datahub.data.getJSON('../asset/gfs_data.json', function(error, json) {
+        rasterMapBig.renderRaster(json)
+    })
+
     var rasterMapBig = datahub.map.rasterMap({
             parent: document.querySelector('.map-raster'),
             colorScale: datahub.palette.equalizedSpectral
         })
         .init()
-
-    datahub.data.getWorldVector(function(geojson) {
-        vectorMap.renderPolygon(geojson)
-    })
+        .renderVectorMap()
 
     var pointsGeojson = datahub.data.generateGeojsonPoints()
 
@@ -1146,6 +1145,10 @@
         })
         .init()
         .renderPolygon(pointsGeojson)
+
+    datahub.data.getWorldVector(function(geojson) {
+        vectorMap.renderPolygon(geojson)
+    })
 
     datahub.map.selectorMap({
         parent: document.querySelector('.map-selector')
