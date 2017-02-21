@@ -35,6 +35,11 @@
             var mapSize = map.getSize()
             var mapSizeY = mapSize.y
 
+            // when map is smaller than viewport
+            if(map._zoom < mapSize.y/512) {
+                mapSizeY = worldBounds.max.y - worldBounds.min.y
+            }
+
             console.log('Start rendering...')
             console.time('render')
             var lat = data.lat
@@ -80,6 +85,11 @@
 
                         lonIndex = Math.max(j, 0)
                         point = map.latLngToContainerPoint([lat[latIndex], lon[lonIndex]])
+
+                        if(map._zoom < mapSize.y/512) {
+                            point.y = point.y + pixelOrigin.y - map._getMapPanePos().y
+                        }
+
 
                         value = values[latIndex][lonIndex]
 
@@ -370,8 +380,8 @@
             maxZoom: 13,
             minZoom: 1,
             scrollWheelZoom: false,
-            zoomSnap: 0.1,
-            // zoomDelta: 1,
+            zoomSnap: 0,
+            zoomDelta: 0.5,
             attributionControl: false,
             fadeAnimation: false,
             tileLayer: {
