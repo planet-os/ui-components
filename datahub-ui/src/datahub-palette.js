@@ -40,4 +40,4 @@
 
     exports.palette = colorScales
 
-}));
+}))

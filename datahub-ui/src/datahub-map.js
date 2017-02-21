@@ -521,6 +521,7 @@
             var bboxGeojsonLayer = L.geoJson(polygon)
             map.fitBounds(bboxGeojsonLayer.getBounds())
             cachedBBoxPolygon = polygon
+
             return this
         }
 
