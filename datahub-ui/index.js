@@ -1,5 +1,6 @@
 var datahub = {
     palette: require('./src/datahub-palette.js').palette,
+    colorLegend: require('./src/datahub-legend.js').colorLegend,
     map: require('./src/datahub-map.js').map,
     widget: require('./src/datahub-widget.js').widget,
     group: require('./src/datahub-group.js').group,
