@@ -18,6 +18,7 @@
     <script src="../src/datahub-table-chart.js"></script>
     <script src="../src/datahub-vertical-chart.js"></script>
     <script src="../src/datahub-waterfall-chart.js"></script>
+    <script src="../src/datahub-legend.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.2/leaflet.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.7/leaflet.draw.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flexboxgrid/6.3.1/flexboxgrid.min.css" />
@@ -429,6 +430,14 @@
         </div>
         <div class="col-xs-12 col-md-5">
             <div class="description">A vector map supports markers and rectangle selection. Clicking on the selection deletes it.</div>
+        </div>
+    </div>
+    <div class="row section">
+        <div class="col-xs-12 col-md-7">
+            <div class="map-legend"></div>
+        </div>
+        <div class="col-xs-12 col-md-5">
+            <div class="description">A color palette legend to go with the map.</div>
         </div>
     </div>
     <script>
@@ -1129,6 +1138,7 @@
 
     datahub.data.getJSON('../asset/gfs_data.json', function(error, json) {
         rasterMapBig.renderRaster(json)
+        colorLegend.setData(json.uniqueValues)
     })
 
     var rasterMapBig = datahub.map.rasterMap({
@@ -1152,6 +1162,12 @@
 
     datahub.map.selectorMap({
         parent: document.querySelector('.map-selector')
+    })
+
+    var colorLegend = datahub.colorLegend({
+        parent: document.querySelector('.map-legend'),
+        height: 50,
+        colorScale: datahub.palette.equalizedSpectral
     })
 
     </script>

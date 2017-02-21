@@ -413,6 +413,14 @@ body {
     color: white;
 }
 
+.datahub-legend .tick-label {
+    fill: white;
+}
+
+.datahub-legend .tick-line {
+    stroke: white;
+}
+
 /* non-component styling */
 .section {
     background-color: #233541;
