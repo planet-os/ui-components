@@ -72,6 +72,18 @@
         })
     }
 
+    function capitalize(string) {
+        return string.charAt(0).toUpperCase() + string.slice(1)
+    }
+
+    function createDateAsUTC(date) {
+        return new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes(), date.getSeconds()));
+    }
+
+    function convertDateToUTC(date) { 
+        return new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds()); 
+    }
+
     var generateRaster = function() {
         var rasterData = {
             lon: generateArray(360, function(d, i) {
@@ -99,18 +111,26 @@
         return Array.apply(null, Array(n)).map(generationFn)
     }
 
-    var generateTimeSeries = function(n, _layerCount, _timeStart, _timeIncrement, _step) {
-        var layerCount = _layerCount || 1
+    var generateTimeSeries = function(_config) {
+        var _config = _config || {}
+        var config = {
+            count: _config.count || 12,
+            layerCount: _config.layerCount || 1,
+            timeStart: _config.timeStart || '2016-01-01',
+            timeIncrement: _config.timeIncrement || 'month',
+            step: _config.step || 1
+        }
+
         var startValue = ~~(Math.random() * 100)
-        var values = generateArray(n, function() {
-            return generateArray(layerCount, function(d) {
+        var values = generateArray(config.count, function() {
+            return generateArray(config.layerCount, function(d) {
                 startValue += (Math.random() * 2 - 1) * 10
                 startValue = Math.max(startValue, 0)
                 return startValue
             })
         })
 
-        var timestamps = generateTimestamps(n, _layerCount, _timeStart, _timeIncrement, _step)
+        var timestamps = generateTimestamps(config)
 
         var merged = timestamps.map(function(d, i) {
             return {
@@ -124,31 +144,26 @@
         return merged
     }
 
-    function capitalize(string) {
-        return string.charAt(0).toUpperCase() + string.slice(1)
-    }
+    var generateTimestamps = function(_config) {
+        var _config = _config || {}
+        var config = {
+            count: _config.count || 12,
+            layerCount: _config.layerCount || 1,
+            timeStart: _config.timeStart || '2016-01-01',
+            timeIncrement: _config.timeIncrement || 'month',
+            step: _config.step || 1
+        }
 
-    function createDateAsUTC(date) {
-        return new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes(), date.getSeconds()));
-    }
-
-    function convertDateToUTC(date) { 
-        return new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds()); 
-    }
-
-    var generateTimestamps = function(_n, _layerCount, _timeStart, _timeIncrement, _step) {
-        var timeIncrement = _timeIncrement || 'hour'
-        var intervalFuncName = 'utc' + capitalize(timeIncrement) || 'utcHour'
-        var step = _step || 3
-        var n = _n || 36
+        var intervalFuncName = 'utc' + capitalize(config.timeIncrement) || 'utcHour'
+        // var step = _step || 3
+        // var n = _n || 36
         var intervalFunc = d3[intervalFuncName]
         var intervalRangeFunc = d3[intervalFuncName + 's']
 
-        var dateStart = _timeStart ? new Date(_timeStart)
-            : new Date()
-        var dateEnd = intervalFunc.offset(dateStart, n * step)
+        var dateStart = config.timeStart ? new Date(config.timeStart) : new Date()
+        var dateEnd = intervalFunc.offset(dateStart, config.count * config.step)
 
-        var dates = intervalRangeFunc(dateStart, dateEnd, step)
+        var dates = intervalRangeFunc(dateStart, dateEnd, config.step)
 
         var datesISOString = dates.map(function(d, i) {
             return d3.isoFormat(d)

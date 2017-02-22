@@ -170,7 +170,7 @@
             <div class="chart-types"></div>
         </div>
         <div class="col-xs-12 col-md-5">
-            <div class="description">An chart can mix multiple types.</div>
+            <div class="description">A chart can mix multiple types.</div>
         </div>
     </div>
     <div class="row section">
@@ -443,8 +443,8 @@
     <script>
 
     var dataMulti = {
-        timestamp: datahub.data.generateTimestamps(12, 1, '2016-01-01', 'month', 1),
-        barData: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1)
+        timestamp: datahub.data.generateTimestamps(),
+        barData: datahub.data.generateTimeSeries()
     }
 
     var container = document.querySelector('.bar-chart')
@@ -455,9 +455,9 @@
     })
 
     var dataMulti = {
-        timestamp: datahub.data.generateTimestamps(12, 1, '2016-01-01', 'month', 1),
-        barData: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1),
-        referenceData: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1)
+        timestamp: datahub.data.generateTimestamps(),
+        barData: datahub.data.generateTimeSeries(),
+        referenceData: datahub.data.generateTimeSeries()
     }
 
     dataMulti.barData.forEach(function(d) {
@@ -480,9 +480,9 @@
     })
 
     var dataMulti = {
-        timestamp: datahub.data.generateTimestamps(12, 1, '2016-01-01', 'month', 1),
-        barData: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1),
-        referenceData: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1)
+        timestamp: datahub.data.generateTimestamps(),
+        barData: datahub.data.generateTimeSeries(),
+        referenceData: datahub.data.generateTimeSeries()
     }
 
     dataMulti.barData.forEach(function(d) {
@@ -503,8 +503,8 @@
     .on('hover', function(d) { console.log(d) })
 
     var dataMulti = {
-        timestamp: datahub.data.generateTimestamps(12, 1, '2016-01-01', 'month', 1),
-        barData: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1)
+        timestamp: datahub.data.generateTimestamps(),
+        barData: datahub.data.generateTimeSeries()
     }
 
     dataMulti.barData.map(function(d) {
@@ -522,8 +522,8 @@
     })
 
     var dataMulti = {
-        timestamp: datahub.data.generateTimestamps(12, 1, '2016-01-01', 'month', 1),
-        barData: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1)
+        timestamp: datahub.data.generateTimestamps(),
+        barData: datahub.data.generateTimeSeries()
     }
 
     var container = document.querySelector('.domain-bar-chart')
@@ -535,8 +535,8 @@
     })
 
     var dataMulti = {
-        timestamp: datahub.data.generateTimestamps(12, 1, '2016-01-01', 'month', 1),
-        stackedBarData: datahub.data.generateTimeSeries(12, 3, '2016-01-01', 'month', 1)
+        timestamp: datahub.data.generateTimestamps(),
+        stackedBarData: datahub.data.generateTimeSeries({layerCount: 3})
     }
 
     var container = document.querySelector('.stacked-bar-chart')
@@ -547,8 +547,8 @@
     })
 
     var dataMulti = {
-        timestamp: datahub.data.generateTimestamps(12, 1, '2016-01-01', 'month', 1),
-        lineData: datahub.data.generateTimeSeries(12, 2, '2016-01-01', 'month', 1)
+        timestamp: datahub.data.generateTimestamps(),
+        lineData: datahub.data.generateTimeSeries({layerCount: 2})
     }
 
     var container = document.querySelector('.multiline-chart')
@@ -559,8 +559,8 @@
     })
 
     var dataMulti = {
-        timestamp: datahub.data.generateTimestamps(12, 1, '2016-01-01', 'month', 1),
-        areaData: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1)
+        timestamp: datahub.data.generateTimestamps(),
+        areaData: datahub.data.generateTimeSeries()
     }
 
     var container = document.querySelector('.area-chart')
@@ -571,8 +571,8 @@
     })
 
     var dataMulti = {
-        timestamp: datahub.data.generateTimestamps(12, 1, '2016-01-01', 'month', 1),
-        stackedAreaData: datahub.data.generateTimeSeries(12, 3, '2016-01-01', 'month', 1)
+        timestamp: datahub.data.generateTimestamps(),
+        stackedAreaData: datahub.data.generateTimeSeries({layerCount: 3})
     }
 
     var container = document.querySelector('.stacked-area-chart')
@@ -583,16 +583,18 @@
     })
 
     var dataMulti = {
-        timestamp: datahub.data.generateTimestamps(12, 1, '2016-01-01', 'month', 1),
-        barData: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1),
-        stackedBarData: datahub.data.generateTimeSeries(8, 3, '2016-01-01', 'month', 1),
-        estimateData: datahub.data.generateTimeSeries(4, 1, '2016-09-01', 'month', 1),
-        lineData: datahub.data.generateTimeSeries(12, 2, '2016-01-01', 'month', 1),
-        areaData: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1),
-        stackedAreaData: datahub.data.generateTimeSeries(12, 3, '2016-01-01', 'month', 1),
-        referenceData: datahub.data.generateTimeSeries(8, 1, '2016-01-01', 'month', 1),
-        thresholdData: datahub.data.generateTimeSeries(1, 1, '2016-01-01', 'month', 12)
+        timestamp: datahub.data.generateTimestamps(),
+        barData: datahub.data.generateTimeSeries(),
+        stackedBarData: datahub.data.generateTimeSeries({count: 8, layerCount: 3}),
+        estimateData: datahub.data.generateTimeSeries({count: 4, timeStart: '2016-09-01'}),
+        lineData: datahub.data.generateTimeSeries({layerCount: 2}),
+        areaData: datahub.data.generateTimeSeries(),
+        stackedAreaData: datahub.data.generateTimeSeries({layerCount: 3}),
+        referenceData: datahub.data.generateTimeSeries({count: 8}),
+        thresholdData: datahub.data.generateTimeSeries({count: 1, step: 12})
     }
+
+    console.log(dataMulti)
 
     var container = document.querySelector('.multi-chart')
     datahub.chart.multi({
@@ -615,8 +617,8 @@
     .setConfig({chartTitle: 'Title2'})
 
     var dataMulti = {
-        timestamp: datahub.data.generateTimestamps(12, 1, '2016-01-01', 'month', 1),
-        barData: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1)
+        timestamp: datahub.data.generateTimestamps(),
+        barData: datahub.data.generateTimeSeries()
     }
 
     var container = document.querySelector('.data-change')
@@ -627,8 +629,8 @@
 
     function setData() {
         var dataMulti = {
-            timestamp: datahub.data.generateTimestamps(12, 1, '2016-01-01', 'month', 1),
-            barData: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1)
+            timestamp: datahub.data.generateTimestamps(),
+            barData: datahub.data.generateTimeSeries()
         }
         chart.setData(dataMulti)
     }
@@ -636,8 +638,8 @@
     setInterval(setData, 1000)
 
     var dataMulti = {
-        timestamp: datahub.data.generateTimestamps(12, 1, '2016-01-01', 'month', 1),
-        barData: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1)
+        timestamp: datahub.data.generateTimestamps(),
+        barData: datahub.data.generateTimeSeries()
     }
 
     var container = document.querySelector('.data-empty')
@@ -648,15 +650,15 @@
     .setData(dataMulti)
 
     var dataMulti = {
-        timestamp: datahub.data.generateTimestamps(12, 1, '2016-01-01', 'month', 1),
+        timestamp: datahub.data.generateTimestamps(),
         barData: null
     }
     chart2.setData(dataMulti)
 
     var dataMulti = {
-        timestamp: datahub.data.generateTimestamps(12, 1, '2016-01-01', 'month', 1),
-        stackedBarData: datahub.data.generateTimeSeries(8, 3, '2016-01-01', 'month', 1),
-        estimateData: datahub.data.generateTimeSeries(4, 1, '2016-09-01', 'month', 1)
+        timestamp: datahub.data.generateTimestamps(),
+        stackedBarData: datahub.data.generateTimeSeries({count: 8, layerCount: 3}),
+        estimateData: datahub.data.generateTimeSeries({timeStart: '2016-09-01', count: 4, layerCount: 1})
     }
 
     var container = document.querySelector('.chart-types')
@@ -667,10 +669,10 @@
     })
 
     var dataMulti = {
-        timestamp: datahub.data.generateTimestamps(12, 1, '2016-01-01', 'month', 1),
-        barData: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1),
-        referenceData: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1),
-        thresholdData: datahub.data.generateTimeSeries(1, 1, '2016-01-01', 'month', 12)
+        timestamp: datahub.data.generateTimestamps(),
+        barData: datahub.data.generateTimeSeries(),
+        referenceData: datahub.data.generateTimeSeries(),
+        thresholdData: datahub.data.generateTimeSeries({count: 1, step: 12})
     }
 
     var container = document.querySelector('.chart-features')
@@ -687,8 +689,8 @@
     })
 
     var dataMulti = {
-        timestamp: datahub.data.generateTimestamps(12, 1, '2016-01-01', 'month', 1),
-        barData: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1),
+        timestamp: datahub.data.generateTimestamps(),
+        barData: datahub.data.generateTimeSeries(),
     }
 
     var container = document.querySelector('.chart-dummy')
@@ -699,8 +701,8 @@
     })
 
     var dataMulti = {
-        timestamp: datahub.data.generateTimestamps(12, 1, '2016-01-01', 'month', 1),
-        stackedAreaData: datahub.data.generateTimeSeries(12, 3, '2016-01-01', 'month', 1)
+        timestamp: datahub.data.generateTimestamps(),
+        stackedAreaData: datahub.data.generateTimeSeries({count: 12, layerCount: 3})
     }
 
     dataMulti.stackedAreaData[10].value = dataMulti.stackedAreaData[10].value.slice(0, 2)
@@ -712,9 +714,9 @@
     .setData(dataMulti)
 
     var dataMulti = {
-        timestamp: datahub.data.generateTimestamps(12, 1, '2016-01-01', 'month', 1),
-        lineData: datahub.data.generateTimeSeries(12, 3, '2016-01-01', 'month', 1),
-        areaData: datahub.data.generateTimeSeries(12, 3, '2016-01-01', 'month', 1)
+        timestamp: datahub.data.generateTimestamps(),
+        lineData: datahub.data.generateTimeSeries({count: 12, layerCount: 3}),
+        areaData: datahub.data.generateTimeSeries({count: 12, layerCount: 3})
     }
 
     dataMulti.lineData.forEach(function(d) {
@@ -735,9 +737,9 @@
     .setData(dataMulti)
 
     var dataMulti = {
-        timestamp: datahub.data.generateTimestamps(12, 1, '2016-01-01', 'month', 1),
-        lineData: datahub.data.generateTimeSeries(1, 3, '2016-05-01', 'month', 1),
-        areaData: datahub.data.generateTimeSeries(1, 1, '2016-05-01', 'month', 1)
+        timestamp: datahub.data.generateTimestamps(),
+        lineData: datahub.data.generateTimeSeries({count: 1, layerCount: 3}),
+        areaData: datahub.data.generateTimeSeries({count: 1, layerCount: 1})
     }
 
     datahub.chart.multi({
@@ -746,8 +748,8 @@
     .setData(dataMulti)
 
     var dataMulti = {
-        timestamp: datahub.data.generateTimestamps(12, 1, '2016-01-01', 'month', 1),
-        lineData: datahub.data.generateTimeSeries(12, 2, '2016-01-01', 'month', 1)
+        timestamp: datahub.data.generateTimestamps(),
+        lineData: datahub.data.generateTimeSeries({count: 12, layerCount: 2})
     }
 
     var sliderChartContainer = document.querySelector('.slider-chart')

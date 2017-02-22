@@ -2,10 +2,10 @@ var expect = chai.expect;
 
 describe('Data', function() {
 
-    it('should generate valid data', function() {
+    it('should generate valid data with default config', function() {
         var dataMulti = {
-            timestamp: datahub.data.generateTimestamps(12, 1, '2016-01-01', 'month', 1),
-            barData: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1)
+            timestamp: datahub.data.generateTimestamps(),
+            barData: datahub.data.generateTimeSeries()
         }
 
         expect(dataMulti.timestamp.length).to.equal(12)
@@ -17,8 +17,8 @@ describe('Data', function() {
     it('should generate the right number of data points', function() {
         var pointCount = 2
         var dataMulti = {
-            timestamp: datahub.data.generateTimestamps(pointCount, 1, '2016-01-01', 'month', 1),
-            barData: datahub.data.generateTimeSeries(pointCount, 1, '2016-01-01', 'month', 1)
+            timestamp: datahub.data.generateTimestamps({count: pointCount}),
+            barData: datahub.data.generateTimeSeries({count: pointCount})
         }
 
         expect(dataMulti.timestamp.length).to.equal(pointCount)
@@ -27,7 +27,7 @@ describe('Data', function() {
 
     it('should generate dates as iso strings', function() {
         var dataMulti = {
-            timestamp: datahub.data.generateTimestamps(1, 1, '2016-01-01', 'month', 1)
+            timestamp: datahub.data.generateTimestamps()
         }
 
         expect(dataMulti.timestamp[0]).to.equal('2016-01-01T00:00:00.000Z')
@@ -35,8 +35,8 @@ describe('Data', function() {
 
     it('should generate optional ids and classNames', function() {
         var dataMulti = {
-            timestamp: datahub.data.generateTimestamps(12, 1, '2016-01-01', 'month', 1),
-            barData: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1)
+            timestamp: datahub.data.generateTimestamps(),
+            barData: datahub.data.generateTimeSeries()
         }
 
         expect(dataMulti.barData[0].id).to.be.instanceof(Array)
@@ -45,8 +45,8 @@ describe('Data', function() {
 
     it('can change resolution and increment', function() {
         var dataMulti = {
-            timestamp: datahub.data.generateTimestamps(2, 1, '2016-01-01', 'hour', 2),
-            barData: datahub.data.generateTimeSeries(2, 1, '2016-01-01', 'hour', 2)
+            timestamp: datahub.data.generateTimestamps({count: 2, step: 2, timeIncrement: 'hour'}),
+            barData: datahub.data.generateTimeSeries({count: 2, step: 2, timeIncrement: 'hour'})
         }
 
         var delta = new Date(dataMulti.timestamp[1]).getTime() - new Date(dataMulti.timestamp[0]).getTime()
@@ -57,8 +57,8 @@ describe('Data', function() {
 
     it('should include start date', function() {
         var dataMulti = {
-            timestamp: datahub.data.generateTimestamps(12, 1, '2016-01-01', 'month', 1),
-            barData: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1)
+            timestamp: datahub.data.generateTimestamps(),
+            barData: datahub.data.generateTimeSeries()
         }
 
         expect(dataMulti.timestamp[0]).to.equal('2016-01-01T00:00:00.000Z')
@@ -68,8 +68,8 @@ describe('Data', function() {
 
     it('should generate multiple layers when needed', function() {
         var dataMulti = {
-            timestamp: datahub.data.generateTimestamps(12, 1, '2016-01-01', 'month', 1),
-            stackedBarData: datahub.data.generateTimeSeries(12, 4, '2016-01-01', 'month', 1)
+            timestamp: datahub.data.generateTimestamps(),
+            stackedBarData: datahub.data.generateTimeSeries({count: 12, layerCount: 4})
         }
 
         expect(dataMulti.stackedBarData[0].value).to.be.instanceof(Array)

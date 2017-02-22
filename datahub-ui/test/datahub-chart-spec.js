@@ -67,8 +67,8 @@ describe('Chart', function() {
 
         it('should have stripes and bars when passed data', function() {
             var dataMulti = {
-                timestamp: datahub.data.generateTimestamps(12, 1, '2016-01-01', 'month', 1),
-                barData: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1)
+                timestamp: datahub.data.generateTimestamps(),
+                barData: datahub.data.generateTimeSeries()
             }
             chart = datahub.chart.multi({
                 parent: container,
@@ -84,8 +84,8 @@ describe('Chart', function() {
 
         it('should expose mousemove events', function(done) {
             var dataMulti = {
-                timestamp: datahub.data.generateTimestamps(12, 1, '2016-01-01', 'month', 1),
-                barData: datahub.data.generateTimeSeries(12, 1, '2016-01-01', 'month', 1)
+                timestamp: datahub.data.generateTimestamps(),
+                barData: datahub.data.generateTimeSeries()
             }
             chart = datahub.chart.multi({
                 parent: container,

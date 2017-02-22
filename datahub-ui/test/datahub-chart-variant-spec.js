@@ -20,8 +20,8 @@ describe('Chart variants', function() {
             var layerCount = 3
             var stackCount = 2
             var dataMulti = {
-                timestamp: datahub.data.generateTimestamps(2, 1, '2016-01-01', 'month', 1),
-                stackedBarData: datahub.data.generateTimeSeries(stackCount, layerCount, '2016-01-01', 'month', 1)
+                timestamp: datahub.data.generateTimestamps({count: stackCount}),
+                stackedBarData: datahub.data.generateTimeSeries({count: stackCount, layerCount: layerCount})
             }
 
             chart = datahub.chart.multi({
@@ -38,8 +38,8 @@ describe('Chart variants', function() {
             var layerCount = 3
             var stackCount = 2
             var dataMulti = {
-                timestamp: datahub.data.generateTimestamps(2, 1, '2016-01-01', 'month', 1),
-                stackedBarData: datahub.data.generateTimeSeries(stackCount, layerCount, '2016-01-01', 'month', 1)
+                timestamp: datahub.data.generateTimestamps({count: stackCount}),
+                stackedBarData: datahub.data.generateTimeSeries({count: stackCount, layerCount: layerCount})
             }
 
             chart = datahub.chart.multi({
@@ -58,8 +58,8 @@ describe('Chart variants', function() {
         it('should provide the right data to mousemove events', function(done) {
             var layerCount = 3
             var dataMulti = {
-                timestamp: datahub.data.generateTimestamps(12, 1, '2016-01-01', 'month', 1),
-                stackedBarData: datahub.data.generateTimeSeries(12, layerCount, '2016-01-01', 'month', 1)
+                timestamp: datahub.data.generateTimestamps(),
+                stackedBarData: datahub.data.generateTimeSeries({layerCount: layerCount})
             }
             chart = datahub.chart.multi({
                 parent: container,
@@ -97,10 +97,9 @@ describe('Chart variants', function() {
         })
 
         it('should render an area chart', function() {
-            var pointCount = 12
             var dataMulti = {
-                timestamp: datahub.data.generateTimestamps(pointCount, 1, '2016-01-01', 'month', 1),
-                areaData: datahub.data.generateTimeSeries(pointCount, 1, '2016-01-01', 'month', 1)
+                timestamp: datahub.data.generateTimestamps(),
+                areaData: datahub.data.generateTimeSeries()
             }
 
             chart = datahub.chart.multi({
@@ -116,8 +115,8 @@ describe('Chart variants', function() {
         it('should render the right number of layers on stacked area chart', function() {
             var layerCount = 3
             var dataMulti = {
-                timestamp: datahub.data.generateTimestamps(2, 1, '2016-01-01', 'month', 1),
-                stackedAreaData: datahub.data.generateTimeSeries(2, layerCount, '2016-01-01', 'month', 1)
+                timestamp: datahub.data.generateTimestamps(),
+                stackedAreaData: datahub.data.generateTimeSeries({layerCount: layerCount})
             }
 
             chart = datahub.chart.multi({
@@ -132,8 +131,8 @@ describe('Chart variants', function() {
 
         it('should show gaps with dots on line chart', function() {
             var dataMulti = {
-                timestamp: datahub.data.generateTimestamps(12, 1, '2016-01-01', 'month', 1),
-                lineData: datahub.data.generateTimeSeries(12, 3, '2016-01-01', 'month', 1)
+                timestamp: datahub.data.generateTimestamps(),
+                lineData: datahub.data.generateTimeSeries({layerCount: 3})
             }
 
             dataMulti.lineData.forEach(function(d) {
@@ -168,11 +167,11 @@ describe('Chart variants', function() {
         })
 
         it('should render various bar chart variants', function() {
-            var pointCount = 12
+            var pointCount = 2
             var dataMulti = {
-                timestamp: datahub.data.generateTimestamps(pointCount, 1, '2016-01-01', 'month', 1),
-                estimateData: datahub.data.generateTimeSeries(pointCount, 1, '2016-09-01', 'month', 1),
-                referenceData: datahub.data.generateTimeSeries(pointCount, 1, '2016-01-01', 'month', 1)
+                timestamp: datahub.data.generateTimestamps({count: pointCount}),
+                estimateData: datahub.data.generateTimeSeries({count: pointCount}),
+                referenceData: datahub.data.generateTimeSeries({count: pointCount})
             }
 
             chart = datahub.chart.multi({
@@ -188,10 +187,9 @@ describe('Chart variants', function() {
         })
 
         it('should render ine chart variants', function() {
-            var pointCount = 12
             var dataMulti = {
-                timestamp: datahub.data.generateTimestamps(pointCount, 1, '2016-01-01', 'month', 1),
-                thresholdData: datahub.data.generateTimeSeries(1, 1, '2016-01-01', 'month', 12)
+                timestamp: datahub.data.generateTimestamps(),
+                thresholdData: datahub.data.generateTimeSeries({count: 1, step: 12})
             }
 
             chart = datahub.chart.multi({
