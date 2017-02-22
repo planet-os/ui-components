@@ -503,15 +503,39 @@
             + '</div>'
         var parentNode = utils.appendHtmlToNode(template, config.parent)
         var parent = d3.select(parentNode)
-            .on('mouseout', close)
         var elementsContainer = parent.select('.elements')
-            .on('mouseover', open)
+
+            // .on('mouseover', open)
         var elementsUpdate
 
         var events = d3.dispatch('change')
 
         parent.select('.title').html(config.title)
-        var selectedElement = parent.on('mouseover', open).select('.selected-element')
+        var selectedElement = parent
+            .on('mouseover', function() {
+                var isTouchDevice = 'ontouchstart' in document.documentElement
+                var isOpen = elementsContainer.classed('active')
+                if(!isOpen && !isTouchDevice) {
+                    open()
+                }
+            })
+            .on('mouseout', function() {
+                var isOpen = elementsContainer.classed('active')
+                if(isOpen) {
+                    close()
+                }
+            })
+            .select('.top')
+            .on('click', function() {
+                var isOpen = elementsContainer.classed('active')
+                if(isOpen) {
+                    close()
+                }
+                else {
+                    open()
+                }
+            })
+            .select('.selected-element')
 
         function setSelected(label) {
             selectedElement.html(label)
