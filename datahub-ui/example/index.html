@@ -444,7 +444,7 @@
 
     var dataMulti = {
         timestamp: datahub.data.generateTimestamps(),
-        barData: datahub.data.generateTimeSeries()
+        barData: datahub.data.generateTimeSeries({min: 100, max: 10000})
     }
 
     var container = document.querySelector('.bar-chart')

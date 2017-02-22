@@ -55,6 +55,18 @@ describe('Data', function() {
         expect(deltaHour).to.equal(2)
     })
 
+    it('should generate data between min and max', function() {
+        var min = 1000
+        var max = 10000
+        var data = datahub.data.generateTimeSeries({count: 10, min: min, max: max})
+        var values = data.map(function(d) {
+            return d.value[0]
+        })
+
+        expect(d3.min(values)).to.be.at.least(min)
+        expect(d3.max(values)).to.be.at.most(max)
+    })
+
     it('should include start date', function() {
         var dataMulti = {
             timestamp: datahub.data.generateTimestamps(),

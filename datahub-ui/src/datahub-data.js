@@ -118,14 +118,16 @@
             layerCount: _config.layerCount || 1,
             timeStart: _config.timeStart || '2016-01-01',
             timeIncrement: _config.timeIncrement || 'month',
-            step: _config.step || 1
+            step: _config.step || 1,
+            min: _config.min || 0,
+            max: _config.max || 100
         }
 
-        var startValue = ~~(Math.random() * 100)
+        var startValue = ~~(Math.random() * (config.max - config.min)) + config.min
         var values = generateArray(config.count, function() {
             return generateArray(config.layerCount, function(d) {
-                startValue += (Math.random() * 2 - 1) * 10
-                startValue = Math.max(startValue, 0)
+                startValue += (Math.random() * 2 - 1) * ((config.max - config.min) / 10)
+                startValue = Math.max(startValue, config.min)
                 return startValue
             })
         })
@@ -151,12 +153,12 @@
             layerCount: _config.layerCount || 1,
             timeStart: _config.timeStart || '2016-01-01',
             timeIncrement: _config.timeIncrement || 'month',
-            step: _config.step || 1
+            step: _config.step || 1,
+            min: _config.min || 0,
+            max: _config.max || 100
         }
 
         var intervalFuncName = 'utc' + capitalize(config.timeIncrement) || 'utcHour'
-        // var step = _step || 3
-        // var n = _n || 36
         var intervalFunc = d3[intervalFuncName]
         var intervalRangeFunc = d3[intervalFuncName + 's']
 
