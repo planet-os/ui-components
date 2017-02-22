@@ -81,6 +81,12 @@
         width: 200px;
         text-align: center;
     }
+
+    .datahub-chart text tspan:nth-child(even),
+    .datahub-table-chart text tspan:nth-child(even) {
+        fill: white;
+        font-size: 12px;
+    }
     </style>
 </head>
 
@@ -123,6 +129,14 @@
         </div>
         <div class="col-xs-12 col-md-5">
             <div class="description">A bar chart can force a Y domain.</div>
+        </div>
+    </div>
+    <div class="row section">
+        <div class="col-xs-12 col-md-7">
+            <div class="formatted-bar-chart"></div>
+        </div>
+        <div class="col-xs-12 col-md-5">
+            <div class="description">A bar chart Y labels can be formatted.</div>
         </div>
     </div>
     <div class="row section">
@@ -536,6 +550,29 @@
 
     var dataMulti = {
         timestamp: datahub.data.generateTimestamps(),
+        stackedBarData: datahub.data.generateTimeSeries({min: 1000, max: 10000})
+    }    
+
+    var container = document.querySelector('.formatted-bar-chart')
+    datahub.chart.multi({
+        parent: container,
+        width: container.clientWidth,
+        data: dataMulti,
+        labelsRewriterY: function(d, i) {
+            var label = this.textContent
+            var match = label.match(/[a-zA-Z]/)
+            if(match){
+                var idx = match.index
+                return '<tspan>' + label.slice(0, idx) + '</tspan><tspan dx="0.1em">' + label.slice(idx) + '</tspan>'
+            }
+            else {
+                return label
+            }
+        }
+    })
+
+    var dataMulti = {
+        timestamp: datahub.data.generateTimestamps(),
         stackedBarData: datahub.data.generateTimeSeries({layerCount: 3})
     }
 
@@ -827,7 +864,18 @@
             ],
             valueKey: 'actual',
             referenceKey: 'plan',
-            domain: [-40, 160],
+            domain: [-160, 160],
+            labelsRewriterX: function(d, i) {
+                var label = this.textContent
+                var match = label.match(/[a-zA-Z]/)
+                if(match){
+                    var idx = match.index
+                    return '<tspan>' + label.slice(0, idx) + '</tspan><tspan dx="0.1em">' + label.slice(idx) + '</tspan>'
+                }
+                else {
+                    return label
+                }
+            },
             sortFunc: function(a, b) {
                 var forceTop = 'zzz'
                 var matchA = a.filter(function(d) {

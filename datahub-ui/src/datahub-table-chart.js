@@ -399,6 +399,17 @@
         return {}
     }
 
+    var labelsRewriterX = function(config) {
+        if(!config.labelsRewriterX) {
+            return {}
+        }
+        config.container.selectAll('.axis')
+            .selectAll('text')
+            .html(config.labelsRewriterX)
+
+        return {}
+    }
+
     var multi = utils.pipeline(
         template,
         sort,
@@ -408,6 +419,7 @@
         stripes,
         verticalLines,
         axisX,
+        labelsRewriterX,
         bars
     )
 

@@ -30,6 +30,11 @@ body {
     font-size: 14px;
 }
 
+.datahub-chart text tspan:nth-child(even),
+.datahub-table-chart text tspan:nth-child(even) {
+    font-weight: 300;
+}
+
 .datahub-chart .message-group text,
 .datahub-table-chart .message-group text {
     fill: #F6A623;

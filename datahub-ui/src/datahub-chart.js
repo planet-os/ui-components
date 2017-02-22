@@ -812,6 +812,7 @@
         dotShapes,
         thresholdLineShape,
         common.axisComponentY,
+        common.labelsRewriterY,
         common.message,
         common.axisComponentX,
         common.axisTitleComponentX,

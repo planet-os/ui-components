@@ -326,6 +326,17 @@
         return {}
     }
 
+    var labelsRewriterY = function(config) {
+        if(!config.labelsRewriterY) {
+            return {}
+        }
+        config.container.selectAll('g.axis.y')
+            .selectAll('text')
+            .html(config.labelsRewriterY)
+
+        return {}
+    }
+
     exports.common = {
         axesFormatAutoconfig: axesFormatAutoconfig,
         defaultConfig: defaultConfig,
@@ -345,7 +356,8 @@
         axisXFormatterTime: axisXFormatterTime,
         axisXFormatterTimeHour: axisXFormatterTimeHour,
         axisXFormatterRotate30: axisXFormatterRotate30,
-        axisYFormatSI: axisYFormatSI
+        axisYFormatSI: axisYFormatSI,
+        labelsRewriterY: labelsRewriterY
     }
 
 }))
