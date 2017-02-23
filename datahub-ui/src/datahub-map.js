@@ -369,7 +369,8 @@
             basemapName: _config.basemapName || 'basemapDark',
             imagePath: _config.imagePath || 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.2/images/',
             showLabels: !(_config.showLabels === false),
-            showTooltip: !(_config.showTooltip === false)
+            showTooltip: !(_config.showTooltip === false),
+            polygonTooltipFunc: _config.polygonTooltipFunc
         }
 
         var mapConfig = {
@@ -568,18 +569,23 @@
             }
 
             geojsonLayer = L.geoJson(polygon, {
-                onEachFeature: onEachFeature,
-                pointToLayer: function(feature, latlng) {
-                    return new L.CircleMarker(latlng, {
-                        radius: 4,
-                        fillColor: '#05A5DE',
-                        color: '#1E1E1E',
-                        weight: 1,
-                        opacity: 0.5,
-                        fillOpacity: 0.4
-                    })
-                }
-            }).addTo(map)
+                    onEachFeature: onEachFeature,
+                    pointToLayer: function(feature, latlng) {
+                        return new L.CircleMarker(latlng, {
+                            radius: 4,
+                            fillColor: '#05A5DE',
+                            color: '#1E1E1E',
+                            weight: 1,
+                            opacity: 0.5,
+                            fillOpacity: 0.4
+                        })
+                    }
+                })
+                .addTo(map)
+
+            if(config.polygonTooltipFunc) {
+                geojsonLayer.bindTooltip(config.polygonTooltipFunc)
+            }
 
             return this
         }
@@ -658,7 +664,7 @@
             renderVectorMap: renderVectorMap,
             isVisible: states.isVisible,
             hideZoomControl: hideZoomControl,
-            events: events,
+            on: utils.rebind(events),
             _getMap: function() {
                 return map
             }
