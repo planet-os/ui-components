@@ -372,29 +372,29 @@
         var events = d3.dispatch('change')
 
         function changeYear() {
-            var dateFormats = getDateFormats()
-            events.call('change', null, dateFormats)
-
             selectYear.text(configCache.year)
         }
 
         function changeMonth() {
-            var dateFormats = getDateFormats()
-            events.call('change', null, dateFormats)
-
             monthsUpdate.classed('active', function(d) {
                 return d === configCache.month
             })
+        }
+
+        function sendChangeEvent() {
+            events.call('change', null, getDateFormats())
         }
 
         var selectYear = parent.select('.selected-year').text(configCache.year)
         parent.select('.prev-year').on('click', function(d) {
             configCache.year -= 1
             changeYear()
+            sendChangeEvent()
         })
         parent.select('.next-year').on('click', function(d) {
             configCache.year += 1
             changeYear()
+            sendChangeEvent()
         })
 
         var months = parent.select('.month-selector').selectAll('.element')
@@ -412,6 +412,7 @@
 
                 configCache.month = d
                 changeMonth()
+                sendChangeEvent()
             })
             .merge(months)
             .classed('active', function(d) {
@@ -427,6 +428,7 @@
         } else {
             setDate(config.defaultDate || new Date())
         }
+        sendChangeEvent()
 
         function getDateFormats() {
             return {
@@ -479,6 +481,10 @@
             changeMonth()
         }
 
+        function destroy() {
+            config.parent.innerHTML = null
+        }
+
         return {
             on: utils.rebind(events),
             getDateFormats: getDateFormats,
@@ -489,7 +495,8 @@
             setMonth: setMonth,
             setYear: setYear,
             getMonthNames: getMonthNames,
-            setMonthNumber: setMonthNumber
+            setMonthNumber: setMonthNumber,
+            destroy: destroy
         }
     }
 
