@@ -107,7 +107,7 @@
 
     var scaleX = function(config) {
         var dataX = config.dataIsEmpty ? 0 : config.data.timestamp
-        var scaleX = d3.scaleBand().domain(dataX).rangeRound([0, config.chartWidth])
+        var scaleX = d3.scaleBand().domain(dataX).range([0, config.chartWidth])
             .paddingInner(0.4).paddingOuter(0.2)
         var referenceScaleX = scaleX.copy().paddingInner(0.1).paddingOuter(0.05)
         var stripeScaleX = scaleX.copy().paddingInner(0).paddingOuter(0)
@@ -717,6 +717,11 @@
     }
 
     var stripes = function(config) {
+        if(config.showStripes === false) {
+            config.container.select('.stripe-group')
+                .selectAll('rect.stripe').remove()
+            return {}
+        }
         var shapes = config.container.select('.stripe-group')
             .selectAll('rect.stripe')
             .data(config.data.timestamp)
