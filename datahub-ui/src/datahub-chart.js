@@ -278,11 +278,10 @@
                 })
             })
             .on('mouseout', function(d) {
-                if(config.dataIsEmpty) {
-                    return
-                }
-
                 config.events.call('mouseout', null, {})
+            })
+            .on('click', function(d) {
+                config.events.call('click', null, {event: d3.event})
             })
 
         return {
@@ -828,7 +827,7 @@
 
     var multiChart = function(config) {
         var configCache,
-            events = d3.dispatch('hover', 'mouseout', 'active'),
+            events = d3.dispatch('hover', 'click', 'mouseout', 'active'),
             chartCache,
             uid = ~~(Math.random()*10000)
 

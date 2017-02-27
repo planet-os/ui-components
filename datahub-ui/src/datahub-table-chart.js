@@ -302,19 +302,22 @@
     }
 
     var eventsPanel = function(config) {
-        var eventPanel = config.container.select('.events')
-            .selectAll('rect.event-panel')
-            .data([0])
-        eventPanel.enter().append('rect')
-            .attr('class', 'event-panel')
-            .merge(eventPanel)
-            .on('mousemove', function(d) {
-                config.events.call('hover', null, {})
-            })
-        eventPanel.exit().remove()
-        return {
-            eventPanel: eventPanel
-        }
+        config.container.on('click', function() {
+            config.events.call('click', null, {event: d3.event})
+        })
+
+        // var eventPanel = config.container.select('.events')
+        //     .selectAll('rect.event-panel')
+        //     .data([0])
+        // eventPanel.enter().append('rect')
+        //     .attr('class', 'event-panel')
+        //     .merge(eventPanel)
+        //     .on('mousemove', function(d) {
+        //         config.events.call('barHover', null, {})
+        //         console.log(111)
+        //     })
+        // eventPanel.exit().remove()
+        return {}
     }
 
     var stripes = function(config) {
@@ -416,6 +419,7 @@
         header,
         body,
         scaleX,
+        eventsPanel,
         stripes,
         verticalLines,
         axisX,
@@ -425,7 +429,7 @@
 
     var tableChart = function(config) {
         var configCache,
-            events = d3.dispatch('barHover'),
+            events = d3.dispatch('click'),
             chartCache,
             uid = ~~(Math.random()*10000)
 
