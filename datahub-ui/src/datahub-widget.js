@@ -369,20 +369,27 @@
             year: (new Date()).getFullYear()
         }
 
-        var events = d3.dispatch('change')
+        var events = d3.dispatch('change', 'update')
 
         function changeYear() {
             selectYear.text(configCache.year)
+            sendUpdateEvent()
         }
 
         function changeMonth() {
             monthsUpdate.classed('active', function(d) {
                 return d === configCache.month
             })
+            sendUpdateEvent()
         }
 
         function sendChangeEvent() {
             events.call('change', null, getDateFormats())
+            sendUpdateEvent()
+        }
+
+        function sendUpdateEvent() {
+            events.call('update', null, getDateFormats())
         }
 
         var selectYear = parent.select('.selected-year').text(configCache.year)
@@ -460,16 +467,19 @@
             }
             changeYear()
             changeMonth()
+            return this
         }
 
         function setMonth(month) {
             configCache.month = month
             changeMonth()
+            return this
         }
 
         function setYear(year) {
             configCache.year = year
             changeYear()
+            return this
         }
 
         function getMonthNames() {
@@ -479,6 +489,7 @@
         function setMonthNumber(monthNumber) {
             configCache.month = monthNames[monthNumber]
             changeMonth()
+            return this
         }
 
         function destroy() {
@@ -635,8 +646,10 @@
                 defaultMonth: config.defaultMonth
             })
             .on('change', function(d) {
-                menu.setSelected(d.formatted)
                 events.call('change', null, d)
+            })
+            .on('update', function(d) {
+                menu.setSelected(d.formatted)
             })
 
         menu.setSelected(monthCalendar.getFormattedDate())

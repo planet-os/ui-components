@@ -32,8 +32,8 @@
 
         var container = d3.select(containerNode)
         var chartContainer = container.select('.chart-container')
-        var chartWidth = chartContainer.node().clientWidth
-        var chartHeight = chartContainer.node().clientHeight || 300
+        var chartWidth = config.width || chartContainer.node().clientWidth
+        var chartHeight = config.height || chartContainer.node().clientHeight || 300
         var isConnected = ['closed', 'new']
 
         return {
