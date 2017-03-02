@@ -257,7 +257,7 @@
 
     var eventsPanel = function(config) {
         var eventPanel = config.container.select('.events .event-panel')
-            .on('mousemove', function(d) {
+            .on('mousemove touchstart', function(d) {
                 if(config.dataIsEmpty) {
                     return
                 }
