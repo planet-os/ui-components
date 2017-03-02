@@ -559,14 +559,21 @@
         width: container.clientWidth,
         data: dataMulti,
         labelsRewriterY: function(d, i) {
-            var label = this.textContent
-            var match = label.match(/[a-zA-Z]/)
+            var locale = d3.formatDefaultLocale({
+                "decimal": ",",
+                "thousands": "",
+                "grouping": [3],
+                "currency": ["€", ""]
+            })
+            var formattedValue = d3.formatPrefix('.1', d)(d)
+
+            var match = formattedValue.match(/[a-zA-Z]/)
             if(match){
                 var idx = match.index
-                return '<tspan>' + label.slice(0, idx) + '</tspan><tspan dx="0.1em">' + label.slice(idx) + '</tspan>'
+                return '<tspan>' + formattedValue.slice(0, idx) + '</tspan><tspan dx="0.1em">' + formattedValue.slice(idx) + '</tspan>'
             }
             else {
-                return label
+                return formattedValue
             }
         }
     })
