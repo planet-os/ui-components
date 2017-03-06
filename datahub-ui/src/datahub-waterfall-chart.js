@@ -28,21 +28,25 @@
             containerNode = utils.appendHtmlToNode(template, config.parent)
         }
 
-        var dataIsEmpty = !(config.elements && config.elements.length)
+        var infoIsEmpty = !(config.elements && config.elements.length)
+        var dataIsEmpty = !(!infoIsEmpty && config.elements[0].value)
 
         var container = d3.select(containerNode)
         var chartContainer = container.select('.chart-container')
         var chartWidth = config.width || chartContainer.node().clientWidth
         var chartHeight = config.height || chartContainer.node().clientHeight || 300
-        var isConnected = ['closed', 'new']
+        var isConnected = [1, 3]
+        var isNegative = [1]
 
         return {
             container: container,
             chartWidth: chartWidth,
             chartHeight: chartHeight,
             dataIsEmpty: dataIsEmpty,
+            infoIsEmpty: infoIsEmpty,
             elements: config.elements || [],
-            isConnected: isConnected
+            isConnected: isConnected,
+            isNegative: isNegative
         }
     }
 
@@ -76,6 +80,13 @@
             .attr('width', config.chartWidth)
             .attr('height', config.chartHeight)
             .select('.panel')
+
+        if(config.dataIsEmpty) {
+            panel.select('.bars')
+                .selectAll('.bar')
+                .remove()
+            return {}
+        }
         
         var bars = panel.select('.bars')
             .selectAll('.bar')
@@ -89,11 +100,11 @@
                 return config.scaleX(i)
             })
             .attr('y', function(d, i) {
-                var isConnected = config.isConnected.indexOf(d.key) > -1
+                var isConnected = config.isConnected.indexOf(i) > -1
                 if(isConnected) {
                     var prevIdx = Math.max(0, i-1)
                     var prev = config.elements[prevIdx]
-                    if(d.value < 0) {
+                    if(config.isNegative.indexOf(i) > -1) {
                         return config.chartHeight - config.scaleY(Math.abs(prev.value))
                     }
                     else {
@@ -116,6 +127,13 @@
     }
 
     var connectors = function(config) {
+        if(config.dataIsEmpty) {
+            config.container.select('.connectors')
+                .selectAll('.connector')
+                .remove()
+            return {}
+        }
+
         var line = config.container.select('.connectors')
             .selectAll('.connector')
             .data(config.elements)
@@ -126,11 +144,11 @@
                 return config.scaleX(i)
             })
             .attr('y1', function(d, i) {
-                var isConnected = config.isConnected.indexOf(d.key) > -1
+                var isConnected = config.isConnected.indexOf(i) > -1
                 if(isConnected) {
                     var prevIdx = Math.max(0, i-1)
                     var prev = config.elements[prevIdx]
-                    if(d.value < 0) {
+                    if(config.isNegative.indexOf(i) > -1) {
                         return config.scaleY(Math.abs(d.value))
                     }
                     else {
@@ -143,11 +161,11 @@
                 return config.scaleX(Math.min(i+1, config.elements.length - 1))
             })
             .attr('y2', function(d, i) {
-                var isConnected = config.isConnected.indexOf(d.key) > -1
+                var isConnected = config.isConnected.indexOf(i) > -1
                 if(isConnected) {
                     var prevIdx = Math.max(0, i-1)
                     var prev = config.elements[prevIdx]
-                    if(d.value < 0) {
+                    if(config.isNegative.indexOf(i) > -1) {
                         return config.chartHeight - config.scaleY(Math.abs(prev.value)) + config.scaleY(Math.abs(d.value))
                     }
                     else {
@@ -204,7 +222,7 @@
             .attr('class', 'value')
             .merge(values)
             .html(function(d) {
-                return Math.round(d.value)
+                return typeof d.value === 'undefined' ? '<div class="error">(Data Unavailable)</div>' : Math.round(d.value)
             })
         values.exit().remove()
         
