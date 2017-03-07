@@ -408,7 +408,9 @@
         }
         config.container.selectAll('.axis')
             .selectAll('text')
-            .html(config.labelsRewriterX)
+            .html(function(d, i) {
+                return config.labelsRewriterX(d, i, config)
+            })
 
         return {}
     }

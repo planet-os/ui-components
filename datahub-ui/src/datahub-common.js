@@ -332,7 +332,9 @@
         }
         config.container.selectAll('g.axis.y')
             .selectAll('text')
-            .html(config.labelsRewriterY)
+            .html(function(d, i) {
+                return config.labelsRewriterY(d, i, config)
+            })
 
         return {}
     }
