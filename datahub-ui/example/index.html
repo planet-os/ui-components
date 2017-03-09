@@ -7,18 +7,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.7/leaflet.draw.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.4.0/d3.js"></script>
     <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
-    <script src="../src/datahub-utils.js"></script>
-    <script src="../src/datahub-palette.js"></script>
-    <script src="../src/datahub-data.js"></script>
-    <script src="../src/datahub-map.js"></script>
-    <script src="../src/datahub-common.js"></script>
-    <script src="../src/datahub-widget.js"></script>
-    <script src="../src/datahub-group.js"></script>
-    <script src="../src/datahub-chart.js"></script>
-    <script src="../src/datahub-table-chart.js"></script>
-    <script src="../src/datahub-vertical-chart.js"></script>
-    <script src="../src/datahub-waterfall-chart.js"></script>
-    <script src="../src/datahub-legend.js"></script>
+    <script src="../dist/datahub.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.2/leaflet.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.7/leaflet.draw.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flexboxgrid/6.3.1/flexboxgrid.min.css" />
@@ -299,16 +288,6 @@
     <div class="row section">
         <div class="col-xs-12 col-md-7">
             <div class="row">
-                <div class="number-group small col-xs"></div>
-            </div>
-        </div>
-        <div class="col-xs-12 col-md-5">
-            <div class="description">Number widgets can be grouped.</div>
-        </div>
-    </div>
-    <div class="row section">
-        <div class="col-xs-12 col-md-7">
-            <div class="row">
                 <div class="table-widget col-xs"></div>
             </div>
         </div>
@@ -462,7 +441,7 @@
     }
 
     var container = document.querySelector('.bar-chart')
-    datahub.chart.multi({
+    datahub.multiChart({
         parent: container,
         width: container.clientWidth,
         data: dataMulti
@@ -487,7 +466,7 @@
     })
 
     var container = document.querySelector('.negative-bar-chart')
-    datahub.chart.multi({
+    datahub.multiChart({
         parent: container,
         width: container.clientWidth,
         data: dataMulti
@@ -508,7 +487,7 @@
     })
 
     var container = document.querySelector('.reverse-bar-chart')
-    datahub.chart.multi({
+    datahub.multiChart({
         parent: container,
         width: container.clientWidth,
         data: dataMulti,
@@ -528,7 +507,7 @@
     })
 
     var container = document.querySelector('.autoscale-bar-chart')
-    datahub.chart.multi({
+    datahub.multiChart({
         parent: container,
         width: container.clientWidth,
         data: dataMulti,
@@ -541,7 +520,7 @@
     }
 
     var container = document.querySelector('.domain-bar-chart')
-    datahub.chart.multi({
+    datahub.multiChart({
         parent: container,
         width: container.clientWidth,
         data: dataMulti,
@@ -554,7 +533,7 @@
     }    
 
     var container = document.querySelector('.formatted-bar-chart')
-    datahub.chart.multi({
+    datahub.multiChart({
         parent: container,
         width: container.clientWidth,
         data: dataMulti,
@@ -584,7 +563,7 @@
     }
 
     var container = document.querySelector('.stacked-bar-chart')
-    datahub.chart.multi({
+    datahub.multiChart({
         parent: container,
         width: container.clientWidth,
         data: dataMulti
@@ -596,7 +575,7 @@
     }
 
     var container = document.querySelector('.multiline-chart')
-    datahub.chart.multi({
+    datahub.multiChart({
         parent: container,
         width: container.clientWidth,
         data: dataMulti
@@ -608,7 +587,7 @@
     }
 
     var container = document.querySelector('.area-chart')
-    datahub.chart.multi({
+    datahub.multiChart({
         parent: container,
         width: container.clientWidth,
         data: dataMulti
@@ -620,7 +599,7 @@
     }
 
     var container = document.querySelector('.stacked-area-chart')
-    datahub.chart.multi({
+    datahub.multiChart({
         parent: container,
         width: container.clientWidth,
         data: dataMulti
@@ -638,10 +617,8 @@
         thresholdData: datahub.data.generateTimeSeries({count: 1, step: 12})
     }
 
-    console.log(dataMulti)
-
     var container = document.querySelector('.multi-chart')
-    datahub.chart.multi({
+    datahub.multiChart({
         parent: container,
         width: container.clientWidth,
         height: 300,
@@ -666,7 +643,7 @@
     }
 
     var container = document.querySelector('.data-change')
-    var chart = datahub.chart.multi({
+    var chart = datahub.multiChart({
         parent: container,
         width: container.clientWidth
     })
@@ -687,7 +664,7 @@
     }
 
     var container = document.querySelector('.data-empty')
-    var chart2 = datahub.chart.multi({
+    var chart2 = datahub.multiChart({
         parent: container,
         width: container.clientWidth
     })
@@ -706,7 +683,7 @@
     }
 
     var container = document.querySelector('.chart-types')
-    datahub.chart.multi({
+    datahub.multiChart({
         parent: container,
         width: container.clientWidth,
         data: dataMulti
@@ -720,14 +697,14 @@
     }
 
     var container = document.querySelector('.chart-features')
-    datahub.chart.multi({
+    datahub.multiChart({
         parent: container,
         width: container.clientWidth,
         data: dataMulti
     })
 
     var container = document.querySelector('.multiline-chart-empty')
-    datahub.chart.multi({
+    datahub.multiChart({
         parent: container,
         width: container.clientWidth
     })
@@ -738,7 +715,7 @@
     }
 
     var container = document.querySelector('.chart-dummy')
-    datahub.chart.multi({
+    datahub.multiChart({
         parent: container,
         width: container.clientWidth,
         data: dataMulti
@@ -752,7 +729,7 @@
     dataMulti.stackedAreaData[10].value = dataMulti.stackedAreaData[10].value.slice(0, 2)
     dataMulti.stackedAreaData[6].value = dataMulti.stackedAreaData[6].value.slice(1, 2)
 
-    datahub.chart.multi({
+    datahub.multiChart({
         parent: document.querySelector('.gaps')
     })
     .setData(dataMulti)
@@ -775,7 +752,7 @@
         })
     })
 
-    datahub.chart.multi({
+    datahub.multiChart({
         parent: document.querySelector('.gaps2')
     })
     .setData(dataMulti)
@@ -786,7 +763,7 @@
         areaData: datahub.data.generateTimeSeries({count: 1, layerCount: 1})
     }
 
-    datahub.chart.multi({
+    datahub.multiChart({
         parent: document.querySelector('.isolated')
     })
     .setData(dataMulti)
@@ -799,7 +776,7 @@
     var sliderChartContainer = document.querySelector('.slider-chart')
 
     function renderMainChart(dataMulti) {
-        datahub.chart.multi({
+        datahub.multiChart({
             parent: sliderChartContainer,
             width: sliderChartContainer.clientWidth,
             data: dataMulti
@@ -874,6 +851,9 @@
             domain: [-160, 160],
             labelsRewriterX: function(d, i) {
                 var label = this.textContent
+                if(typeof this.textContent === 'undefined') {
+                    return ''
+                }
                 var match = label.match(/[a-zA-Z]/)
                 if(match){
                     var idx = match.index
@@ -963,15 +943,6 @@
         value: '16,00%',
         info: 'MTD Actual'
     })
-
-    var numberGroup = datahub.group.number({
-        parent: document.querySelector('.number-group'),
-        values: ['235,43GWh', '235,43GWh', '15,00%'],
-        infos: ['Net Production', 'Plan: 231,64GWh', 'MTD Actual'],
-        titles: ['Title 1', 'Title 2', 'Title 3']
-    })
-
-    numberGroup.setValues(['236,43GWh', '236,43GWh', '16,00%'])
 
     var table = datahub.widget.table({
         parent: document.querySelector('.table-widget'),

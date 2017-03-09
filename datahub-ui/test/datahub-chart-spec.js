@@ -17,7 +17,7 @@ describe('Chart', function() {
         })
 
         it('should initialize with a base structure with minimal configuration', function() {
-            chart = datahub.chart.multi({
+            chart = datahub.multiChart({
                 parent: container
             })
 
@@ -29,7 +29,7 @@ describe('Chart', function() {
         })
 
         it('should use sizes from config', function() {
-            chart = datahub.chart.multi({
+            chart = datahub.multiChart({
                 parent: container,
                 width: 400,
                 height: 300
@@ -54,7 +54,7 @@ describe('Chart', function() {
                 }]
             }
 
-            chart = datahub.chart.multi({
+            chart = datahub.multiChart({
                 parent: container,
                 data: dataMulti
             })
@@ -70,7 +70,7 @@ describe('Chart', function() {
                 timestamp: datahub.data.generateTimestamps(),
                 barData: datahub.data.generateTimeSeries()
             }
-            chart = datahub.chart.multi({
+            chart = datahub.multiChart({
                 parent: container,
                 data: dataMulti
             })
@@ -87,7 +87,7 @@ describe('Chart', function() {
                 timestamp: datahub.data.generateTimestamps(),
                 barData: datahub.data.generateTimeSeries()
             }
-            chart = datahub.chart.multi({
+            chart = datahub.multiChart({
                 parent: container,
                 data: dataMulti
             })
@@ -123,7 +123,7 @@ describe('Chart', function() {
                     }
                 ]}
             
-            chart = datahub.chart.multi({
+            chart = datahub.multiChart({
                 parent: container,
                 data: dataMulti
             })
@@ -146,7 +146,7 @@ describe('Chart', function() {
                     }
                 ]}
             
-            chart = datahub.chart.multi({
+            chart = datahub.multiChart({
                 parent: container,
                 data: dataMulti,
                 autoScaleY: true
@@ -176,7 +176,7 @@ describe('Chart', function() {
                     }
                 ]}
             
-            chart = datahub.chart.multi({
+            chart = datahub.multiChart({
                 parent: container,
                 data: dataMulti,
                 reverseY: true
@@ -206,7 +206,7 @@ describe('Chart', function() {
                     }
                 ]}
             
-            chart = datahub.chart.multi({
+            chart = datahub.multiChart({
                 parent: container,
                 data: dataMulti,
                 domain: [0, 1000],
@@ -237,7 +237,7 @@ describe('Chart', function() {
                     }
                 ]}
             
-            chart = datahub.chart.multi({
+            chart = datahub.multiChart({
                 parent: container,
                 data: dataMulti,
                 axisYFormat: '.2s',
@@ -275,7 +275,7 @@ describe('Chart', function() {
                     }
                 ]}
             
-            chart = datahub.chart.multi({
+            chart = datahub.multiChart({
                 parent: container,
                 data: dataMulti,
                 axisTitleX: 'TitleX',
@@ -293,7 +293,7 @@ describe('Chart', function() {
         })
 
         it('should destroy cleanly', function() {
-            chart = datahub.chart.multi({
+            chart = datahub.multiChart({
                 parent: container
             })
 

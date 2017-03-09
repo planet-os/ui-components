@@ -24,7 +24,7 @@ describe('Chart variants', function() {
                 stackedBarData: datahub.data.generateTimeSeries({count: stackCount, layerCount: layerCount})
             }
 
-            chart = datahub.chart.multi({
+            chart = datahub.multiChart({
                 parent: container,
                 data: dataMulti
             })
@@ -42,7 +42,7 @@ describe('Chart variants', function() {
                 stackedBarData: datahub.data.generateTimeSeries({count: stackCount, layerCount: layerCount})
             }
 
-            chart = datahub.chart.multi({
+            chart = datahub.multiChart({
                 parent: container,
                 data: dataMulti
             })
@@ -61,7 +61,7 @@ describe('Chart variants', function() {
                 timestamp: datahub.data.generateTimestamps(),
                 stackedBarData: datahub.data.generateTimeSeries({layerCount: layerCount})
             }
-            chart = datahub.chart.multi({
+            chart = datahub.multiChart({
                 parent: container,
                 data: dataMulti
             })
@@ -102,7 +102,7 @@ describe('Chart variants', function() {
                 areaData: datahub.data.generateTimeSeries()
             }
 
-            chart = datahub.chart.multi({
+            chart = datahub.multiChart({
                 parent: container,
                 data: dataMulti
             })
@@ -119,7 +119,7 @@ describe('Chart variants', function() {
                 stackedAreaData: datahub.data.generateTimeSeries({layerCount: layerCount})
             }
 
-            chart = datahub.chart.multi({
+            chart = datahub.multiChart({
                 parent: container,
                 data: dataMulti
             })
@@ -141,7 +141,7 @@ describe('Chart variants', function() {
                 })
             })
 
-            chart = datahub.chart.multi({
+            chart = datahub.multiChart({
                 parent: container,
                 data: dataMulti
             })
@@ -174,7 +174,7 @@ describe('Chart variants', function() {
                 referenceData: datahub.data.generateTimeSeries({count: pointCount})
             }
 
-            chart = datahub.chart.multi({
+            chart = datahub.multiChart({
                 parent: container,
                 data: dataMulti
             })
@@ -192,7 +192,7 @@ describe('Chart variants', function() {
                 thresholdData: datahub.data.generateTimeSeries({count: 1, step: 12})
             }
 
-            chart = datahub.chart.multi({
+            chart = datahub.multiChart({
                 parent: container,
                 data: dataMulti
             })
