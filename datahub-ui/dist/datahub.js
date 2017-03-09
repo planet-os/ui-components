@@ -2015,6 +2015,9 @@ var body = function(config) {
                     .join('');
                 return '<div class="multiline">' + lines + '</div>'
             }
+            else if(d.label === null || typeof d.label === 'undefined') {
+                return config.emptyPlaceholder || ''
+            }
             else {
                 return d.label
             }
