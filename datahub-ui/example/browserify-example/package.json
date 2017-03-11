@@ -4,10 +4,7 @@
   "description": "testing datahub-ui",
   "main": "bundle.js",
   "dependencies": {
-    "d3": "^4.4.0",
-    "d3-scale-chromatic": "^1.1.0",
-    "datahub-ui": "^0.3.3",
-    "leaflet": "^1.0.2"
+    "datahub-ui": "file:../../"
   },
   "devDependencies": {},
   "scripts": {
