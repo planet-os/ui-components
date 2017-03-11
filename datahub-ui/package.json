@@ -16,10 +16,14 @@
   "bugs": {
     "url": "https://github.com/planet-os/ui-components/issues"
   },
+  "src": "src/start.js src/*utils.js src/*common.js src/*data.js src/*widget.js src/*legend.js src/*palette.js src/*map.js src/*chart.js src/end.js",
+  "srcChart": "src/start-chart.js src/*utils.js src/*common.js src/*data.js src/*chart.js src/end.js",
   "scripts": {
-    "build": "rollup index-rollup.js -o dist/datahub.js -f umd -n datahub -g d3:d3,leaflet:L,d3-scale-chromatic:d3",
-    "build-watch": "rollup index-rollup.js -o dist/datahub.js -w -f umd -n datahub -g d3:d3,leaflet:L,d3-scale-chromatic:d3",
-    "build-min": "rollup index-rollup.js -f umd -n datahub -g d3:d3,leaflet:L,d3-scale-chromatic:d3 | uglifyjs -o ./dist/datahub-min.js -c -m"
+    "build": "uglifyjs $npm_package_src -b --wrap datahub -o dist/datahub.js",
+    "build-min": "uglifyjs $npm_package_src -b -c -m --wrap datahub -o dist/datahub-min.js",
+    "build-chart": "uglifyjs $npm_package_srcChart -b --wrap datahub -o dist/datahub-chart.js",
+    "build-chart-min": "uglifyjs $npm_package_srcChart -b -c -m --wrap datahub -o dist/datahub-chart-min.js",
+    "build-watch": "npm-watch"
   },
   "homepage": "https://github.com/planet-os/ui-components#readme",
   "dependencies": {
@@ -28,7 +32,9 @@
     "d3-scale-chromatic": "^1.1.0"
   },
   "devDependencies": {
-    "rollup": "^0.41.4",
-    "rollup-watch": "^3.2.2"
+    "npm-watch": "^0.1.8"
+  },
+  "watch": {
+    "build-chart": "src/*.js"
   }
 }
