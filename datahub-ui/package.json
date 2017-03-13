@@ -1,6 +1,6 @@
 {
   "name": "datahub-ui",
-  "version": "0.8.7",
+  "version": "0.8.8",
   "description": "Reusable components for Planet OS Datahub",
   "main": "index.js",
   "repository": {
@@ -17,7 +17,7 @@
     "url": "https://github.com/planet-os/ui-components/issues"
   },
   "src": "src/start.js src/*utils.js src/*common.js src/*data.js src/*widget.js src/*legend.js src/*palette.js src/*map.js src/*chart.js src/end.js",
-  "srcChart": "src/start-chart.js src/*utils.js src/*common.js src/*data.js src/*chart.js src/end.js",
+  "srcChart": "src/start-chart.js src/*utils.js src/*common.js src/*data.js src/*widget.js src/*chart.js src/end.js",
   "srcMap": "src/start.js src/*utils.js src/*data.js src/*palette.js src/*legend.js src/*map.js src/end.js",
   "scripts": {
     "build": "uglifyjs $npm_package_src -b --wrap datahub -o dist/datahub.js",
