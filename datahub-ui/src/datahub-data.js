@@ -43,8 +43,11 @@
         return pointsToFeatures(points)
     }
 
-    var pointsToFeatures = function(points) {
+    var generateRandomString = function(len) {
+        return Math.random().toString(36).substring(4, (len + 4) || 8)
+    }
 
+    var pointsToFeatures = function(points) {
         return {
             "type": "FeatureCollection",
             "features": points.map(function(d) {
@@ -63,10 +66,6 @@
         getJSON(geojsonUrl, function(error, json) {
             cb(json)
         })
-    }
-
-    function capitalize(string) {
-        return string.charAt(0).toUpperCase() + string.slice(1)
     }
 
     function createDateAsUTC(date) {
@@ -139,6 +138,36 @@
         return merged
     }
 
+    var generateTimeSeriesSplit = function(_config) {
+        var _config = _config || {}
+        var config = {
+            count: _config.count || 12,
+            layerCount: _config.layerCount || 1,
+            timeStart: _config.timeStart || '2016-01-01',
+            timeIncrement: _config.timeIncrement || 'month',
+            step: _config.step || 1,
+            min: _config.min || 0,
+            max: _config.max || 100
+        }
+
+        var startValue = ~~(Math.random() * (config.max - config.min)) + config.min
+        var values = generateArray(config.layerCount, function() {
+            var dataset = {}
+            var timestamps = generateTimestamps(config)
+            dataset.data = generateArray(config.count, function(d, i) {
+                startValue += (Math.random() * 2 - 1) * ((config.max - config.min) / 10)
+                startValue = Math.max(startValue, config.min)
+                startValue = Math.min(startValue, config.max)
+                return { value: startValue, timestamp: timestamps[i] }
+            })
+
+            dataset.metadata = {id: generateRandomString(8)}
+            return dataset
+        })
+
+        return values
+    }
+
     var generateTimestamps = function(_config) {
         var _config = _config || {}
         var config = {
@@ -151,7 +180,7 @@
             max: _config.max || 100
         }
 
-        var intervalFuncName = 'utc' + capitalize(config.timeIncrement) || 'utcHour'
+        var intervalFuncName = 'utc' + dh.utils.capitalize(config.timeIncrement) || 'utcHour'
         var intervalFunc = d3[intervalFuncName]
         var intervalRangeFunc = d3[intervalFuncName + 's']
 
@@ -407,6 +436,7 @@
         generateRaster: generateRaster,
         generateGeojson: generateGeojson,
         generateTimeSeries: generateTimeSeries,
+        generateTimeSeriesSplit: generateTimeSeriesSplit,
         generateTimestamps: generateTimestamps,
         getDatasetDetails: getDatasetDetails,
         getVariables: getVariables,

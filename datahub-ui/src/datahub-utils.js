@@ -178,6 +178,45 @@
         }
     }
 
+    var capitalize = function(string) {
+        return string.charAt(0).toUpperCase() + string.slice(1)
+    }
+
+    var getExtent = function(d, isMin) {
+        var func = isMin ? 'min' : 'max'
+        if (d) {
+            return d3[func](d.map(function(d) {
+                return d.value
+            }))
+        }
+        return null
+    }
+
+    var getStackExtent = function(d, isMin) {
+        var func = isMin ? 'min' : 'max'
+        if (d && d.length) {
+            var sums = d.map(function(d) {
+                return d3.sum(d.value)
+            })
+            return d3[func](sums)
+        }
+        return null
+    }
+
+    var getMultiExtent = function(d, isMin) {
+        var func = isMin ? 'min' : 'max'
+        if (d && d.length) {
+            var data = d.map(function(d, i) {
+                return d.value
+            })
+            if (data[0].length) {
+                data = d3.merge(data)
+            }
+            return d3[func](data)
+        }
+        return null
+    }
+
     dh.utils =  {
         merge: merge,
         mergeAll: mergeAll,
@@ -195,6 +234,10 @@
         parseRGB: parseRGB,
         pipeline: pipeline,
         override: override,
-        rebind: rebind
+        rebind: rebind,
+        capitalize: capitalize,
+        getExtent: getExtent,
+        getStackExtent: getStackExtent,
+        getMultiExtent: getMultiExtent
     }
 }(datahub))

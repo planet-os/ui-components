@@ -332,6 +332,10 @@
         return {}
     }
 
+    var printer = function(config) {
+        console.warn(config);
+    }
+
     dh.common =  {
         axesFormatAutoconfig: axesFormatAutoconfig,
         defaultConfig: defaultConfig,
@@ -352,6 +356,7 @@
         axisXFormatterTimeHour: axisXFormatterTimeHour,
         axisXFormatterRotate30: axisXFormatterRotate30,
         axisYFormatSI: axisYFormatSI,
-        labelsRewriterY: labelsRewriterY
+        labelsRewriterY: labelsRewriterY,
+        printer: printer
     }
 }(datahub, root.d3))

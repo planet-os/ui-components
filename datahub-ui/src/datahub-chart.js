@@ -90,10 +90,6 @@
         }
     }
 
-    var printer = function(config) {
-        console.warn(config);
-    }
-
     var scaleX = function(config) {
         var dataX = config.dataIsEmpty ? 0 : config.data.timestamp
         var scaleX = d3.scaleBand().domain(dataX).range([0, config.chartWidth])
@@ -110,62 +106,27 @@
         }
     }
 
-    var getExtent = function(d, isMin) {
-        var func = isMin ? 'min' : 'max'
-        if (d) {
-            return d3[func](d.map(function(d) {
-                return d.value
-            }))
-        }
-        return null
-    }
-
-    var getStackExtent = function(d, isMin) {
-        var func = isMin ? 'min' : 'max'
-        if (d && d.length) {
-            var sums = d.map(function(d) {
-                return d3.sum(d.value)
-            })
-            return d3[func](sums)
-        }
-        return null
-    }
-
-    var getMultiExtent = function(d, isMin) {
-        var func = isMin ? 'min' : 'max'
-        if (d && d.length) {
-            var data = d.map(function(d, i) {
-                return d.value
-            })
-            if (data[0].length) {
-                data = d3.merge(data)
-            }
-            return d3[func](data)
-        }
-        return null
-    }
-
     var scaleY = function(config) {
         var maxs = []
-        maxs.push(getExtent(config.data.barData))
-        maxs.push(getExtent(config.data.referenceData))
-        maxs.push(getExtent(config.data.estimateData))
-        maxs.push(getExtent(config.data.thresholdData))
-        maxs.push(getExtent(config.data.areaData))
-        maxs.push(getStackExtent(config.data.stackedBarData))
-        maxs.push(getStackExtent(config.data.stackedAreaData))
-        maxs.push(getMultiExtent(config.data.lineData))
+        maxs.push(dh.utils.getExtent(config.data.barData))
+        maxs.push(dh.utils.getExtent(config.data.referenceData))
+        maxs.push(dh.utils.getExtent(config.data.estimateData))
+        maxs.push(dh.utils.getExtent(config.data.thresholdData))
+        maxs.push(dh.utils.getExtent(config.data.areaData))
+        maxs.push(dh.utils.getStackExtent(config.data.stackedBarData))
+        maxs.push(dh.utils.getStackExtent(config.data.stackedAreaData))
+        maxs.push(dh.utils.getMultiExtent(config.data.lineData))
 
         var mins = []
         var isMin = true
-        mins.push(getExtent(config.data.barData, isMin))
-        mins.push(getExtent(config.data.referenceData, isMin))
-        mins.push(getExtent(config.data.estimateData, isMin))
-        mins.push(getExtent(config.data.thresholdData, isMin))
-        mins.push(getExtent(config.data.areaData, isMin))
-        mins.push(getStackExtent(config.data.stackedBarData, isMin))
-        mins.push(getStackExtent(config.data.stackedAreaData, isMin))
-        mins.push(getMultiExtent(config.data.lineData, isMin))
+        mins.push(dh.utils.getExtent(config.data.barData, isMin))
+        mins.push(dh.utils.getExtent(config.data.referenceData, isMin))
+        mins.push(dh.utils.getExtent(config.data.estimateData, isMin))
+        mins.push(dh.utils.getExtent(config.data.thresholdData, isMin))
+        mins.push(dh.utils.getExtent(config.data.areaData, isMin))
+        mins.push(dh.utils.getStackExtent(config.data.stackedBarData, isMin))
+        mins.push(dh.utils.getStackExtent(config.data.stackedAreaData, isMin))
+        mins.push(dh.utils.getMultiExtent(config.data.lineData, isMin))
 
         var max = d3.max(maxs)
         var min
@@ -785,7 +746,7 @@
     var multi = dh.utils.pipeline(
         dh.common.defaultConfig,
         dataAdapter,
-        // printer,
+        // dh.common.printer,
         template,
         scaleX,
         scaleY,

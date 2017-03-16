@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <script src="https://d3js.org/d3.v4.js"></script>
+    <script src="../src/start.js"></script>
+    <script src="../dist/datahub-chart.js"></script>
+    <script src="datahub-timeseries-chart.js"></script>
+
+    <link rel="stylesheet" href="../style/components.css" />
+    <link rel="stylesheet" href="../style/dark-theme.css" />
+    <style>
+        .chart {
+            width: 600px;
+            height: 400px;
+        }
+
+        .datahub-timeseries-chart .tick line,
+        .datahub-timeseries-chart .domain {
+            stroke: #888;
+        }
+
+        .datahub-timeseries-chart .grid .tick line {
+            stroke: #333;
+        }
+
+        .datahub-timeseries-chart .grid .domain {
+            display: none;
+        }
+
+        .datahub-timeseries-chart .tick text {
+            fill: #aaa;
+        }
+
+        .datahub-timeseries-chart .reference {
+            stroke: lime;
+        }
+
+        .datahub-timeseries-chart .shape {
+            fill: none;
+            stroke: skyblue;
+        }
+
+        .datahub-timeseries-chart .layer0 {
+            stroke: orangered;
+        }
+
+        .datahub-timeseries-chart .area {
+            fill-opacity: 0.5;
+        }
+
+        .datahub-timeseries-chart .area {
+            fill: skyblue;
+        }
+
+        .datahub-timeseries-chart .area.layer0 {
+            fill: orangered;
+        }
+
+        .datahub-timeseries-chart .tooltip line,
+        .datahub-timeseries-chart .tooltip circle {
+            stroke: white;
+            fill: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="chart"></div>
+    
+    <script>
+
+    /*
+    -timestamp in tooltip
+    -step reference line
+    -step reference band
+    */
+
+    var dataConfig = {
+        layerCount: 2,
+        timeIncrement: 'minute', 
+        step: 1, 
+        // min: -100, 
+        max: 100
+    }
+
+    var data = datahub.data.generateTimeSeriesSplit(dataConfig)
+
+    console.log(data)
+
+    var container = document.querySelector('.chart')
+    var timeseries = datahub.timeseries({
+            parent: container
+        })
+        .on('hover', function(d) {
+            // console.log(d)
+        })
+
+    timeseries.setConfig({
+        tickStep: 2,
+        resolution: 'minute',
+        axisXFormat: '%H:%M',
+        reference: 10,
+        // domain: [-200, 200],
+        domain: [0, 100],
+        // chartType: 'area',
+        margin: {
+            top: 50,
+            right: 50,
+            bottom: 100,
+            left: 80
+        }
+    })
+
+    timeseries.setData(data)
+
+    // var dataMulti = {
+    //     timestamp: datahub.data.generateTimestamps(),
+    //     lineData: datahub.data.generateTimeSeries({min: 100, max: 10000})
+    // }
+
+    // var container = document.querySelector('.weather-chart')
+    // datahub.multiChart({
+    //     parent: container
+    // })
+
+    </script>
+</body>
+
+</html>
