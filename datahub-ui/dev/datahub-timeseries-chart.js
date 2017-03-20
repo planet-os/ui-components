@@ -17,7 +17,6 @@
                             + '<g class="reference"></g>'
                             + '<g class="tooltip">'
                                 + '<line></line>'
-                                + '<circle></circle>'
                             + '</g>'
                             + '<g class="events"><rect class="event-panel"></rect></g>'
                         + '</g>'
@@ -55,6 +54,21 @@
             height: height,
             chartWidth: chartWidth,
             chartHeight: chartHeight
+        }
+    }
+
+    var defaultConfig = function(config) {
+        var defaultMargin = {
+            top: 0,
+            right: 0,
+            bottom: 10,
+            left: 10
+        }
+
+        return {
+            margin: config.margin || defaultMargin,
+            width: config.width || 600,
+            height: config.height || 300
         }
     }
 
@@ -137,7 +151,7 @@
         var timeResolution = d3[intervalFuncName]
         var axisX = d3.axisBottom()
             .scale(config.scaleX)
-            .ticks(timeResolution.every(config.tickStep || 2))
+            .ticks(config.xTicks || null)
             .tickFormat(d3.utcFormat(config.axisXFormat || '%H:%M'))
 
         return {
@@ -152,7 +166,7 @@
 
         var axisY = d3.axisLeft()
             .scale(config.scaleY)
-            .ticks(6, 's')
+            .ticks(config.yTicks || 6, 's')
             .tickPadding(10)
 
         return {
@@ -161,7 +175,7 @@
     }
 
     var axisComponentX = function(config){
-        if(config.dataIsEmpty) {
+        if(config.dataIsEmpty || config.hideXAxis) {
             return {}
         }
 
@@ -173,7 +187,7 @@
     }
 
     var axisComponentY = function(config){
-        if(config.dataIsEmpty) {
+        if(config.dataIsEmpty || config.hideYAxis) {
             return {}
         }
 
@@ -184,7 +198,7 @@
     }
 
     var gridX = function(config){
-        if(config.dataIsEmpty) {
+        if(config.dataIsEmpty || config.hideXGrid) {
             return {}
         }
 
@@ -328,7 +342,7 @@
 
     var tooltipComponent = function(config){
         var line = config.container.select('.tooltip line')
-        var circle = config.container.select('.tooltip circle')
+        var tooltipContainer = config.container.select('.tooltip')
 
         config.events.on('hover.tooltip', function(d) {
             line.attr('y1', 0)
@@ -336,9 +350,21 @@
                 .attr('x1', d[0].posX)
                 .attr('x2', d[0].posX)
 
-            circle.attr('cx', d[0].posX)
-                .attr('cy', d[0].posY)
+            var circles = tooltipContainer.selectAll('circle.dot')
+                .data(d)
+            circles.enter().append('circle')
+                .merge(circles)
+                .attr('class', function(dB, dI) {
+                    return ['dot', dB.id, 'layer' + dI].join(' ')
+                })
+                .attr('cx', function(dB) {
+                    return dB.posX
+                })
+                .attr('cy', function(dB) {
+                    return dB.posY
+                })
                 .attr('r', 2)
+            circles.exit().remove()
         })
     }
 
@@ -390,47 +416,6 @@
     //     return {}
     // }
 
-    // var axisTitleComponentY = function(config){
-    //     // var config = {
-    //     //     panel: null,
-    //     //     axisTitleY: null,
-    //     //     chartWidth: null,
-    //     //     chartHeight: null,
-    //     //     margin: null,
-    //     //     position: null
-    //     // }
-
-    //     var positionY = config.position === 'bottom' ? config.chartHeight + config.margin.top + config.margin.bottom / 4 : -10
-    //     var positionX = config.position === 'bottom' ? function(){ return -10 } : function(){return config.chartWidth / 2 - this.getBBox().width / 2 + 10}
-
-    //     var axisTitleY = config.panel.selectAll('text.axis-title.y')
-    //             .data([0])
-    //         axisTitleY.enter().append('text')
-    //             .attr({
-    //                 'class': 'y axis-title'
-    //             })
-    //         axisTitleY.text(config.axisTitleY || '')
-    //             .attr({
-    //                 x: positionX,
-    //                 y: positionY
-    //             })
-    //     axisTitleY.exit().remove()
-
-    //     return {}
-    // }
-
-    // var axisTitleBottomComponentY = function(config){
-    //     // var config = {
-    //     //     panel: null,
-    //     //     axisTitleY: null,
-    //     //     chartHeight: null,
-    //     //     margin: null,
-    //     //     position: 'bottom'
-    //     // }
-
-    //     return axisTitleComponentY(config)
-    // }
-
     // var barShapes = function(config){
     //     // var config = {
     //     //     panel: null,
@@ -463,75 +448,6 @@
     //     return {}
     // }
 
-    // // var verticalLine = function(config){
-    // //     var config = {
-    // //         panel: null,
-    // //         dataConverted: null,
-    // //         scaleX: null,
-    // //         scaleY: null,
-    // //         chartHeight: null,
-    // //         margin: null,
-    // //         verticalLineX: null,
-    // //         verticalLineValue: null
-    // //     }
-
-    //     var scaledverticalLineX = config.scaleX(config.verticalLineX)
-    //     var path = 'M' + [[scaledverticalLineX, 0], [scaledverticalLineX, config.chartHeight]].join('L')
-
-    //     var shapes = config.panel.selectAll('path.vertical-line')
-    //         .data([0])
-    //     shapes.enter().append('path')
-    //         .attr({
-    //             'class': 'vertical-line shape'
-    //         })
-    //     shapes.attr({
-    //         d: path
-    //     })
-    //     shapes.exit().remove()
-
-    //     var label = config.panel.selectAll('text.vertical-line-label')
-    //         .data([0])
-    //     label.enter().append('text')
-    //         .attr({
-    //             'class': 'vertical-line-label'
-    //         })
-    //     label.attr({
-    //         x: scaledverticalLineX + 2,
-    //         y: config.chartHeight + config.margin.top + config.margin.bottom / 4
-    //     })
-    //     .text(config.verticalLineValue)
-    //     shapes.exit().remove()
-
-    //     return {}
-    // }
-
-    // var endCircle = function(config){
-    //     // var config = {
-    //     //     panel: null,
-    //     //     dataConverted: null,
-    //     //     scaleX: null,
-    //     //     scaleY: null,
-    //     //     width: null
-    //     // }
-
-    //     var lastDataY = config.dataConverted[config.dataConverted.length-1]
-
-    //     var shapes = config.panel.selectAll('circle.end-circle')
-    //         .data([lastDataY])
-    //     shapes.enter().append('circle')
-    //         .attr({
-    //             'class': 'end-circle shape'
-    //         })
-    //     shapes.attr({
-    //         cx: function(d){ return config.scaleX(d.x) },
-    //         cy: function(d){ return config.scaleY(d.y) },
-    //         r: 2
-    //     })
-    //     shapes.exit().remove()
-
-    //     return {}
-    // }
-
     // var axisXFormatter = function(config){
     //     // var config = {
     //     //     panel: null,
@@ -547,179 +463,16 @@
     //     return {}
     // }
 
-    // var eventCatchingLayer = function(config){
-    //     // var config = {
-    //     //     panel: null,
-    //     //     chartWidth: null,
-    //     //     chartHeight: null,
-    //     // }
-
-    //     var eventPanelContainer = config.panel
-    //         .selectAll('g.event-panel-container')
-    //         .data([0])
-    //     eventPanelContainer.enter().append('g')
-    //         .attr({
-    //             'class': 'event-panel-container'
-    //         })
-    //         .append('rect')
-    //         .attr({
-    //             'class': 'event-panel'
-    //         })
-    //     eventPanelContainer.exit().remove()
-
-    //     var eventPanel = eventPanelContainer.select('.event-panel')
-    //         .attr({
-    //             width: config.chartWidth,
-    //             height: config.chartHeight
-    //         })
-    //         .style({
-    //             visibility: 'hidden',
-    //             'pointer-events': 'all'
-    //         })
-
-    //     return {eventPanel: eventPanel}
-    // }
-
-    // var tooltipComponent = function(config){
-    //     // var config = {
-    //     //     panel: null,
-    //     //     dataConverted: null,
-    //     //     scaleX: null,
-    //     //     scaleY: null,
-    //     //     eventPanel: null,
-    //     //     chartWidth: null,
-    //     //     chartHeight: null,
-    //     //     axisXFormat: null
-    //     // }
-
-    //     var newConfig = eventCatchingLayer(config)
-    //     dh.utils.override(config, newConfig)
-
-    //     var dataConvertedX = config.dataConverted.map(function(d){ return d.x })
-    //     var deltaX = config.scaleX(dataConvertedX[1]) - config.scaleX(dataConvertedX[0])
-
-    //     var tooltipGroup = config.panel
-    //         .selectAll('g.tooltip-container')
-    //         .data([0])
-    //     tooltipGroup.enter().append('g')
-    //         .attr({
-    //             'class': 'tooltip-container',
-    //             'pointer-events': 'none'
-    //         })
-    //         .style({visibility: 'hidden'})
-    //         .append('circle')
-    //         .attr({
-    //             'class': 'tooltip-circle',
-    //             r: 3
-    //         })
-    //     tooltipGroup.exit().remove()
-
-    //     var valueGroup = config.panel
-    //         .selectAll('g.value-container')
-    //         .data([0])
-    //     valueGroup.enter().append('g')
-    //         .attr({
-    //             'class': 'value-container',
-    //             'pointer-events': 'none'
-    //         })
-    //         .style({visibility: 'hidden'})
-    //         .append('text')
-    //         .attr({
-    //             'class': 'value-label',
-    //             dy: -4
-    //         })
-    //     valueGroup.exit().remove()
-
-    //     var dateGroup = config.panel
-    //         .selectAll('g.date-container')
-    //         .data([0])
-    //     dateGroup.enter().append('g')
-    //         .attr({
-    //             'class': 'date-container',
-    //             'pointer-events': 'none'
-    //         })
-    //         .style({visibility: 'hidden'})
-    //         .append('text')
-    //         .attr({
-    //             'class': 'date-label',
-    //             'text-anchor': 'end',
-    //             dy: -4,
-    //             dx: -4
-    //         })
-    //     dateGroup.attr({transform: 'translate(' + [config.chartWidth, config.chartHeight] + ')'})
-    //     dateGroup.exit().remove()
-
-    //     var lineGroup = config.panel
-    //         .selectAll('g.line-container')
-    //         .data([0])
-    //     lineGroup.enter().append('g')
-    //         .attr({
-    //             'class': 'line-container',
-    //             'pointer-events': 'none'
-    //         })
-    //         .style({visibility: 'hidden'})
-    //         .append('line')
-    //         .attr({
-    //             'class': 'tooltip-line'
-    //         })
-    //     lineGroup.exit().remove()
-
-    //     var valueLabel = valueGroup.select('.value-label')
-    //     var dateLabel = dateGroup.select('.date-label')
-    //     var tooltipCircle = tooltipGroup.select('.tooltip-circle')
-    //     var tooltipLine = lineGroup.select('.tooltip-line')
-
-    //     config.eventPanel
-    //         .on('mouseenter', function(d){
-    //             tooltipGroup.style({visibility: 'visible'})
-    //             valueGroup.style({visibility: 'visible'})
-    //             dateGroup.style({visibility: 'visible'})
-    //             tooltipLine.style({visibility: 'visible'})
-    //         })
-    //         .on('mouseout', function(d){
-    //             tooltipGroup.style({visibility: 'hidden'})
-    //             valueGroup.style({visibility: 'hidden'})
-    //             dateGroup.style({visibility: 'hidden'})
-    //             tooltipLine.style({visibility: 'hidden'})
-    //         })
-    //         .on('mousemove', function(d){
-    //             var mouse = d3.mouse(this)
-    //             var dateAtCursor = config.scaleX.invert(mouse[0] - deltaX / 2)
-    //             var dataPointIndexAtCursor = d3.bisectLeft(dataConvertedX, dateAtCursor)
-    //             var dataPointAtCursor = config.dataConverted[dataPointIndexAtCursor]
-    //             if(dataPointAtCursor){
-    //                 var date = dataPointAtCursor.x
-    //                 var value = dataPointAtCursor.y
-    //                 var x = config.scaleX(date)
-    //                 var y = config.scaleY(value)
-    //                 tooltipGroup.attr({transform: 'translate(' + [x, y] + ')'})
-    //                 valueGroup.attr({transform: 'translate(' + [0, y] + ')'})
-    //                 valueLabel.text(d3.format('.2s')(value))
-    //                 dateLabel.text(d3.time.format('%H:%M:%S')(date))
-    //                 tooltipLine.attr({
-    //                     x1: 0,
-    //                     y1: y,
-    //                     x2: x,
-    //                     y2: y
-    //                 })
-    //             }
-    //     })
-
-    //     return {}
-    // }
-
     var lineChart = dh.utils.pipeline(
-        dh.common.defaultConfig,
+        defaultConfig,
         template,
         data,
         scaleX,
         scaleY,
         axisX,
         axisY,
-        // panelComponent,
         axisComponentX,
         gridX,
-        // axisTitleComponentY,
         lineShapes,
         // dh.common.printer,
         // areaShapes,

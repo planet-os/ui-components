@@ -11,9 +11,13 @@
     <link rel="stylesheet" href="../style/components.css" />
     <link rel="stylesheet" href="../style/dark-theme.css" />
     <style>
+    /*
+    blue: #5499C2
+    green: #50935D
+    */
         .chart {
-            width: 600px;
-            height: 400px;
+            width: 400px;
+            height: 100px;
         }
 
         .datahub-timeseries-chart .tick line,
@@ -22,7 +26,7 @@
         }
 
         .datahub-timeseries-chart .grid .tick line {
-            stroke: #333;
+            stroke: #555;
         }
 
         .datahub-timeseries-chart .grid .domain {
@@ -39,27 +43,28 @@
 
         .datahub-timeseries-chart .shape {
             fill: none;
-            stroke: skyblue;
+            stroke: #5499C2;
         }
 
-        .datahub-timeseries-chart .layer0 {
-            stroke: orangered;
+        .datahub-timeseries-chart .shape.layer0 {
+            stroke: #50935D;
         }
 
-        .datahub-timeseries-chart .area {
+        .datahub-timeseries-chart .area,
+        .datahub-timeseries-chart .dot {
             fill-opacity: 0.5;
+            fill: #5499C2;
+            stroke: #5499C2;
         }
 
-        .datahub-timeseries-chart .area {
-            fill: skyblue;
+        .datahub-timeseries-chart .area.layer0,
+        .datahub-timeseries-chart .dot.layer0 {
+            fill-opacity: 0.5;
+            fill: #50935D;
+            stroke: #50935D;
         }
 
-        .datahub-timeseries-chart .area.layer0 {
-            fill: orangered;
-        }
-
-        .datahub-timeseries-chart .tooltip line,
-        .datahub-timeseries-chart .tooltip circle {
+        .datahub-timeseries-chart .tooltip line{
             stroke: white;
             fill: white;
         }
@@ -76,17 +81,48 @@
     
     <script>
 
-    var dataConfig = {
-        layerCount: 2,
+    var commonDataConfig = {
+        layerCount: 1,
+        count: 10,
         timeIncrement: 'minute', 
-        step: 1, 
-        // min: -100, 
-        max: 100
+        min: 0, 
+        max: 50
+    }
+    var commonChartConfig = {
+        tickStep: 20,
+        resolution: 'minute',
+        axisXFormat: '%H:%M',
+        yAxisTitle: 'ºc', 
+        domain: [0, 50],
+        chartType: 'area',
+        margin: {
+            top: 20,
+            right: 20,
+            bottom: 20,
+            left: 50
+        }
     }
 
-    var data = datahub.data.generateTimeSeriesSplit(dataConfig)
+    var dataConfig1 = commonDataConfig
+    var chartConfig1 = commonChartConfig
 
-    console.log(data)
+    var dataConfig2 = datahub.utils.mergeAll(commonDataConfig, {
+        layerCount: 1,
+        count: 100,
+    })
+    var chartConfig2 = datahub.utils.mergeAll(commonChartConfig, {
+        chartType: 'line',
+        xTicks: d3.utcMinute.every(20),
+        yTicks: 3,
+        hideXAxis: true,
+        hideYAxis: true,
+        hideXGrid: true
+    })
+
+    var dataConfig = dataConfig2
+    var chartConfig = chartConfig2
+
+    var data = datahub.data.generateTimeSeriesSplit(dataConfig)
 
     var container = document.querySelector('.chart')
     var timeseries = datahub.timeseries({
@@ -96,22 +132,7 @@
             // console.log(d)
         })
 
-    timeseries.setConfig({
-        tickStep: 2,
-        resolution: 'minute',
-        axisXFormat: '%H:%M',
-        reference: 10,
-        yAxisTitle: 'MW', 
-        // domain: [-200, 200],
-        domain: [0, 100],
-        // chartType: 'area',
-        margin: {
-            top: 50,
-            right: 50,
-            bottom: 100,
-            left: 80
-        }
-    })
+    timeseries.setConfig(chartConfig)
 
     timeseries.setData(data)
 
