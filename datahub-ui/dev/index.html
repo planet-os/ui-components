@@ -34,7 +34,7 @@
         }
 
         .datahub-timeseries-chart .reference {
-            stroke: lime;
+            stroke: #aaa;
         }
 
         .datahub-timeseries-chart .shape {
@@ -63,6 +63,11 @@
             stroke: white;
             fill: white;
         }
+
+        .datahub-timeseries-chart .axis-title text {
+            fill: #aaa;
+            font-size: 0.6em;
+        }
     </style>
 </head>
 
@@ -70,12 +75,6 @@
     <div class="chart"></div>
     
     <script>
-
-    /*
-    -timestamp in tooltip
-    -step reference line
-    -step reference band
-    */
 
     var dataConfig = {
         layerCount: 2,
@@ -102,6 +101,7 @@
         resolution: 'minute',
         axisXFormat: '%H:%M',
         reference: 10,
+        yAxisTitle: 'MW', 
         // domain: [-200, 200],
         domain: [0, 100],
         // chartType: 'area',

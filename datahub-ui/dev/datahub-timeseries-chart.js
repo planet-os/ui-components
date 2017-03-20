@@ -12,6 +12,8 @@
                             + '<g class="grid x"></g>'
                             + '<g class="axis x"></g>'
                             + '<g class="axis y"></g>'
+                            + '<g class="axis-title x"><text></text></g>'
+                            + '<g class="axis-title y"><text></text></g>'
                             + '<g class="reference"></g>'
                             + '<g class="tooltip">'
                                 + '<line></line>'
@@ -297,11 +299,11 @@
                     var bisector = d3.bisector(function(dB, x) {
                             return dB.timestamp.getTime() - x.getTime()
                         })
-                        .right
+                        .left
                     var found = bisector(d.data, mouseTimestamp)
 
                     var d1 = d.data[found]
-                    var d0 = d.data[found - 1]
+                    var d0 = d.data[Math.max(found - 1, 0)]
                     var datum = (mouseTimestamp - d0.timestamp > d1.timestamp - mouseTimestamp) ? d1 : d0
                     
                     var posX = Math.round(config.scaleX(datum.timestamp))
@@ -328,7 +330,7 @@
         var line = config.container.select('.tooltip line')
         var circle = config.container.select('.tooltip circle')
 
-        config.events.on('hover', function(d) {
+        config.events.on('hover.tooltip', function(d) {
             line.attr('y1', 0)
                 .attr('y2', config.chartHeight)
                 .attr('x1', d[0].posX)
@@ -338,6 +340,36 @@
                 .attr('cy', d[0].posY)
                 .attr('r', 2)
         })
+    }
+
+    var xAxisTitle = function(config){
+        var xTitleFormat = config.xTitleFormat || d3.utcFormat('%c')
+        var titleContainer = config.container.select('.axis-title.x')
+        var title = titleContainer.select('text')
+
+        config.events.on('hover.title', function(d) {
+            var timestamp = d[0].timestamp
+
+            titleContainer.attr('transform', 'translate(' + [
+                config.chartWidth,
+                config.chartHeight
+            ] + ')')
+
+            title.text(xTitleFormat(timestamp))
+                .attr('dy', -8)
+                .attr('text-anchor', 'end')
+        })
+
+        return {}
+    }
+
+    var yAxisTitle = function(config){
+        config.container.select('.axis-title.y text')
+            .text(config.yAxisTitle || '')
+            .attr('dx', '0.5em')
+            .attr('dy', '1em')
+
+        return {}
     }
 
     // var singleAxisComponentX = function(config){
@@ -694,7 +726,9 @@
         axisComponentY,
         reference,
         eventsPanel,
-        tooltipComponent
+        tooltipComponent,
+        xAxisTitle,
+        yAxisTitle
     )
 
     var timeseries = function(config) {
