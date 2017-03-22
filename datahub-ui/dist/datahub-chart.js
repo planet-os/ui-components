@@ -18,13 +18,19 @@
                 obj1[p] = obj2[p];
             }
         };
-        var mergeAll = function() {
-            var newObj = {};
-            var objs = arguments;
-            for (var i = 0; i < objs.length; i++) {
-                merge(newObj, objs[i]);
+        var mergeAll = function(target, varArgs) {
+            var to = Object(target);
+            for (var index = 1; index < arguments.length; index++) {
+                var nextSource = arguments[index];
+                if (nextSource != null) {
+                    for (var nextKey in nextSource) {
+                        if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
+                            to[nextKey] = nextSource[nextKey];
+                        }
+                    }
+                }
             }
-            return newObj;
+            return to;
         };
         var htmlToNode = function(htmlString, parent) {
             while (parent.lastChild) {

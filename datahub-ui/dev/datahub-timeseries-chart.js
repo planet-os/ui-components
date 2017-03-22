@@ -8,7 +8,6 @@
                     + '<svg>'
                         + '<g class="panel">'
                             + '<g class="historical"></g>'
-                            + '<g class="forecast"></g>'
                             + '<g class="grid x"></g>'
                             + '<g class="axis x"></g>'
                             + '<g class="axis y"></g>'
@@ -30,8 +29,8 @@
         var dataIsEmpty = !(config.data)
 
         var container = d3.select(containerNode)
-        var width = containerNode.clientWidth
-        var height = containerNode.clientHeight || 300
+        var width = config.width || containerNode.clientWidth
+        var height = config.height || containerNode.clientHeight || 300
 
         var chartWidth = width - config.margin.left - config.margin.right
         var chartHeight = height - config.margin.top - config.margin.bottom
@@ -67,8 +66,7 @@
 
         return {
             margin: config.margin || defaultMargin,
-            width: config.width || 600,
-            height: config.height || 300
+            hide: config.hide || []
         }
     }
 
@@ -175,7 +173,7 @@
     }
 
     var axisComponentX = function(config){
-        if(config.dataIsEmpty || config.hideXAxis) {
+        if(config.dataIsEmpty || config.hide.indexOf('xAxis') > -1) {
             return {}
         }
 
@@ -187,7 +185,7 @@
     }
 
     var axisComponentY = function(config){
-        if(config.dataIsEmpty || config.hideYAxis) {
+        if(config.dataIsEmpty || config.hide.indexOf('yAxis') > -1 || config.axisOnly) {
             return {}
         }
 
@@ -198,7 +196,7 @@
     }
 
     var gridX = function(config){
-        if(config.dataIsEmpty || config.hideXGrid) {
+        if(config.dataIsEmpty || config.hide.indexOf('xGrid') > -1 || config.axisOnly) {
             return {}
         }
 
@@ -210,7 +208,7 @@
     }
 
     var lineShapes = function(config) {
-        if (config.dataIsEmpty) {
+        if (config.dataIsEmpty || config.axisOnly) {
             config.container.select('.line-group')
                 .selectAll('path.line')
                 .remove()
@@ -300,6 +298,29 @@
         return {}
     }
 
+    function getHoverInfo(config, timestamp) {
+        var dataUnderCursor = []
+        config.dataConverted.forEach(function(d, i) {
+            var bisector = d3.bisector(function(dB, x) {
+                    return dB.timestamp.getTime() - x.getTime()
+                })
+                .left
+            var found = bisector(d.data, timestamp)
+
+            var d1 = d.data[found]
+            var d0 = d.data[Math.max(found - 1, 0)]
+            var datum = (timestamp - d0.timestamp > d1.timestamp - timestamp) ? d1 : d0
+            
+            var posX = Math.round(config.scaleX(datum.timestamp))
+            var posY = Math.round(config.scaleY(datum.value))
+            var eventData = {event: d3.event, posX: posX, posY: posY}
+            datum = dh.utils.mergeAll({}, datum, d.metadata, eventData)
+            dataUnderCursor.push(datum)
+        })
+
+        return dataUnderCursor
+    }
+
     var eventsPanel = function(config) {
         var eventPanel = config.container.select('.events .event-panel')
             .on('mousemove touchstart', function(d) {
@@ -308,24 +329,7 @@
                 }
                 var mouseX = d3.mouse(this)[0]
                 var mouseTimestamp = config.scaleX.invert(mouseX)
-                var dataUnderCursor = []
-                config.dataConverted.forEach(function(d, i) {
-                    var bisector = d3.bisector(function(dB, x) {
-                            return dB.timestamp.getTime() - x.getTime()
-                        })
-                        .left
-                    var found = bisector(d.data, mouseTimestamp)
-
-                    var d1 = d.data[found]
-                    var d0 = d.data[Math.max(found - 1, 0)]
-                    var datum = (mouseTimestamp - d0.timestamp > d1.timestamp - mouseTimestamp) ? d1 : d0
-                    
-                    var posX = Math.round(config.scaleX(datum.timestamp))
-                    var posY = Math.round(config.scaleY(datum.value))
-                    var eventData = {event: d3.event, posX: posX, posY: posY}
-                    datum = dh.utils.mergeAll({}, datum, d.metadata, eventData)
-                    dataUnderCursor.push(datum)
-                })
+                var dataUnderCursor = getHoverInfo(config, mouseTimestamp)
                 config.events.call('hover', null, dataUnderCursor)
             })
             .on('mouseout', function(d) {
@@ -340,35 +344,65 @@
         }
     }
 
+    function setTooltip(config, d) {
+        config.container.select('.tooltip line')
+            .attr('y1', 0)
+            .attr('y2', config.chartHeight)
+            .attr('x1', d[0].posX)
+            .attr('x2', d[0].posX)
+            .attr('display', 'block')
+
+        var circles = config.container.select('.tooltip')
+            .attr('display', 'block')
+            .selectAll('circle.dot')
+            .data(d)
+        circles.enter().append('circle')
+            .merge(circles)
+            .attr('class', function(dB, dI) {
+                return ['dot', dB.id, 'layer' + dI].join(' ')
+            })
+            .attr('cx', function(dB) {
+                return dB.posX
+            })
+            .attr('cy', function(dB) {
+                return dB.posY
+            })
+            .attr('r', 2)
+        circles.exit().remove()
+    }
+
+    function hideTooltip(config) {
+        config.container.select('.tooltip line')
+            .attr('display', 'none')
+        config.container.select('.tooltip')
+            .attr('display', 'none')
+    }
+
     var tooltipComponent = function(config){
-        var line = config.container.select('.tooltip line')
-        var tooltipContainer = config.container.select('.tooltip')
-
+        if(typeof config.tooltipTimestamp !== 'undefined') {
+            if(config.tooltipTimestamp === null) {
+                hideTooltip(config)
+                config.events.call('tooltipChange', null, {})
+            }
+            else {
+                var dataUnderCursor = getHoverInfo(config, config.tooltipTimestamp)
+                setTooltip(config, dataUnderCursor)
+                config.events.call('tooltipChange', null, {timestamp: dataUnderCursor[0].timestamp})
+            }
+        }
+        if (config.dataIsEmpty || config.axisOnly || config.hide.indexOf('tooltip') > -1) {
+            return {}
+        }
+        
         config.events.on('hover.tooltip', function(d) {
-            line.attr('y1', 0)
-                .attr('y2', config.chartHeight)
-                .attr('x1', d[0].posX)
-                .attr('x2', d[0].posX)
-
-            var circles = tooltipContainer.selectAll('circle.dot')
-                .data(d)
-            circles.enter().append('circle')
-                .merge(circles)
-                .attr('class', function(dB, dI) {
-                    return ['dot', dB.id, 'layer' + dI].join(' ')
-                })
-                .attr('cx', function(dB) {
-                    return dB.posX
-                })
-                .attr('cy', function(dB) {
-                    return dB.posY
-                })
-                .attr('r', 2)
-            circles.exit().remove()
+            setTooltip(config, d)
         })
     }
 
     var xAxisTitle = function(config){
+        if (config.dataIsEmpty || config.axisOnly || config.hide.indexOf('xTitle') > -1) {
+            return {}
+        }
         var xTitleFormat = config.xTitleFormat || d3.utcFormat('%c')
         var titleContainer = config.container.select('.axis-title.x')
         var title = titleContainer.select('text')
@@ -390,6 +424,9 @@
     }
 
     var yAxisTitle = function(config){
+        if (config.axisOnly || config.hide.indexOf('yTitle') > -1) {
+            return {}
+        }
         config.container.select('.axis-title.y text')
             .text(config.yAxisTitle || '')
             .attr('dx', '0.5em')
@@ -486,7 +523,7 @@
 
     var timeseries = function(config) {
         var configCache,
-            events = d3.dispatch('hover', 'click', 'mouseout'),
+            events = d3.dispatch('hover', 'click', 'mouseout', 'tooltipChange'),
             chartCache,
             uid = ~~(Math.random()*10000)
 
@@ -509,13 +546,13 @@
         }
 
         var setConfig = function(config) {
-            configCache = dh.utils.mergeAll(configCache, config)
+            configCache = dh.utils.mergeAll({}, configCache, config)
             render()
             return this
         }
 
         var init = function(config, events) {
-            setConfig(dh.utils.mergeAll(config, {events: events}))
+            setConfig(dh.utils.mergeAll({}, config, {events: events}))
         }
 
         var destroy = function() {
