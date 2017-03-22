@@ -148,7 +148,8 @@
         var intervalFuncName = 'utc' + dh.utils.capitalize(resolution)
 
         var timeResolution = d3[intervalFuncName]
-        var axisX = d3.axisBottom()
+        var axisFunc = config.xAxisOnTop ? 'axisTop' : 'axisBottom'
+        var axisX = d3[axisFunc]()
             .scale(config.scaleX)
             .ticks(config.xTicks || null)
             .tickFormat(d3.utcFormat(config.axisXFormat || '%H:%M'))
@@ -285,7 +286,8 @@
         var arrows = config.container.select('.shapes')
             .selectAll('path.arrow')
             .data(config.dataConverted[0].data.filter(function(d, i) {
-                return i % 3 === 0;
+                var skip = config.arrowSkip || 3
+                return i % skip === 0;
             }))
 
         arrows.enter().append('path')
@@ -345,7 +347,6 @@
             var datum = (timestamp - d0.timestamp > d1.timestamp - timestamp) ? d1 : d0
             
             var posX = Math.round(config.scaleX(datum.timestamp))
-            console.log(datum.timestamp, posX)
             var posY = Math.round(config.scaleY(datum.value))
             var eventData = {event: d3.event, posX: posX, posY: posY}
             datum = dh.utils.mergeAll({}, datum, d.metadata, eventData)
@@ -387,36 +388,36 @@
             .attr('x2', d[0].posX)
             .attr('display', 'block')
 
-        // if(config.hide.indexOf('tooltipDot') > -1) {
-        //     config.container.select('.tooltip')
-        //         .selectAll('circle.dot')
-        //         .remove()
-        //     return
-        // }
-        // var circles = config.container.select('.tooltip')
-        //     .selectAll('circle.dot')
-        //     .data(d)
-        // circles.enter().append('circle')
-        //     .merge(circles)
-        //     .attr('display', 'block')
-        //     .attr('class', function(dB, dI) {
-        //         return ['dot', dB.id, 'layer' + dI].join(' ')
-        //     })
-        //     .attr('cx', function(dB) {
-        //         return dB.posX
-        //     })
-        //     .attr('cy', function(dB) {
-        //         return dB.posY
-        //     })
-        //     .attr('r', 2)
-        // circles.exit().remove()
+        if(config.hide.indexOf('tooltipDot') > -1) {
+            config.container.select('.tooltip')
+                .selectAll('circle.dot')
+                .remove()
+            return
+        }
+        var circles = config.container.select('.tooltip')
+            .selectAll('circle.dot')
+            .data(d)
+        circles.enter().append('circle')
+            .merge(circles)
+            .attr('display', 'block')
+            .attr('class', function(dB, dI) {
+                return ['dot', dB.id, 'layer' + dI].join(' ')
+            })
+            .attr('cx', function(dB) {
+                return dB.posX
+            })
+            .attr('cy', function(dB) {
+                return dB.posY
+            })
+            .attr('r', 2)
+        circles.exit().remove()
     }
 
     function hideTooltip(config) {
         config.container.select('.tooltip line')
-            // .attr('display', 'none')
+            .attr('display', 'none')
         config.container.select('.tooltip circle')
-            // .attr('display', 'none')
+            .attr('display', 'none')
     }
 
     var tooltipComponent = function(config){

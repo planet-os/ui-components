@@ -8,6 +8,16 @@
     stroke: #888;
 }
 
+.axis-top .datahub-timeseries-chart .domain,
+.axis-bottom .datahub-timeseries-chart .domain {
+    stroke: none;
+}
+
+.axis-top .datahub-timeseries-chart .tick line,
+.axis-bottom .datahub-timeseries-chart .tick line {
+    stroke: #555;
+}
+
 .datahub-timeseries-chart .grid .tick line {
     stroke: #555;
 }
@@ -46,6 +56,14 @@
     fill-opacity: 0.5;
     fill: #50935D;
     stroke: #50935D;
+}
+
+.forecast .datahub-timeseries-chart .area,
+.forecast .datahub-timeseries-chart .dot,
+.forecast .datahub-timeseries-chart .arrow {
+    fill-opacity: 0.5;
+    fill: #5499C2;
+    stroke: #5499C2;
 }
 
 .datahub-timeseries-chart .tooltip line{
