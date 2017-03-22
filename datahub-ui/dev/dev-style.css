@@ -2,7 +2,7 @@
     blue: #5499C2
     green: #50935D
 */
-    
+
 .datahub-timeseries-chart .tick line,
 .datahub-timeseries-chart .domain {
     stroke: #888;
@@ -33,15 +33,16 @@
     stroke: #50935D;
 }
 
-.datahub-timeseries-chart .area,
-.datahub-timeseries-chart .dot {
-    fill-opacity: 0.5;
-    fill: #5499C2;
-    stroke: #5499C2;
-}
-
-.datahub-timeseries-chart .area.layer0,
+/*.datahub-timeseries-chart .area.layer0,
 .datahub-timeseries-chart .dot.layer0 {
+    fill-opacity: 0.5;
+    fill: #50935D;
+    stroke: #50935D;
+}*/
+
+.datahub-timeseries-chart .area,
+.datahub-timeseries-chart .dot,
+.datahub-timeseries-chart .arrow {
     fill-opacity: 0.5;
     fill: #50935D;
     stroke: #50935D;
