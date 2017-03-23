@@ -3,6 +3,10 @@
     green: #50935D
 */
 
+.datahub-timeseries-chart svg {
+    display: block;
+}
+
 .datahub-timeseries-chart .tick line,
 .datahub-timeseries-chart .domain {
     stroke: #888;

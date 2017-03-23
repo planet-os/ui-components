@@ -14,11 +14,9 @@
                             + '<g class="axis-title x"><text></text></g>'
                             + '<g class="axis-title y"><text></text></g>'
                             + '<g class="reference"></g>'
-                            + '<g class="tooltip">'
-                                + '<line></line>'
-                            + '</g>'
-                            + '<g class="events"><rect class="event-panel"></rect></g>'
                         + '</g>'
+                        + '<g class="tooltip"><line></line></g>'
+                        + '<g class="events"><rect class="event-panel"></rect></g>'
                     + '</svg>'
                 + '</div>'
             + '</div>'
@@ -43,8 +41,8 @@
             .attr('transform', 'translate(' + config.margin.left + ',' + config.margin.top + ')')
 
         container.select('.events rect')
-            .attr('width', chartWidth)
-            .attr('height', chartHeight)
+            .attr('width', width)
+            .attr('height', height)
             .attr('opacity', 0)
 
         return {
@@ -342,7 +340,7 @@
                 .left
             var found = bisector(d.data, timestamp)
 
-            var d1 = d.data[found]
+            var d1 = d.data[Math.min(found, d.data.length - 1)]
             var d0 = d.data[Math.max(found - 1, 0)]
             var datum = (timestamp - d0.timestamp > d1.timestamp - timestamp) ? d1 : d0
             
@@ -362,7 +360,7 @@
                 if(config.dataIsEmpty) {
                     return
                 }
-                var mouseX = d3.mouse(this)[0]
+                var mouseX = d3.mouse(this)[0] - config.margin.left
                 var mouseTimestamp = config.scaleX.invert(mouseX)
                 var dataUnderCursor = getHoverInfo(config, mouseTimestamp)
 
@@ -381,11 +379,12 @@
     }
 
     function setTooltip(config, d) {
+        var x = d[0].posX + config.margin.left
         config.container.select('.tooltip line')
             .attr('y1', 0)
-            .attr('y2', config.chartHeight)
-            .attr('x1', d[0].posX)
-            .attr('x2', d[0].posX)
+            .attr('y2', config.height)
+            .attr('x1', x)
+            .attr('x2', x)
             .attr('display', 'block')
 
         if(config.hide.indexOf('tooltipDot') > -1) {
@@ -404,10 +403,10 @@
                 return ['dot', dB.id, 'layer' + dI].join(' ')
             })
             .attr('cx', function(dB) {
-                return dB.posX
+                return dB.posX + config.margin.left
             })
             .attr('cy', function(dB) {
-                return dB.posY
+                return dB.posY + config.margin.top
             })
             .attr('r', 2)
         circles.exit().remove()
