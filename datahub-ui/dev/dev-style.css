@@ -47,6 +47,12 @@
     stroke: #50935D;
 }
 
+.datahub-timeseries-chart .step-group .shape.layer1 {
+    stroke: none;
+    fill: #50935D;
+    fill-opacity: 0.5;
+}
+
 /*.datahub-timeseries-chart .area.layer0,
 .datahub-timeseries-chart .dot.layer0 {
     fill-opacity: 0.5;

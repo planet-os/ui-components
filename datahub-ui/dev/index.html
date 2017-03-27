@@ -12,16 +12,20 @@
     <link rel="stylesheet" href="../style/dark-theme.css" />
     <link rel="stylesheet" href="dev-style.css" />
     <style>
-        .chart {
+        .chart-container {
             width: 400px;
             height: 100px;
+            background-color: #233541;
+            margin: 40px;
         }
 
     </style>
 </head>
 
 <body>
-    <div class="chart"></div>
+    <div class="chart-container chart1"></div>
+    <div class="chart-container chart2"></div>
+    <div class="chart-container chart3"></div>
     
     <script>
 
@@ -42,43 +46,62 @@
         margin: {
             top: 20,
             right: 20,
-            bottom: 20,
-            left: 50
+            bottom: 30,
+            left: 40
         }
     }
 
+    // chart 1
     var dataConfig1 = commonDataConfig
     var chartConfig1 = commonChartConfig
-
-    var dataConfig2 = datahub.utils.mergeAll(commonDataConfig, {
-        layerCount: 1,
-        count: 100,
-    })
-    var chartConfig2 = datahub.utils.mergeAll(commonChartConfig, {
-        chartType: 'line',
-        xTicks: d3.utcMinute.every(20),
-        yTicks: 3,
-        hideXAxis: true,
-        hideYAxis: true,
-        hideXGrid: true
-    })
-
-    var dataConfig = dataConfig2
-    var chartConfig = chartConfig2
-
-    var data = datahub.data.generateTimeSeriesSplit(dataConfig)
-
-    var container = document.querySelector('.chart')
-    var timeseries = datahub.timeseries({
-            parent: container
+    var data = datahub.data.generateTimeSeriesSplit(dataConfig1)
+    datahub.timeseries({
+            parent: document.querySelector('.chart1')
         })
         .on('hover', function(d) {
             // console.log(d)
         })
+        .setConfig(chartConfig1)
+        .setData(data)
 
-    timeseries.setConfig(chartConfig)
+    // chart 2
+    var dataConfig2 = datahub.utils.mergeAll({}, commonDataConfig, {
+        layerCount: 2,
+        count: 100,
+    })
+    var chartConfig2 = datahub.utils.mergeAll({}, commonChartConfig, {
+        chartType: 'line',
+        xTicks: d3.utcMinute.every(20),
+        yTicks: 3
+    })
+    var data = datahub.data.generateTimeSeriesSplit(dataConfig2)
+    datahub.timeseries({
+            parent: document.querySelector('.chart2')
+        })
+        .on('hover', function(d) {
+            // console.log(d)
+        })
+        .setConfig(chartConfig2)
+        .setData(data)
 
-    timeseries.setData(data)
+    // chart 3
+    var dataConfig3 = datahub.utils.mergeAll({}, commonDataConfig, {
+        layerCount: 1,
+        count: 30,
+    })
+    var chartConfig3 = datahub.utils.mergeAll({}, commonChartConfig, {
+        chartType: 'step',
+        stepRange: 7
+    })
+    var data = datahub.data.generateTimeSeriesSplit(dataConfig3)
+    datahub.timeseries({
+            parent: document.querySelector('.chart3')
+        })
+        .on('hover', function(d) {
+            // console.log(d)
+        })
+        .setConfig(chartConfig3)
+        .setData(data)
 
     </script>
 </body>

@@ -27,8 +27,8 @@
         var dataIsEmpty = !(config.data)
 
         var container = d3.select(containerNode)
-        var width = config.width || containerNode.clientWidth
-        var height = config.height || containerNode.clientHeight || 300
+        var width = config.width || config.parent.clientWidth
+        var height = config.height || config.parent.clientHeight
 
         var chartWidth = width - config.margin.left - config.margin.right
         var chartHeight = height - config.margin.top - config.margin.bottom
@@ -265,6 +265,76 @@
             })
             .attr('d', function(d) {
                 return lineGenerator(d.data)
+            })
+        shapes.exit().remove()
+        shapeGroups.exit().remove()
+
+        return {}
+    }
+
+    var stepShapes = function(config) {
+        if (config.dataIsEmpty || config.axisOnly 
+            || (config.chartType !== 'step')) {
+            config.container.select('.step-group')
+                .selectAll('path.shape')
+                .remove()
+            return {}
+        }
+
+        var id = config.dataConverted[0].metadata.id
+        var range = config.stepRange || 3
+
+        var line = []
+        var lineData = config.dataConverted[0].data
+        lineData.forEach(function(d, i) {
+            var prevIdx = Math.max(i - 1, 0)
+            line.push([config.scaleX(d.timestamp), config.scaleY(lineData[prevIdx].value)])
+            line.push([config.scaleX(d.timestamp), config.scaleY(d.value)])
+            
+        })
+        var areaHigh = []
+        var areaLow = []
+        var areaData = config.dataConverted[0].data
+        areaData.forEach(function(d, i) {
+            var prevIdx = Math.max(i - 1, 0)
+            areaHigh.push([config.scaleX(d.timestamp), config.scaleY(lineData[prevIdx].value + range)])
+            areaHigh.push([config.scaleX(d.timestamp), config.scaleY(d.value + range)])
+
+            areaLow.push([config.scaleX(d.timestamp), config.scaleY(lineData[prevIdx].value - range)])
+            areaLow.push([config.scaleX(d.timestamp), config.scaleY(d.value - range)])
+        })
+        var area = areaHigh.concat(areaLow.reverse())
+
+        var lineGenerator = d3.line()
+            .defined(function(d) {
+                return d.value != null
+            })
+            .x(function(d) {
+                return config.scaleX(d.timestamp)
+            })
+            .y(function(d) {
+                return config.scaleY(d.value)
+            })
+
+        var shapeGroups = config.container.select('.shapes')
+            .selectAll('.step-group')
+            .data([line, area])
+        var shapes = shapeGroups.enter().append('g')
+            .attr('class', 'step-group')
+            .merge(shapeGroups)
+            .selectAll('path.shape')
+            .data(function(d, i) { 
+                d.layer = i
+                return [d]
+            })
+        shapes.enter().append('path')
+            .merge(shapes)
+            .attr('class', function(d, i, a, b) {
+                return ['shape', id, 'layer' + d.layer, config.chartType].join(' ')
+            })
+            .attr('d', function(d, i) {
+                // return 'M' + d.join() + (d.layer === 1 ? 'Z' : '')
+                return 'M' + d.join()
             })
         shapes.exit().remove()
         shapeGroups.exit().remove()
@@ -553,6 +623,7 @@
         gridX,
         lineShapes,
         arrowShapes,
+        stepShapes,
         // dh.common.printer,
         // areaShapes,
         axisComponentY,
