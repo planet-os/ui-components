@@ -30,13 +30,19 @@
                 obj1[p] = obj2[p];
             }
         };
-        var mergeAll = function() {
-            var newObj = {};
-            var objs = arguments;
-            for (var i = 0; i < objs.length; i++) {
-                merge(newObj, objs[i]);
+        var mergeAll = function(target, varArgs) {
+            var to = Object(target);
+            for (var index = 1; index < arguments.length; index++) {
+                var nextSource = arguments[index];
+                if (nextSource != null) {
+                    for (var nextKey in nextSource) {
+                        if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
+                            to[nextKey] = nextSource[nextKey];
+                        }
+                    }
+                }
             }
-            return newObj;
+            return to;
         };
         var htmlToNode = function(htmlString, parent) {
             while (parent.lastChild) {
@@ -172,6 +178,41 @@
                 return this;
             };
         };
+        var capitalize = function(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        };
+        var getExtent = function(d, isMin) {
+            var func = isMin ? "min" : "max";
+            if (d) {
+                return d3[func](d.map(function(d) {
+                    return d.value;
+                }));
+            }
+            return null;
+        };
+        var getStackExtent = function(d, isMin) {
+            var func = isMin ? "min" : "max";
+            if (d && d.length) {
+                var sums = d.map(function(d) {
+                    return d3.sum(d.value);
+                });
+                return d3[func](sums);
+            }
+            return null;
+        };
+        var getMultiExtent = function(d, isMin) {
+            var func = isMin ? "min" : "max";
+            if (d && d.length) {
+                var data = d.map(function(d, i) {
+                    return d.value;
+                });
+                if (data[0].length) {
+                    data = d3.merge(data);
+                }
+                return d3[func](data);
+            }
+            return null;
+        };
         dh.utils = {
             merge: merge,
             mergeAll: mergeAll,
@@ -189,7 +230,11 @@
             parseRGB: parseRGB,
             pipeline: pipeline,
             override: override,
-            rebind: rebind
+            rebind: rebind,
+            capitalize: capitalize,
+            getExtent: getExtent,
+            getStackExtent: getStackExtent,
+            getMultiExtent: getMultiExtent
         };
     }(datahub);
     !function(dh, d3) {
@@ -407,6 +452,9 @@
             });
             return {};
         };
+        var printer = function(config) {
+            console.warn(config);
+        };
         dh.common = {
             axesFormatAutoconfig: axesFormatAutoconfig,
             defaultConfig: defaultConfig,
@@ -427,7 +475,8 @@
             axisXFormatterTimeHour: axisXFormatterTimeHour,
             axisXFormatterRotate30: axisXFormatterRotate30,
             axisYFormatSI: axisYFormatSI,
-            labelsRewriterY: labelsRewriterY
+            labelsRewriterY: labelsRewriterY,
+            printer: printer
         };
     }(datahub, root.d3);
     !function(dh, d3) {
@@ -462,6 +511,9 @@
             });
             return pointsToFeatures(points);
         };
+        var generateRandomString = function(len) {
+            return Math.random().toString(36).substring(4, len + 4 || 8);
+        };
         var pointsToFeatures = function(points) {
             return {
                 type: "FeatureCollection",
@@ -485,9 +537,6 @@
                 cb(json);
             });
         };
-        function capitalize(string) {
-            return string.charAt(0).toUpperCase() + string.slice(1);
-        }
         function createDateAsUTC(date) {
             return new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes(), date.getSeconds()));
         }
@@ -551,6 +600,37 @@
             });
             return merged;
         };
+        var generateTimeSeriesSplit = function(_config) {
+            var _config = _config || {};
+            var config = {
+                count: _config.count || 12,
+                layerCount: _config.layerCount || 1,
+                timeStart: _config.timeStart || "2016-01-01",
+                timeIncrement: _config.timeIncrement || "month",
+                step: _config.step || 1,
+                min: _config.min || 0,
+                max: _config.max || 100
+            };
+            var startValue = ~~(Math.random() * (config.max - config.min)) + config.min;
+            var values = generateArray(config.layerCount, function() {
+                var dataset = {};
+                var timestamps = generateTimestamps(config);
+                dataset.data = generateArray(config.count, function(d, i) {
+                    startValue += (Math.random() * 2 - 1) * ((config.max - config.min) / 10);
+                    startValue = Math.max(startValue, config.min);
+                    startValue = Math.min(startValue, config.max);
+                    return {
+                        value: startValue,
+                        timestamp: timestamps[i]
+                    };
+                });
+                dataset.metadata = {
+                    id: generateRandomString(8)
+                };
+                return dataset;
+            });
+            return values;
+        };
         var generateTimestamps = function(_config) {
             var _config = _config || {};
             var config = {
@@ -562,7 +642,7 @@
                 min: _config.min || 0,
                 max: _config.max || 100
             };
-            var intervalFuncName = "utc" + capitalize(config.timeIncrement) || "utcHour";
+            var intervalFuncName = "utc" + dh.utils.capitalize(config.timeIncrement) || "utcHour";
             var intervalFunc = d3[intervalFuncName];
             var intervalRangeFunc = d3[intervalFuncName + "s"];
             var dateStart = config.timeStart ? new Date(config.timeStart) : new Date();
@@ -788,6 +868,7 @@
             generateRaster: generateRaster,
             generateGeojson: generateGeojson,
             generateTimeSeries: generateTimeSeries,
+            generateTimeSeriesSplit: generateTimeSeriesSplit,
             generateTimestamps: generateTimestamps,
             getDatasetDetails: getDatasetDetails,
             getVariables: getVariables,
@@ -2040,9 +2121,6 @@
                 }
             };
         };
-        var printer = function(config) {
-            console.warn(config);
-        };
         var scaleX = function(config) {
             var dataX = config.dataIsEmpty ? 0 : config.data.timestamp;
             var scaleX = d3.scaleBand().domain(dataX).range([ 0, config.chartWidth ]).paddingInner(.4).paddingOuter(.2);
@@ -2056,58 +2134,26 @@
                 lineScaleX: lineScaleX
             };
         };
-        var getExtent = function(d, isMin) {
-            var func = isMin ? "min" : "max";
-            if (d) {
-                return d3[func](d.map(function(d) {
-                    return d.value;
-                }));
-            }
-            return null;
-        };
-        var getStackExtent = function(d, isMin) {
-            var func = isMin ? "min" : "max";
-            if (d && d.length) {
-                var sums = d.map(function(d) {
-                    return d3.sum(d.value);
-                });
-                return d3[func](sums);
-            }
-            return null;
-        };
-        var getMultiExtent = function(d, isMin) {
-            var func = isMin ? "min" : "max";
-            if (d && d.length) {
-                var data = d.map(function(d, i) {
-                    return d.value;
-                });
-                if (data[0].length) {
-                    data = d3.merge(data);
-                }
-                return d3[func](data);
-            }
-            return null;
-        };
         var scaleY = function(config) {
             var maxs = [];
-            maxs.push(getExtent(config.data.barData));
-            maxs.push(getExtent(config.data.referenceData));
-            maxs.push(getExtent(config.data.estimateData));
-            maxs.push(getExtent(config.data.thresholdData));
-            maxs.push(getExtent(config.data.areaData));
-            maxs.push(getStackExtent(config.data.stackedBarData));
-            maxs.push(getStackExtent(config.data.stackedAreaData));
-            maxs.push(getMultiExtent(config.data.lineData));
+            maxs.push(dh.utils.getExtent(config.data.barData));
+            maxs.push(dh.utils.getExtent(config.data.referenceData));
+            maxs.push(dh.utils.getExtent(config.data.estimateData));
+            maxs.push(dh.utils.getExtent(config.data.thresholdData));
+            maxs.push(dh.utils.getExtent(config.data.areaData));
+            maxs.push(dh.utils.getStackExtent(config.data.stackedBarData));
+            maxs.push(dh.utils.getStackExtent(config.data.stackedAreaData));
+            maxs.push(dh.utils.getMultiExtent(config.data.lineData));
             var mins = [];
             var isMin = true;
-            mins.push(getExtent(config.data.barData, isMin));
-            mins.push(getExtent(config.data.referenceData, isMin));
-            mins.push(getExtent(config.data.estimateData, isMin));
-            mins.push(getExtent(config.data.thresholdData, isMin));
-            mins.push(getExtent(config.data.areaData, isMin));
-            mins.push(getStackExtent(config.data.stackedBarData, isMin));
-            mins.push(getStackExtent(config.data.stackedAreaData, isMin));
-            mins.push(getMultiExtent(config.data.lineData, isMin));
+            mins.push(dh.utils.getExtent(config.data.barData, isMin));
+            mins.push(dh.utils.getExtent(config.data.referenceData, isMin));
+            mins.push(dh.utils.getExtent(config.data.estimateData, isMin));
+            mins.push(dh.utils.getExtent(config.data.thresholdData, isMin));
+            mins.push(dh.utils.getExtent(config.data.areaData, isMin));
+            mins.push(dh.utils.getStackExtent(config.data.stackedBarData, isMin));
+            mins.push(dh.utils.getStackExtent(config.data.stackedAreaData, isMin));
+            mins.push(dh.utils.getMultiExtent(config.data.lineData, isMin));
             var max = d3.max(maxs);
             var min;
             if (config.autoScaleY) {
