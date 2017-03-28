@@ -316,3 +316,7 @@
 .datahub-waterfall-chart .number-container .value {
     display: flex;
 }
+
+.datahub-timeseries-chart svg {
+    display: block;
+}

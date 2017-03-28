@@ -275,6 +275,30 @@
     </div>
     <div class="row section">
         <div class="col-xs-12 col-md-7">
+            <div class="timeseries-area"></div>
+        </div>
+        <div class="col-xs-12 col-md-5">
+            <div class="description">A timeseries area chart.</div>
+        </div>
+    </div>
+    <div class="row section">
+        <div class="col-xs-12 col-md-7">
+            <div class="timeseries-line"></div>
+        </div>
+        <div class="col-xs-12 col-md-5">
+            <div class="description">A timeseries line chart.</div>
+        </div>
+    </div>
+    <div class="row section">
+        <div class="col-xs-12 col-md-7">
+            <div class="timeseries-step"></div>
+        </div>
+        <div class="col-xs-12 col-md-5">
+            <div class="description">A timeseries step chart.</div>
+        </div>
+    </div>
+    <div class="row section">
+        <div class="col-xs-12 col-md-7">
             <div class="row">
                 <div class="number-widget big col-xs"></div>
                 <div class="number-widget medium col-xs"></div>
@@ -434,6 +458,9 @@
         </div>
     </div>
     <script>
+
+    // multi chart
+    ////////////////////////////////////////
 
     var dataMulti = {
         timestamp: datahub.data.generateTimestamps(),
@@ -814,6 +841,9 @@
 
     renderMainChart(dataMulti)
 
+    // table chart
+    ////////////////////////////////////////
+
     var table = datahub.tableChart({
         parent: document.querySelector('.table-chart')
     })
@@ -891,6 +921,9 @@
             }
         })
 
+    // vertical chart
+    ////////////////////////////////////////
+
     var vertical = datahub.verticalChart({
         parent: document.querySelector('.vertical-chart')
     })
@@ -906,6 +939,9 @@
         unit: '%'
     })
 
+    // waterfall chart
+    ////////////////////////////////////////
+
     var waterfall = datahub.waterfallChart({
         parent: document.querySelector('.waterfall-chart')
     })
@@ -919,6 +955,86 @@
             {key: 'total', label: 'Total', value: 38}
         ]
     })
+
+    // timeseries chart
+    ////////////////////////////////////////
+
+    var commonDataConfig = {
+        layerCount: 1,
+        count: 10,
+        timeIncrement: 'minute', 
+        min: 0, 
+        max: 50
+    }
+    var commonChartConfig = {
+        tickStep: 20,
+        resolution: 'minute',
+        axisXFormat: '%H:%M',
+        yAxisTitle: 'ºc', 
+        domain: [0, 50],
+        chartType: 'area',
+        margin: {
+            top: 20,
+            right: 20,
+            bottom: 30,
+            left: 40
+        }
+    }
+
+    // chart 1
+    var dataConfig1 = commonDataConfig
+    var chartConfig1 = commonChartConfig
+    var data = datahub.data.generateTimeSeriesSplit(dataConfig1)
+    datahub.timeseries({
+            parent: document.querySelector('.timeseries-area')
+        })
+        .on('hover', function(d) {
+            // console.log(d)
+        })
+        .setConfig(chartConfig1)
+        .setData(data)
+
+    // chart 2
+    var dataConfig2 = datahub.utils.mergeAll({}, commonDataConfig, {
+        layerCount: 2,
+        count: 100,
+    })
+    var chartConfig2 = datahub.utils.mergeAll({}, commonChartConfig, {
+        chartType: 'line',
+        xTicks: d3.utcMinute.every(20),
+        yTicks: 3
+    })
+    var data = datahub.data.generateTimeSeriesSplit(dataConfig2)
+    datahub.timeseries({
+            parent: document.querySelector('.timeseries-line')
+        })
+        .on('hover', function(d) {
+            // console.log(d)
+        })
+        .setConfig(chartConfig2)
+        .setData(data)
+
+    // chart 3
+    var dataConfig3 = datahub.utils.mergeAll({}, commonDataConfig, {
+        layerCount: 1,
+        count: 30,
+    })
+    var chartConfig3 = datahub.utils.mergeAll({}, commonChartConfig, {
+        chartType: 'step',
+        stepRange: 7
+    })
+    var data = datahub.data.generateTimeSeriesSplit(dataConfig3)
+    datahub.timeseries({
+            parent: document.querySelector('.timeseries-step')
+        })
+        .on('hover', function(d) {
+            // console.log(d)
+        })
+        .setConfig(chartConfig3)
+        .setData(data)
+
+    // other widgets
+    ////////////////////////////////////////
 
     var number = datahub.widget.number({
             parent: document.querySelector('.number-widget.big'),
@@ -1112,91 +1228,94 @@
     })
     .on('change', function(d){ console.log(d) })
 
-    datahub.data.setApiKey('0f58fe2540fa4cf19a4aa68f290fd148')
+    // maps
+    ////////////////////////////////////////
 
-    datahub.map.rasterMap({
-            parent: document.querySelector('.map-light'),
-            showLabels: false,
-            mapConfig: {
-                zoomControl: false
-            },
-            showTooltip: false
-        })
-        .init()
+    // datahub.data.setApiKey('0f58fe2540fa4cf19a4aa68f290fd148')
 
-    datahub.map.rasterMap({
-            parent: document.querySelector('.map-dark'),
-            basemapName: 'basemapLight',
-            showLabels: false,
-            mapConfig: {
-                zoomControl: false
-            },
-            showTooltip: false
-        })
-        .init()
+    // datahub.map.rasterMap({
+    //         parent: document.querySelector('.map-light'),
+    //         showLabels: false,
+    //         mapConfig: {
+    //             zoomControl: false
+    //         },
+    //         showTooltip: false
+    //     })
+    //     .init()
 
-    var datasetName = 'noaa_gfs_global_sflux_0.12d'
-    var variableName = 'Temperature_hybrid'
-    datahub.data.getPreview(datasetName, variableName, null, function(response) {
-        rasterMap.renderRaster(response.json)
-        rasterMapGrayscale.renderRaster(response.json)
-    })
+    // datahub.map.rasterMap({
+    //         parent: document.querySelector('.map-dark'),
+    //         basemapName: 'basemapLight',
+    //         showLabels: false,
+    //         mapConfig: {
+    //             zoomControl: false
+    //         },
+    //         showTooltip: false
+    //     })
+    //     .init()
 
-    var rasterMap = datahub.map.rasterMap({
-            parent: document.querySelector('.map-grayscale'),
-            colorScale: datahub.palette.grayscale,
-            showLabels: false,
-            mapConfig: {
-                zoomControl: false
-            },
-            showTooltip: false
-        })
-        .init()
+    // var datasetName = 'noaa_gfs_global_sflux_0.12d'
+    // var variableName = 'Temperature_hybrid'
+    // datahub.data.getPreview(datasetName, variableName, null, function(response) {
+    //     rasterMap.renderRaster(response.json)
+    //     rasterMapGrayscale.renderRaster(response.json)
+    // })
 
-    var rasterMapGrayscale = datahub.map.rasterMap({
-            parent: document.querySelector('.map-rainbow'),
-            colorScale: datahub.palette.equalizedSpectral,
-            showLabels: false,
-            mapConfig: {
-                zoomControl: false
-            },
-            showTooltip: false
-        })
-        .init()
+    // var rasterMap = datahub.map.rasterMap({
+    //         parent: document.querySelector('.map-grayscale'),
+    //         colorScale: datahub.palette.grayscale,
+    //         showLabels: false,
+    //         mapConfig: {
+    //             zoomControl: false
+    //         },
+    //         showTooltip: false
+    //     })
+    //     .init()
 
-    datahub.data.getJSON('../asset/gfs_data.json', function(error, json) {
-        rasterMapBig.renderRaster(json)
-        colorLegend.setData(json.uniqueValues)
-    })
+    // var rasterMapGrayscale = datahub.map.rasterMap({
+    //         parent: document.querySelector('.map-rainbow'),
+    //         colorScale: datahub.palette.equalizedSpectral,
+    //         showLabels: false,
+    //         mapConfig: {
+    //             zoomControl: false
+    //         },
+    //         showTooltip: false
+    //     })
+    //     .init()
 
-    var rasterMapBig = datahub.map.rasterMap({
-            parent: document.querySelector('.map-raster'),
-            colorScale: datahub.palette.equalizedSpectral
-        })
-        .init()
-        .renderVectorMap()
+    // datahub.data.getJSON('../asset/gfs_data.json', function(error, json) {
+    //     rasterMapBig.renderRaster(json)
+    //     colorLegend.setData(json.uniqueValues)
+    // })
 
-    var pointsGeojson = datahub.data.generateGeojsonPoints()
+    // var rasterMapBig = datahub.map.rasterMap({
+    //         parent: document.querySelector('.map-raster'),
+    //         colorScale: datahub.palette.equalizedSpectral
+    //     })
+    //     .init()
+    //     .renderVectorMap()
 
-    var vectorMap = datahub.map.rasterMap({
-            parent: document.querySelector('.map-vector')
-        })
-        .init()
-        .renderPolygon(pointsGeojson)
+    // var pointsGeojson = datahub.data.generateGeojsonPoints()
 
-    datahub.data.getWorldVector(function(geojson) {
-        vectorMap.renderPolygon(geojson)
-    })
+    // var vectorMap = datahub.map.rasterMap({
+    //         parent: document.querySelector('.map-vector')
+    //     })
+    //     .init()
+    //     .renderPolygon(pointsGeojson)
 
-    datahub.map.selectorMap({
-        parent: document.querySelector('.map-selector')
-    })
+    // datahub.data.getWorldVector(function(geojson) {
+    //     vectorMap.renderPolygon(geojson)
+    // })
 
-    var colorLegend = datahub.colorLegend({
-        parent: document.querySelector('.map-legend'),
-        height: 50,
-        colorScale: datahub.palette.equalizedSpectral
-    })
+    // datahub.map.selectorMap({
+    //     parent: document.querySelector('.map-selector')
+    // })
+
+    // var colorLegend = datahub.colorLegend({
+    //     parent: document.querySelector('.map-legend'),
+    //     height: 50,
+    //     colorScale: datahub.palette.equalizedSpectral
+    // })
 
     </script>
 </body>

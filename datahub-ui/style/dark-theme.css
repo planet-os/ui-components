@@ -426,6 +426,85 @@ body {
     stroke: white;
 }
 
+.datahub-timeseries-chart .tick line,
+.datahub-timeseries-chart .domain {
+    stroke: #888;
+}
+
+.axis-top .datahub-timeseries-chart .domain,
+.axis-bottom .datahub-timeseries-chart .domain {
+    stroke: none;
+}
+
+.axis-top .datahub-timeseries-chart .tick line,
+.axis-bottom .datahub-timeseries-chart .tick line {
+    stroke: #555;
+}
+
+.datahub-timeseries-chart .grid .tick line {
+    stroke: #555;
+}
+
+.datahub-timeseries-chart .grid .domain {
+    display: none;
+}
+
+.datahub-timeseries-chart .tick text {
+    fill: #aaa;
+}
+
+.datahub-timeseries-chart .reference {
+    stroke: #aaa;
+}
+
+.datahub-timeseries-chart .shape {
+    fill: none;
+    stroke: #5499C2;
+}
+
+.datahub-timeseries-chart .shape.layer0 {
+    stroke: #50935D;
+}
+
+.datahub-timeseries-chart .step-group .shape.layer1 {
+    stroke: none;
+    fill: #50935D;
+    fill-opacity: 0.5;
+}
+
+/*.datahub-timeseries-chart .area.layer0,
+.datahub-timeseries-chart .dot.layer0 {
+    fill-opacity: 0.5;
+    fill: #50935D;
+    stroke: #50935D;
+}*/
+
+.datahub-timeseries-chart .area,
+.datahub-timeseries-chart .dot,
+.datahub-timeseries-chart .arrow {
+    fill-opacity: 0.5;
+    fill: #50935D;
+    stroke: #50935D;
+}
+
+.forecast .datahub-timeseries-chart .area,
+.forecast .datahub-timeseries-chart .dot,
+.forecast .datahub-timeseries-chart .arrow {
+    fill-opacity: 0.5;
+    fill: #5499C2;
+    stroke: #5499C2;
+}
+
+.datahub-timeseries-chart .tooltip line{
+    stroke: white;
+    fill: white;
+}
+
+.datahub-timeseries-chart .axis-title text {
+    fill: #aaa;
+    font-size: 0.6em;
+}
+
 /* non-component styling */
 .section {
     background-color: #233541;
