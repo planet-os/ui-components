@@ -387,7 +387,7 @@
         dh.utils.merge(mapConfig, _config.mapConfig)
 
         var events = d3.dispatch('click', 'mousemove', 'mouseenter', 'mouseleave', 
-            'featureClicked', 'featureMousEnter', 'featureMousLeave', 'markerClicked')
+            'featureClick', 'featureMousEnter', 'featureMousLeave', 'markerClick')
 
         var states = {
             isVisible: true
@@ -533,7 +533,7 @@
             var onEachFeature = function(feature, layer) {
                 layer.on({
                     click: function(e) {
-                        events.call('featureClicked', this, {
+                        events.call('featureClick', this, {
                             id: e.target.feature.properties.id,
                             lat: e.target._latlng ? e.target._latlng.lat : e.latlng.lat,
                             lon: e.target._latlng ? e.target._latlng.lng : e.latlng.lng,
@@ -592,7 +592,7 @@
                     opacity: 1
                 })
                 .on('click', function(e){
-                    events.call('markerClicked', this, arguments)
+                    events.call('markerClick', this, arguments)
                 })
                 .addTo(map)
 

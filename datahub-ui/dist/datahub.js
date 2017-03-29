@@ -1844,7 +1844,7 @@
                 }
             };
             dh.utils.merge(mapConfig, _config.mapConfig);
-            var events = d3.dispatch("click", "mousemove", "mouseenter", "mouseleave", "featureClicked", "featureMousEnter", "featureMousLeave", "markerClicked");
+            var events = d3.dispatch("click", "mousemove", "mouseenter", "mouseleave", "featureClick", "featureMousEnter", "featureMousLeave", "markerClick");
             var states = {
                 isVisible: true
             };
@@ -1957,7 +1957,7 @@
                 var onEachFeature = function(feature, layer) {
                     layer.on({
                         click: function(e) {
-                            events.call("featureClicked", this, {
+                            events.call("featureClick", this, {
                                 id: e.target.feature.properties.id,
                                 lat: e.target._latlng ? e.target._latlng.lat : e.latlng.lat,
                                 lon: e.target._latlng ? e.target._latlng.lng : e.latlng.lng,
@@ -2009,7 +2009,7 @@
                     draggable: true,
                     opacity: 1
                 }).on("click", function(e) {
-                    events.call("markerClicked", this, arguments);
+                    events.call("markerClick", this, arguments);
                 }).addTo(map);
                 return this;
             }
@@ -3196,8 +3196,9 @@
         function setTooltip(config, d) {
             var x = d[0].posX + config.margin.left;
             config.container.select(".tooltip line").attr("y1", 0).attr("y2", config.height).attr("x1", x).attr("x2", x).attr("display", "block");
-            if (config.hide.indexOf("tooltipDot") > -1) {
+            if (!d || !d[0] || typeof d[0].value === "undefined" || d[0].value === null || config.hide.indexOf("tooltipDot") > -1) {
                 config.container.select(".tooltip").selectAll("circle.dot").remove();
+                config.container.select(".tooltip").selectAll("text.tooltip-label").remove();
                 return;
             }
             var circles = config.container.select(".tooltip").selectAll("circle.dot").data(d);
@@ -3209,6 +3210,15 @@
                 return dB.posY + config.margin.top;
             }).attr("r", 2);
             circles.exit().remove();
+            var labels = config.container.select(".tooltip").selectAll("text.tooltip-label").data(d);
+            labels.enter().append("text").merge(labels).attr("display", "block").attr("class", function(dB, dI) {
+                return [ "tooltip-label", dB.id, "layer" + dI ].join(" ");
+            }).attr("transform", function(dB, dI) {
+                return "translate(" + [ dB.posX + config.margin.left, dB.posY + config.margin.top ] + ")";
+            }).attr("dx", -4).attr("text-anchor", "end").text(function(dB, dI) {
+                return config.valueFormatter ? config.valueFormatter(dB, dI) : dB.value;
+            });
+            labels.exit().remove();
         }
         function hideTooltip(config) {
             config.container.select(".tooltip line").attr("display", "none");

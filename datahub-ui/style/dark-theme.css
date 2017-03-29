@@ -505,6 +505,11 @@ body {
     font-size: 0.6em;
 }
 
+.datahub-timeseries-chart .tooltip-label {
+    fill: #aaa;
+    font-size: 0.6em;
+}
+
 /* non-component styling */
 .section {
     background-color: #233541;

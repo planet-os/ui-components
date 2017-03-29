@@ -970,6 +970,9 @@
         tickStep: 20,
         resolution: 'minute',
         axisXFormat: '%H:%M',
+        valueFormatter: function(d, i) {
+            return Math.round(d.value*100) / 100
+        },
         yAxisTitle: 'ºc', 
         domain: [0, 50],
         chartType: 'area',
