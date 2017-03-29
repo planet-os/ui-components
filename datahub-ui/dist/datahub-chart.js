@@ -2316,7 +2316,13 @@
             if (config.dataIsEmpty) {
                 return {};
             }
-            var axisY = d3.axisLeft().scale(config.scaleY).ticks(config.yTicks || 6, "s").tickPadding(10);
+            var axisY = d3.axisLeft().scale(config.scaleY).ticks(config.yTicks || 6).tickFormat(function(d) {
+                if (d < 1) {
+                    return d3.format(".2")(d);
+                } else {
+                    return d3.format(".2s")(d);
+                }
+            }).tickPadding(10);
             return {
                 axisY: axisY
             };
