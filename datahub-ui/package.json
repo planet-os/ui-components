@@ -41,6 +41,7 @@
     "npm-watch": "^0.1.8"
   },
   "watch": {
-    "build": "src/*.js"
+    "build": "src/*.js",
+    "build-chart": "src/*.js"
   }
 }

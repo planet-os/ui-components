@@ -24,7 +24,7 @@
 
 <body>
     <div class="chart">
-        <div class="chart-row axis-top">
+        <div class="chart-row topAxis">
             <div class="historical"></div>
             <div class="forecast"></div>
         </div>
@@ -32,7 +32,7 @@
             <div class="historical"></div>
             <div class="forecast"></div>
         </div>
-        <div class="chart-row wind-direction">
+        <div class="chart-row windDirection">
             <div class="historical"></div>
             <div class="forecast"></div>
         </div>
@@ -44,7 +44,7 @@
             <div class="historical"></div>
             <div class="forecast"></div>
         </div>
-        <div class="chart-row axis-bottom">
+        <div class="chart-row bottomAxis">
             <div class="historical"></div>
             <div class="forecast"></div>
         </div>
@@ -55,14 +55,42 @@
     
     <script>
 
-    var dataConfig1 = {
+    // generated data
+    var historicalDataConfig = {
         layerCount: 1,
         count: 10,
         timeIncrement: 'minute', 
         min: 0, 
         max: 50
     }
-    var chartConfig1 = {
+
+    var foecastDataConfig = datahub.utils.mergeAll({}, historicalDataConfig, {
+        layerCount: 1,
+        count: 100,
+        timeIncrement: 'hour'
+    })
+
+    var data = {
+        historical: {
+            wind: datahub.data.generateTimeSeriesSplit(historicalDataConfig),
+            windDirection: datahub.data.generateTimeSeriesSplit(historicalDataConfig),
+            wave: datahub.data.generateTimeSeriesSplit(historicalDataConfig),
+            tide: datahub.data.generateTimeSeriesSplit(historicalDataConfig),
+            bottomAxis: datahub.data.generateTimeSeriesSplit(historicalDataConfig),
+            topAxis: datahub.data.generateTimeSeriesSplit(historicalDataConfig)
+        },
+        forecast: {
+            wind: datahub.data.generateTimeSeriesSplit(foecastDataConfig),
+            windDirection: datahub.data.generateTimeSeriesSplit(foecastDataConfig),
+            wave: datahub.data.generateTimeSeriesSplit(foecastDataConfig),
+            tide: datahub.data.generateTimeSeriesSplit(foecastDataConfig),
+            bottomAxis: datahub.data.generateTimeSeriesSplit(foecastDataConfig),
+            topAxis: datahub.data.generateTimeSeriesSplit(foecastDataConfig)
+        }
+    }
+
+    // chart config
+    var historicalChartConfig = {
         tickStep: 20,
         resolution: 'minute',
         axisXFormat: '%H:%M',
@@ -70,170 +98,18 @@
         chartType: 'area',
         yTicks: 3,
         height: 80,
-        hide: ['xTitle', 'yTitle', 'xAxis'],
+        hide: ['xTitle', 'yTitle', 'xAxis'], //['xTitle', 'yTitle', 'tooltip', 'xAxis', 'yAxis', 'shapes', 'xGrid', 'xTitle', 'yTitle']
         margin: { top: 10, right: 20, bottom: 10, left: 50 }
     }
 
-    // var hide = ['xTitle', 'yTitle', 'tooltip', 'xAxis', 'yAxis', 'shapes', 'xGrid', 'xTitle', 'yTitle']
-
-    var dataConfig2 = datahub.utils.mergeAll({}, dataConfig1, {
-        layerCount: 1,
-        count: 100,
-        timeIncrement: 'hour'
-    })
-    var chartConfig2 = datahub.utils.mergeAll({}, chartConfig1, {
+    var forecastChartConfig = datahub.utils.mergeAll({}, historicalChartConfig, {
         xTicks: d3.utcHour.every(12),
         resolution: 'hour',
         hide: ['xAxis', 'yAxis', 'yTitle', 'xTitle'],
         margin: { top: 10, right: 20, bottom: 10, left: 0 }
     })
 
-    function setTimeInfo(timestamp) {
-        var formattedDate = d3.utcFormat('%c')(timestamp)
-        document.querySelector('.info .timestamp').innerText = formattedDate
-    }
-
-    function setHistoricalTooltips(timestamp, toSet) {
-        toSet.forEach(function(d) {
-            d.setConfig({tooltipTimestamp: timestamp})
-        })
-        windForecast.setConfig({tooltipTimestamp: null})
-        waveForecast.setConfig({tooltipTimestamp: null})
-        tideForecast.setConfig({tooltipTimestamp: null})
-        arrowsForecast.setConfig({tooltipTimestamp: null})
-
-        setTimeInfo(timestamp)
-    }
-
-    function setForecastTooltips(timestamp, toSet) {
-        toSet.forEach(function(d) {
-            d.setConfig({tooltipTimestamp: timestamp})
-        })
-        windHistorical.setConfig({tooltipTimestamp: null})
-        waveHistorical.setConfig({tooltipTimestamp: null})
-        tideHistorical.setConfig({tooltipTimestamp: null})
-        arrowsHistorical.setConfig({tooltipTimestamp: null})
-
-        setTimeInfo(timestamp)
-    }
-
-    function setTooltipsToActual() {
-        var timestamp = now
-        windHistorical.setConfig({tooltipTimestamp: timestamp})
-        waveHistorical.setConfig({tooltipTimestamp: timestamp})
-        tideHistorical.setConfig({tooltipTimestamp: timestamp})
-        arrowsHistorical.setConfig({tooltipTimestamp: timestamp})
-        windForecast.setConfig({tooltipTimestamp: null})
-        waveForecast.setConfig({tooltipTimestamp: null})
-        tideForecast.setConfig({tooltipTimestamp: null})
-        arrowsForecast.setConfig({tooltipTimestamp: null})
-
-        setTimeInfo(timestamp)
-    }
-
-    // historical/forecast area charts
-
-    var data = datahub.data.generateTimeSeriesSplit(dataConfig1)
-    var now = new Date(data[0].data.slice(-1)[0].timestamp)
-    var windHistorical = datahub.timeseries({ parent: document.querySelector('.wind .historical') })
-        .setConfig(chartConfig1)
-        .setData(data)
-        .on('hover', function(d) {
-            setHistoricalTooltips(d[0].timestamp, [waveHistorical, tideHistorical, arrowsHistorical])
-        })
-        .on('mouseout', setTooltipsToActual)
-
-    var data = datahub.data.generateTimeSeriesSplit(dataConfig2)
-    var windForecast = datahub.timeseries({ parent: document.querySelector('.wind .forecast') })
-        .setConfig(chartConfig2)
-        .setData(data)
-        .on('hover', function(d) {
-            setForecastTooltips(d[0].timestamp, [waveForecast, tideForecast, arrowsForecast])
-        })
-        .on('mouseout', setTooltipsToActual)
-
-    var data = datahub.data.generateTimeSeriesSplit(dataConfig1)
-    var waveHistorical = datahub.timeseries({ parent: document.querySelector('.wave .historical') })
-        .setConfig(chartConfig1)
-        .setData(data)
-        .on('hover', function(d) {
-            setHistoricalTooltips(d[0].timestamp, [windHistorical, tideHistorical, arrowsHistorical])
-        })
-        .on('mouseout', setTooltipsToActual)
-
-    var data = datahub.data.generateTimeSeriesSplit(dataConfig2)
-    var waveForecast = datahub.timeseries({ parent: document.querySelector('.wave .forecast') })
-        .setConfig(chartConfig2)
-        .setData(data)
-        .on('hover', function(d) {
-            setForecastTooltips(d[0].timestamp, [windForecast, tideForecast, arrowsForecast])
-        })
-        .on('mouseout', setTooltipsToActual)
-
-    var data = datahub.data.generateTimeSeriesSplit(dataConfig1)
-    var tideHistorical = datahub.timeseries({ parent: document.querySelector('.tide .historical') })
-        .setConfig(chartConfig1)
-        .setData(data)
-        .on('hover', function(d) {
-            setHistoricalTooltips(d[0].timestamp, [waveHistorical, windHistorical, arrowsHistorical])
-        })
-        .on('mouseout', setTooltipsToActual)
-
-    var data = datahub.data.generateTimeSeriesSplit(dataConfig2)
-    var tideForecast = datahub.timeseries({ parent: document.querySelector('.tide .forecast') })
-        .setConfig(chartConfig2)
-        .setData(data)
-        .on('hover', function(d) {
-            setForecastTooltips(d[0].timestamp, [waveForecast, windForecast, arrowsForecast])
-        })
-        .on('mouseout', setTooltipsToActual)
-
-    // single axes
-
-    var commonSingleAxis = {
-        axisOnly: true,
-        xAxisOnTop: true,
-        hide: ['yAxis', 'yTitle'],
-        height: 20,
-        margin: { top: 20, right: 20, bottom: 0, left: 50 }
-    }
-
-    var chartConfig3 = datahub.utils.mergeAll({}, chartConfig1, commonSingleAxis)
-    var chartConfig4 = datahub.utils.mergeAll({}, chartConfig2, commonSingleAxis, {
-        margin: {top: 20, right: 20, bottom: 0, left: 0 }
-    })
-    var chartConfig5 = datahub.utils.mergeAll({}, chartConfig1, commonSingleAxis, {
-        margin: {top: 0, right: 20, bottom: 20, left: 50 },
-        xAxisOnTop: false
-    })
-    var chartConfig6 = datahub.utils.mergeAll({}, chartConfig2, commonSingleAxis, {
-        margin: {top: 0, right: 20, bottom: 20, left: 0 },
-        xAxisOnTop: false
-    })
-
-    var data = datahub.data.generateTimeSeriesSplit(dataConfig1)
-    var axisTopHistorical = datahub.timeseries({ parent: document.querySelector('.axis-top .historical') })
-        .setConfig(chartConfig3)
-        .setData(data)
-
-    var data = datahub.data.generateTimeSeriesSplit(dataConfig2)
-    var axisTopForecast = datahub.timeseries({ parent: document.querySelector('.axis-top .forecast') })
-        .setConfig(chartConfig4)
-        .setData(data)
-
-    var data = datahub.data.generateTimeSeriesSplit(dataConfig1)
-    var axisBottomHistorical = datahub.timeseries({ parent: document.querySelector('.axis-bottom .historical') })
-        .setConfig(chartConfig5)
-        .setData(data)
-
-    var data = datahub.data.generateTimeSeriesSplit(dataConfig2)
-    var axisBottomForecast = datahub.timeseries({ parent: document.querySelector('.axis-bottom .forecast') })
-        .setConfig(chartConfig6)
-        .setData(data)
-
-    // arrows
-
-    var commonArrows = {
+    var commonArrowsConfig = {
         hide: ['xAxis', 'yAxis', 'xTitle', 'yTitle', 'tooltipDot'],
         chartType: 'arrow',
         arrowSkip: 1,
@@ -241,30 +117,129 @@
         margin: { top: 0, right: 20, bottom: 0, left: 50 }
     }
 
-    var chartConfig5 = datahub.utils.mergeAll({}, chartConfig1, commonArrows)
+    var historicalArrowsConfig = datahub.utils.mergeAll({}, historicalChartConfig, commonArrowsConfig)
 
-    var chartConfig6 = datahub.utils.mergeAll({}, chartConfig2, commonArrows, {
+    var forecastArrowsConfig = datahub.utils.mergeAll({}, forecastChartConfig, commonArrowsConfig, {
         margin: { top: 0, right: 20, bottom: 0, left: 0 },
         arrowSkip: 6
     })
 
-    var data = datahub.data.generateTimeSeriesSplit(dataConfig1)
-    var arrowsHistorical = datahub.timeseries({ parent: document.querySelector('.wind-direction .historical') })
-        .setConfig(chartConfig5)
-        .setData(data)
-        .on('hover', function(d) {
-            setHistoricalTooltips(d[0].timestamp, [waveHistorical, windHistorical, tideHistorical])
-        })
-        .on('mouseout', setTooltipsToActual)
+    var commonSingleAxis = {
+        axisOnly: true,
+        xAxisOnTop: true,
+        hide: ['yAxis', 'yTitle', 'tooltip', 'tooltipDot'],
+        height: 20,
+        margin: { top: 20, right: 20, bottom: 0, left: 50 }
+    }
 
-    var data = datahub.data.generateTimeSeriesSplit(dataConfig2)
-    var arrowsForecast = datahub.timeseries({ parent: document.querySelector('.wind-direction .forecast') })
-        .setConfig(chartConfig6)
-        .setData(data)
-        .on('hover', function(d) {
-            setForecastTooltips(d[0].timestamp, [waveForecast, windForecast, tideForecast])
-        })
-        .on('mouseout', setTooltipsToActual)
+    var historicalTopAxis = datahub.utils.mergeAll({}, historicalChartConfig, commonSingleAxis)
+    var forecastTopAxis = datahub.utils.mergeAll({}, forecastChartConfig, commonSingleAxis, {
+        margin: {top: 20, right: 20, bottom: 0, left: 0 }
+    })
+    var historicalBottomAxis = datahub.utils.mergeAll({}, historicalChartConfig, commonSingleAxis, {
+        margin: {top: 0, right: 20, bottom: 20, left: 50 },
+        xAxisOnTop: false
+    })
+    var forecastBottomAxis = datahub.utils.mergeAll({}, forecastChartConfig, commonSingleAxis, {
+        margin: {top: 0, right: 20, bottom: 20, left: 0 },
+        xAxisOnTop: false
+    })
+
+    var config = {
+        historical: {
+            wind: historicalChartConfig,
+            windDirection: historicalArrowsConfig,
+            wave: historicalChartConfig,
+            tide: historicalChartConfig,
+            bottomAxis: historicalBottomAxis,
+            topAxis: historicalTopAxis
+        },
+        forecast: {
+            wind: forecastChartConfig,
+            windDirection: forecastArrowsConfig,
+            wave: forecastChartConfig,
+            tide: forecastChartConfig,
+            bottomAxis: forecastBottomAxis,
+            topAxis: forecastTopAxis
+        }
+    }
+
+    // chart object
+    var charts = {
+        historical: {
+            wind: null,
+            windDirection: null,
+            wave: null,
+            tide: null,
+            bottomAxis: null,
+            topAxis: null
+        },
+        forecast: {
+            wind: null,
+            windDirection: null,
+            wave: null,
+            tide: null,
+            bottomAxis: null,
+            topAxis: null
+        }
+    }
+
+    var now = new Date(data.historical.wind[0].data.slice(-1)[0].timestamp)
+
+    // tooltip events
+    function setTimeInfo(timestamp) {
+        var formattedDate = d3.utcFormat('%c')(timestamp)
+        document.querySelector('.info .timestamp').innerText = formattedDate
+    }
+
+    function setTooltipsToActual() {
+        var timestamp = now
+        setTooltip('historical', null, now)
+
+        setTimeInfo(timestamp)
+    }
+
+    function setTooltip(groupKey, chartKey, timestamp) {
+        for(var x in charts) {
+            if(x === groupKey) {
+                for(var y in charts[x]) {
+                    if(y !== chartKey) {
+                        charts[x][y].setConfig({tooltipTimestamp: timestamp})
+                    }
+                }
+            }
+            else {
+                for(var y in charts[x]) {
+                    charts[x][y].setConfig({tooltipTimestamp: null})
+                }
+            }
+        }
+
+        setTimeInfo(timestamp)
+    }
+
+    // generate charts
+    function setCharts() {
+        for(var x in charts) {
+            for(var y in charts[x]) {
+                charts[x][y] = datahub.timeseries({
+                        parent: document.querySelector('.' + y + ' .' + x)
+                    })
+                    .setConfig(config[x][y])
+                    .setData(data[x][y])
+                    .on('hover', (function(d) {
+                        var groupKey = x
+                        var chartKey = y
+                        return function(d){
+                            setTooltip(groupKey, chartKey, d[0].timestamp)
+                        }
+                    })())
+                    .on('mouseout', setTooltipsToActual)
+            }
+        }
+    }
+
+    setCharts()
 
     </script>
 </body>
