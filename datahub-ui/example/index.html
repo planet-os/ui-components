@@ -299,6 +299,14 @@
     </div>
     <div class="row section">
         <div class="col-xs-12 col-md-7">
+            <div class="weather-chart"></div>
+        </div>
+        <div class="col-xs-12 col-md-5">
+            <div class="description">A complex weather chart.</div>
+        </div>
+    </div>
+    <div class="row section">
+        <div class="col-xs-12 col-md-7">
             <div class="row">
                 <div class="number-widget big col-xs"></div>
                 <div class="number-widget medium col-xs"></div>
@@ -670,7 +678,7 @@
     }
 
     var container = document.querySelector('.data-change')
-    var chart = datahub.multiChart({
+    var chartTimer = datahub.multiChart({
         parent: container,
         width: container.clientWidth
     })
@@ -680,7 +688,7 @@
             timestamp: datahub.data.generateTimestamps(),
             barData: datahub.data.generateTimeSeries()
         }
-        chart.setData(dataMulti)
+        chartTimer.setData(dataMulti)
     }
 
     setInterval(setData, 1000)
@@ -1036,6 +1044,15 @@
         .setConfig(chartConfig3)
         .setData(data)
 
+    // weather chart
+    ////////////////////////////////////////
+    var data = datahub.data.generateWeatherChartData()
+    console.log(data)
+    var chart = datahub.weatherChart({
+        parent: document.querySelector('.weather-chart')
+    })
+    .setData(data)
+
     // other widgets
     ////////////////////////////////////////
 
@@ -1234,91 +1251,91 @@
     // maps
     ////////////////////////////////////////
 
-    datahub.data.setApiKey('0f58fe2540fa4cf19a4aa68f290fd148')
+    // datahub.data.setApiKey('0f58fe2540fa4cf19a4aa68f290fd148')
 
-    datahub.map.rasterMap({
-            parent: document.querySelector('.map-light'),
-            showLabels: false,
-            mapConfig: {
-                zoomControl: false
-            },
-            showTooltip: false
-        })
-        .init()
+    // datahub.map.rasterMap({
+    //         parent: document.querySelector('.map-light'),
+    //         showLabels: false,
+    //         mapConfig: {
+    //             zoomControl: false
+    //         },
+    //         showTooltip: false
+    //     })
+    //     .init()
 
-    datahub.map.rasterMap({
-            parent: document.querySelector('.map-dark'),
-            basemapName: 'basemapLight',
-            showLabels: false,
-            mapConfig: {
-                zoomControl: false
-            },
-            showTooltip: false
-        })
-        .init()
+    // datahub.map.rasterMap({
+    //         parent: document.querySelector('.map-dark'),
+    //         basemapName: 'basemapLight',
+    //         showLabels: false,
+    //         mapConfig: {
+    //             zoomControl: false
+    //         },
+    //         showTooltip: false
+    //     })
+    //     .init()
 
-    var datasetName = 'noaa_gfs_global_sflux_0.12d'
-    var variableName = 'Temperature_hybrid'
-    datahub.data.getPreview(datasetName, variableName, null, function(response) {
-        rasterMap.renderRaster(response.json)
-        rasterMapGrayscale.renderRaster(response.json)
-    })
+    // var datasetName = 'noaa_gfs_global_sflux_0.12d'
+    // var variableName = 'Temperature_hybrid'
+    // datahub.data.getPreview(datasetName, variableName, null, function(response) {
+    //     rasterMap.renderRaster(response.json)
+    //     rasterMapGrayscale.renderRaster(response.json)
+    // })
 
-    var rasterMap = datahub.map.rasterMap({
-            parent: document.querySelector('.map-grayscale'),
-            colorScale: datahub.palette.grayscale,
-            showLabels: false,
-            mapConfig: {
-                zoomControl: false
-            },
-            showTooltip: false
-        })
-        .init()
+    // var rasterMap = datahub.map.rasterMap({
+    //         parent: document.querySelector('.map-grayscale'),
+    //         colorScale: datahub.palette.grayscale,
+    //         showLabels: false,
+    //         mapConfig: {
+    //             zoomControl: false
+    //         },
+    //         showTooltip: false
+    //     })
+    //     .init()
 
-    var rasterMapGrayscale = datahub.map.rasterMap({
-            parent: document.querySelector('.map-rainbow'),
-            colorScale: datahub.palette.equalizedSpectral,
-            showLabels: false,
-            mapConfig: {
-                zoomControl: false
-            },
-            showTooltip: false
-        })
-        .init()
+    // var rasterMapGrayscale = datahub.map.rasterMap({
+    //         parent: document.querySelector('.map-rainbow'),
+    //         colorScale: datahub.palette.equalizedSpectral,
+    //         showLabels: false,
+    //         mapConfig: {
+    //             zoomControl: false
+    //         },
+    //         showTooltip: false
+    //     })
+    //     .init()
 
-    datahub.data.getJSON('../asset/gfs_data.json', function(error, json) {
-        rasterMapBig.renderRaster(json)
-        colorLegend.setData(json.uniqueValues)
-    })
+    // datahub.data.getJSON('../asset/gfs_data.json', function(error, json) {
+    //     rasterMapBig.renderRaster(json)
+    //     colorLegend.setData(json.uniqueValues)
+    // })
 
-    var rasterMapBig = datahub.map.rasterMap({
-            parent: document.querySelector('.map-raster'),
-            colorScale: datahub.palette.equalizedSpectral
-        })
-        .init()
-        .renderVectorMap()
+    // var rasterMapBig = datahub.map.rasterMap({
+    //         parent: document.querySelector('.map-raster'),
+    //         colorScale: datahub.palette.equalizedSpectral
+    //     })
+    //     .init()
+    //     .renderVectorMap()
 
-    var pointsGeojson = datahub.data.generateGeojsonPoints()
+    // var pointsGeojson = datahub.data.generateGeojsonPoints()
 
-    var vectorMap = datahub.map.rasterMap({
-            parent: document.querySelector('.map-vector')
-        })
-        .init()
-        .renderPolygon(pointsGeojson)
+    // var vectorMap = datahub.map.rasterMap({
+    //         parent: document.querySelector('.map-vector')
+    //     })
+    //     .init()
+    //     .renderPolygon(pointsGeojson)
 
-    datahub.data.getWorldVector(function(geojson) {
-        vectorMap.renderPolygon(geojson)
-    })
+    // datahub.data.getWorldVector(function(geojson) {
+    //     vectorMap.renderPolygon(geojson)
+    // })
 
-    datahub.map.selectorMap({
-        parent: document.querySelector('.map-selector')
-    })
+    // datahub.map.selectorMap({
+    //     parent: document.querySelector('.map-selector')
+    // })
 
-    var colorLegend = datahub.colorLegend({
-        parent: document.querySelector('.map-legend'),
-        height: 50,
-        colorScale: datahub.palette.equalizedSpectral
-    })
+    // var colorLegend = datahub.colorLegend({
+    //     parent: document.querySelector('.map-legend'),
+    //     height: 50,
+    //     colorScale: datahub.palette.equalizedSpectral
+    // })
 
     </script>
 </body>

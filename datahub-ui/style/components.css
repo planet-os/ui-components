@@ -320,3 +320,15 @@
 .datahub-timeseries-chart svg {
     display: block;
 }
+
+.datahub-weather-chart .chart-row {
+    display: flex;
+}
+
+.datahub-weather-chart .chart-row > div{
+    flex: 1;
+}
+
+.datahub-weather-chart svg {
+    overflow: visible;
+}

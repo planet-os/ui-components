@@ -196,6 +196,43 @@
         return datesISOString
     }
 
+    var generateWeatherChartData = function() {
+        var historicalDataConfig = {
+            layerCount: 1,
+            count: 10,
+            timeIncrement: 'minute', 
+            min: 0, 
+            max: 50
+        }
+
+        var forecastDataConfig = datahub.utils.mergeAll({}, historicalDataConfig, {
+            layerCount: 1,
+            count: 100,
+            timeIncrement: 'hour'
+        })
+
+        var generatedData = {
+            historical: {
+                wind: datahub.data.generateTimeSeriesSplit(historicalDataConfig),
+                windDirection: datahub.data.generateTimeSeriesSplit(historicalDataConfig),
+                wave: datahub.data.generateTimeSeriesSplit(historicalDataConfig),
+                tide: datahub.data.generateTimeSeriesSplit(historicalDataConfig),
+                bottomAxis: datahub.data.generateTimeSeriesSplit(historicalDataConfig),
+                topAxis: datahub.data.generateTimeSeriesSplit(historicalDataConfig)
+            },
+            forecast: {
+                wind: datahub.data.generateTimeSeriesSplit(forecastDataConfig),
+                windDirection: datahub.data.generateTimeSeriesSplit(forecastDataConfig),
+                wave: datahub.data.generateTimeSeriesSplit(forecastDataConfig),
+                tide: datahub.data.generateTimeSeriesSplit(forecastDataConfig),
+                bottomAxis: datahub.data.generateTimeSeriesSplit(forecastDataConfig),
+                topAxis: datahub.data.generateTimeSeriesSplit(forecastDataConfig)
+            }
+        }
+
+        return generatedData
+    }
+
     var getJSON = function(url, cb) {
         var xhr = typeof XMLHttpRequest != 'undefined' ? new XMLHttpRequest() : new ActiveXObject('Microsoft.XMLHTTP')
         xhr.open('get', url, true)
@@ -438,6 +475,7 @@
         generateTimeSeries: generateTimeSeries,
         generateTimeSeriesSplit: generateTimeSeriesSplit,
         generateTimestamps: generateTimestamps,
+        generateWeatherChartData: generateWeatherChartData,
         getDatasetDetails: getDatasetDetails,
         getVariables: getVariables,
         getTimestamps: getTimestamps,

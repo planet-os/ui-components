@@ -3,8 +3,8 @@
         var containerNode = config.parent.querySelector('.datahub-timeseries-chart')
         if(!containerNode) {
             var template = '<div class="datahub-timeseries-chart">'
-                + '<div class="number"></div>'
-                + '<div class="chart">'
+                + '<div class="number-group"></div>'
+                + '<div class="chart-group">'
                     + '<svg>'
                         + '<g class="panel">'
                             + '<g class="shapes"></g>'
@@ -517,7 +517,9 @@
     function hideTooltip(config) {
         config.container.select('.tooltip line')
             .attr('display', 'none')
-        config.container.select('.tooltip circle')
+        config.container.selectAll('.tooltip circle')
+            .attr('display', 'none')
+        config.container.selectAll('.tooltip .tooltip-label')
             .attr('display', 'none')
     }
 
@@ -534,6 +536,7 @@
             }
         }
         if (config.dataIsEmpty || config.axisOnly || config.hide.indexOf('tooltip') > -1) {
+            hideTooltip(config)
             return {}
         }
         
@@ -577,71 +580,6 @@
 
         return {}
     }
-
-    // var singleAxisComponentX = function(config){
-    //     // var config = {
-    //     //     axisX: null,
-    //     //     panel: null
-    //     // }
-
-    //     var axisX = config.panel.selectAll('g.axis.x.single')
-    //         .data([0])
-    //     axisX.enter().append('g')
-    //         .attr({
-    //             'class': 'x axis single'
-    //         })
-    //     axisX.call(config.axisX)
-    //     axisX.exit().remove()
-
-    //     return {}
-    // }
-
-    // var barShapes = function(config){
-    //     // var config = {
-    //     //     panel: null,
-    //     //     dataConverted: null,
-    //     //     scaleX: null,
-    //     //     scaleY: null,
-    //     //     chartHeight: null
-    //     // }
-
-    //     var dataY = config.dataConverted.map(function(d){ return d.y })
-
-    //     var scaleXRange = config.scaleX.range()
-    //     var width = scaleXRange[1] - scaleXRange[0]
-    //     var barWidth = width / (config.dataConverted.length - 1) / 2
-
-    //     var shapes = config.panel.selectAll('rect.bar')
-    //         .data(config.dataConverted)
-    //     shapes.enter().append('rect')
-    //         .attr({
-    //             'class': function(d){ return 'bar shape ' + d.className }
-    //         })
-    //     shapes.attr({
-    //         x: function(d){ return config.scaleX(d.x) - barWidth / 2 },
-    //         y: function(d){ return config.scaleY(d.y) },
-    //         width: function(d){ return barWidth },
-    //         height: function(d){ return config.chartHeight - config.scaleY(d.y) }
-    //     })
-    //     shapes.exit().remove()
-
-    //     return {}
-    // }
-
-    // var axisXFormatter = function(config){
-    //     // var config = {
-    //     //     panel: null,
-    //     //     dataConverted: null
-    //     // }
-
-    //     config.panel.select('g.axis.x.single')
-    //         .selectAll('.tick:first-child text')
-    //         .text(function(d){
-    //             return d3.time.format('%a')(d)
-    //         })
-
-    //     return {}
-    // }
 
     var lineChart = dh.utils.pipeline(
         defaultConfig,
