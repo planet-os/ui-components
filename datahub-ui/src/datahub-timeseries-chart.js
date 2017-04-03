@@ -466,33 +466,37 @@
             .attr('display', 'block')
 
         if(!d || !d[0] || typeof d[0].value === 'undefined'
-            || d[0].value === null
-            || config.hide.indexOf('tooltipDot') > -1) {
+            || d[0].value === null || config.hide.indexOf('tooltip') > -1) {
+                config.container.select('.tooltip')
+                    .selectAll('text.tooltip-label')
+                    .remove()
+            return
+        }
+
+        if(config.hide.indexOf('tooltipDot') > -1) {
             config.container.select('.tooltip')
                 .selectAll('circle.dot')
                 .remove()
-            config.container.select('.tooltip')
-                .selectAll('text.tooltip-label')
-                .remove()
-            return
         }
-        var circles = config.container.select('.tooltip')
-            .selectAll('circle.dot')
-            .data(d)
-        circles.enter().append('circle')
-            .merge(circles)
-            .attr('display', 'block')
-            .attr('class', function(dB, dI) {
-                return ['dot', dB.id, 'layer' + dI].join(' ')
-            })
-            .attr('cx', function(dB) {
-                return dB.posX + config.margin.left
-            })
-            .attr('cy', function(dB) {
-                return dB.posY + config.margin.top
-            })
-            .attr('r', 2)
-        circles.exit().remove()
+        else {
+            var circles = config.container.select('.tooltip')
+                .selectAll('circle.dot')
+                .data(d)
+            circles.enter().append('circle')
+                .merge(circles)
+                .attr('display', 'block')
+                .attr('class', function(dB, dI) {
+                    return ['dot', dB.id, 'layer' + dI].join(' ')
+                })
+                .attr('cx', function(dB) {
+                    return dB.posX + config.margin.left
+                })
+                .attr('cy', function(dB) {
+                    return dB.posY + config.margin.top
+                })
+                .attr('r', 2)
+            circles.exit().remove()
+        }
 
         var labels = config.container.select('.tooltip')
             .selectAll('text.tooltip-label')

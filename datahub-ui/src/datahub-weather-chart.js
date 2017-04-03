@@ -86,7 +86,7 @@
         var commonSingleAxis = {
             axisOnly: true,
             xAxisOnTop: true,
-            hide: ['yAxis', 'yTitle', 'tooltip', 'tooltipDot'],
+            hide: ['yAxis', 'yTitle', 'tooltip'],
             height: 20,
             margin: { top: 20, right: 20, bottom: 0, left: 50 }
         }

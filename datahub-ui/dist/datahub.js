@@ -3236,20 +3236,23 @@
         function setTooltip(config, d) {
             var x = d[0].posX + config.margin.left;
             config.container.select(".tooltip line").attr("y1", 0).attr("y2", config.height).attr("x1", x).attr("x2", x).attr("display", "block");
-            if (!d || !d[0] || typeof d[0].value === "undefined" || d[0].value === null || config.hide.indexOf("tooltipDot") > -1) {
-                config.container.select(".tooltip").selectAll("circle.dot").remove();
+            if (!d || !d[0] || typeof d[0].value === "undefined" || d[0].value === null || config.hide.indexOf("tooltip") > -1) {
                 config.container.select(".tooltip").selectAll("text.tooltip-label").remove();
                 return;
             }
-            var circles = config.container.select(".tooltip").selectAll("circle.dot").data(d);
-            circles.enter().append("circle").merge(circles).attr("display", "block").attr("class", function(dB, dI) {
-                return [ "dot", dB.id, "layer" + dI ].join(" ");
-            }).attr("cx", function(dB) {
-                return dB.posX + config.margin.left;
-            }).attr("cy", function(dB) {
-                return dB.posY + config.margin.top;
-            }).attr("r", 2);
-            circles.exit().remove();
+            if (config.hide.indexOf("tooltipDot") > -1) {
+                config.container.select(".tooltip").selectAll("circle.dot").remove();
+            } else {
+                var circles = config.container.select(".tooltip").selectAll("circle.dot").data(d);
+                circles.enter().append("circle").merge(circles).attr("display", "block").attr("class", function(dB, dI) {
+                    return [ "dot", dB.id, "layer" + dI ].join(" ");
+                }).attr("cx", function(dB) {
+                    return dB.posX + config.margin.left;
+                }).attr("cy", function(dB) {
+                    return dB.posY + config.margin.top;
+                }).attr("r", 2);
+                circles.exit().remove();
+            }
             var labels = config.container.select(".tooltip").selectAll("text.tooltip-label").data(d);
             labels.enter().append("text").merge(labels).attr("display", "block").attr("class", function(dB, dI) {
                 return [ "tooltip-label", dB.id, "layer" + dI ].join(" ");
@@ -3753,7 +3756,7 @@
             var commonSingleAxis = {
                 axisOnly: true,
                 xAxisOnTop: true,
-                hide: [ "yAxis", "yTitle", "tooltip", "tooltipDot" ],
+                hide: [ "yAxis", "yTitle", "tooltip" ],
                 height: 20,
                 margin: {
                     top: 20,
