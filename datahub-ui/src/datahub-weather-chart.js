@@ -194,11 +194,11 @@
                         }
                     })())
                     .on('mouseout', function() {
-                        var latestHistoricalTimestamp = new Date(config.dataConverted.historical.wind[0].data.slice(-1)[0].timestamp)
+                        var latestHistoricalTimestamp = new Date(config.dataConverted.historical.wind.data.slice(-1)[0].timestamp)
                         setTooltip(charts, 'historical', null, latestHistoricalTimestamp, config)
                     })
                 if(!config.dataIsEmpty) {
-                    charts[x][y].setData(config.dataConverted[x][y])
+                    charts[x][y].setData([config.dataConverted[x][y]])
                 }
             }
         }

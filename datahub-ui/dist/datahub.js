@@ -668,20 +668,20 @@
             });
             var generatedData = {
                 historical: {
-                    wind: datahub.data.generateTimeSeriesSplit(historicalDataConfig),
-                    windDirection: datahub.data.generateTimeSeriesSplit(historicalDataConfig),
-                    wave: datahub.data.generateTimeSeriesSplit(historicalDataConfig),
-                    tide: datahub.data.generateTimeSeriesSplit(historicalDataConfig),
-                    bottomAxis: datahub.data.generateTimeSeriesSplit(historicalDataConfig),
-                    topAxis: datahub.data.generateTimeSeriesSplit(historicalDataConfig)
+                    wind: datahub.data.generateTimeSeriesSplit(historicalDataConfig)[0],
+                    windDirection: datahub.data.generateTimeSeriesSplit(historicalDataConfig)[0],
+                    wave: datahub.data.generateTimeSeriesSplit(historicalDataConfig)[0],
+                    tide: datahub.data.generateTimeSeriesSplit(historicalDataConfig)[0],
+                    bottomAxis: datahub.data.generateTimeSeriesSplit(historicalDataConfig)[0],
+                    topAxis: datahub.data.generateTimeSeriesSplit(historicalDataConfig)[0]
                 },
                 forecast: {
-                    wind: datahub.data.generateTimeSeriesSplit(forecastDataConfig),
-                    windDirection: datahub.data.generateTimeSeriesSplit(forecastDataConfig),
-                    wave: datahub.data.generateTimeSeriesSplit(forecastDataConfig),
-                    tide: datahub.data.generateTimeSeriesSplit(forecastDataConfig),
-                    bottomAxis: datahub.data.generateTimeSeriesSplit(forecastDataConfig),
-                    topAxis: datahub.data.generateTimeSeriesSplit(forecastDataConfig)
+                    wind: datahub.data.generateTimeSeriesSplit(forecastDataConfig)[0],
+                    windDirection: datahub.data.generateTimeSeriesSplit(forecastDataConfig)[0],
+                    wave: datahub.data.generateTimeSeriesSplit(forecastDataConfig)[0],
+                    tide: datahub.data.generateTimeSeriesSplit(forecastDataConfig)[0],
+                    bottomAxis: datahub.data.generateTimeSeriesSplit(forecastDataConfig)[0],
+                    topAxis: datahub.data.generateTimeSeriesSplit(forecastDataConfig)[0]
                 }
             };
             return generatedData;
@@ -3876,11 +3876,11 @@
                             setTooltip(charts, groupKey, chartKey, d[0].timestamp, config);
                         };
                     }()).on("mouseout", function() {
-                        var latestHistoricalTimestamp = new Date(config.dataConverted.historical.wind[0].data.slice(-1)[0].timestamp);
+                        var latestHistoricalTimestamp = new Date(config.dataConverted.historical.wind.data.slice(-1)[0].timestamp);
                         setTooltip(charts, "historical", null, latestHistoricalTimestamp, config);
                     });
                     if (!config.dataIsEmpty) {
-                        charts[x][y].setData(config.dataConverted[x][y]);
+                        charts[x][y].setData([ config.dataConverted[x][y] ]);
                     }
                 }
             }
