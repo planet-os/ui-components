@@ -2351,7 +2351,9 @@
                 return {};
             }
             var axisY = d3.axisLeft().scale(config.scaleY).ticks(config.yTicks || 6).tickFormat(function(d) {
-                if (d < 1) {
+                if (config.axisYFormat) {
+                    return d3.format(config.axisYFormat)(d);
+                } else if (d < 1) {
                     return d3.format(".2")(d);
                 } else {
                     return d3.format(".2s")(d);
@@ -2473,6 +2475,10 @@
                 config.container.select(".shapes").selectAll("path.arrow").remove();
                 return {};
             }
+            var test = config.dataConverted[0].data.filter(function(d, i) {
+                var skip = config.arrowSkip || 3;
+                return i % skip === 0;
+            });
             var arrowPath = "M6 0L12 10L8 10L8 24L4 24L4 10L0 10Z";
             var arrows = config.container.select(".shapes").selectAll("path.arrow").data(config.dataConverted[0].data.filter(function(d, i) {
                 var skip = config.arrowSkip || 3;
@@ -2564,7 +2570,12 @@
             labels.enter().append("text").merge(labels).attr("display", "block").attr("class", function(dB, dI) {
                 return [ "tooltip-label", dB.id, "layer" + dI ].join(" ");
             }).attr("transform", function(dB, dI) {
-                return "translate(" + [ dB.posX + config.margin.left, dB.posY + config.margin.top ] + ")";
+                var x = dB.posX + config.margin.left;
+                var y = dB.posY + config.margin.top;
+                if (config.chartType === "arrow") {
+                    y = 0;
+                }
+                return "translate(" + [ x, y ] + ")";
             }).attr("dx", -4).attr("text-anchor", "end").text(function(dB, dI) {
                 return config.valueFormatter ? config.valueFormatter(dB, dI) : dB.value;
             });
@@ -3008,9 +3019,10 @@
         };
         var defaultConfig = function(config) {
             var historicalChartConfig = {
-                tickStep: 20,
+                xTicks: config.historicalXTicks || d3.utcHour.every(12),
                 resolution: "minute",
-                axisXFormat: "%H:%M",
+                axisXFormat: config.historicalXFormat || "%H:%M",
+                axisYFormat: ".0f",
                 domain: [ 0, 50 ],
                 chartType: "area",
                 yTicks: 3,
@@ -3022,43 +3034,44 @@
                 hide: [ "xTitle", "yTitle", "xAxis" ],
                 margin: {
                     top: 10,
-                    right: 20,
+                    right: 4,
                     bottom: 10,
-                    left: 50
+                    left: 24
                 }
             };
             var forecastChartConfig = datahub.utils.mergeAll({}, historicalChartConfig, {
-                xTicks: d3.utcHour.every(12),
+                xTicks: config.forecastXTicks || d3.utcHour.every(12),
+                axisXFormat: config.forecastXFormat || "%H:%M",
                 resolution: "hour",
                 hide: [ "xAxis", "yAxis", "yTitle", "xTitle" ],
                 margin: {
                     top: 10,
-                    right: 20,
+                    right: 4,
                     bottom: 10,
-                    left: 0
+                    left: 24
                 }
             });
             var commonArrowsConfig = {
                 hide: [ "xAxis", "yAxis", "xTitle", "yTitle", "tooltipDot" ],
                 chartType: "arrow",
-                arrowSkip: 1,
                 height: 20,
+                arrowSkip: config.historicalArrowSkip || 3,
                 margin: {
                     top: 0,
-                    right: 20,
+                    right: 4,
                     bottom: 0,
-                    left: 50
+                    left: 24
                 }
             };
             var historicalArrowsConfig = datahub.utils.mergeAll({}, historicalChartConfig, commonArrowsConfig);
             var forecastArrowsConfig = datahub.utils.mergeAll({}, forecastChartConfig, commonArrowsConfig, {
+                arrowSkip: config.forecastArrowSkip || 6,
                 margin: {
                     top: 0,
-                    right: 20,
+                    right: 4,
                     bottom: 0,
-                    left: 0
-                },
-                arrowSkip: 6
+                    left: 24
+                }
             });
             var commonSingleAxis = {
                 axisOnly: true,
@@ -3067,35 +3080,35 @@
                 height: 20,
                 margin: {
                     top: 20,
-                    right: 20,
+                    right: 4,
                     bottom: 0,
-                    left: 50
+                    left: 24
                 }
             };
             var historicalTopAxis = datahub.utils.mergeAll({}, historicalChartConfig, commonSingleAxis);
             var forecastTopAxis = datahub.utils.mergeAll({}, forecastChartConfig, commonSingleAxis, {
                 margin: {
                     top: 20,
-                    right: 20,
+                    right: 4,
                     bottom: 0,
-                    left: 0
+                    left: 24
                 }
             });
             var historicalBottomAxis = datahub.utils.mergeAll({}, historicalChartConfig, commonSingleAxis, {
                 margin: {
                     top: 0,
-                    right: 20,
+                    right: 4,
                     bottom: 20,
-                    left: 50
+                    left: 24
                 },
                 xAxisOnTop: false
             });
             var forecastBottomAxis = datahub.utils.mergeAll({}, forecastChartConfig, commonSingleAxis, {
                 margin: {
                     top: 0,
-                    right: 20,
+                    right: 4,
                     bottom: 20,
-                    left: 0
+                    left: 24
                 },
                 xAxisOnTop: false
             });
@@ -3186,6 +3199,11 @@
                         var latestHistoricalTimestamp = new Date(config.dataConverted.historical.wind.data.slice(-1)[0].timestamp);
                         setTooltip(charts, "historical", null, latestHistoricalTimestamp, config);
                     });
+                    if (config.domain) {
+                        charts[x][y].setConfig({
+                            domain: config.domain[y]
+                        });
+                    }
                     if (!config.dataIsEmpty) {
                         charts[x][y].setData([ config.dataConverted[x][y] ]);
                     }

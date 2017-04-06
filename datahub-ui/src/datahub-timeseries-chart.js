@@ -166,11 +166,14 @@
             .scale(config.scaleY)
             .ticks(config.yTicks || 6)
             .tickFormat(function(d) {
-                if(d < 1 ){
-                    return d3.format(".2")(d)
+                if(config.axisYFormat) {
+                    return d3.format(config.axisYFormat)(d)
+                }
+                else if(d < 1 ){
+                    return d3.format('.2')(d)
                 }
                 else {
-                    return d3.format(".2s")(d)
+                    return d3.format('.2s')(d)
                 }
             })
             .tickPadding(10)
@@ -358,12 +361,17 @@
             return {}
         }
 
+        var test = config.dataConverted[0].data.filter(function(d, i) {
+                var skip = config.arrowSkip || 3
+                return (i % skip) === 0;
+            })
+
         var arrowPath = 'M6 0L12 10L8 10L8 24L4 24L4 10L0 10Z';
         var arrows = config.container.select('.shapes')
             .selectAll('path.arrow')
             .data(config.dataConverted[0].data.filter(function(d, i) {
                 var skip = config.arrowSkip || 3
-                return i % skip === 0;
+                return (i % skip) === 0;
             }))
 
         arrows.enter().append('path')
@@ -508,7 +516,12 @@
                 return ['tooltip-label', dB.id, 'layer' + dI].join(' ')
             })
             .attr('transform', function(dB, dI) {
-                return 'translate(' + [dB.posX + config.margin.left, dB.posY + config.margin.top] + ')'
+                var x = dB.posX + config.margin.left
+                var y = dB.posY + config.margin.top
+                if(config.chartType ===  'arrow') {
+                    y = 0
+                }
+                return 'translate(' + [x, y] + ')'
             })
             .attr('dx', -4)
             .attr('text-anchor', 'end')

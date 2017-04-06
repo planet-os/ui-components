@@ -332,3 +332,7 @@
 .datahub-weather-chart svg {
     overflow: visible;
 }
+
+.datahub-weather-chart svg .tooltip {
+    pointer-events: none;
+}
