@@ -2595,7 +2595,8 @@
                     var dataUnderCursor = getHoverInfo(config, config.tooltipTimestamp);
                     setTooltip(config, dataUnderCursor);
                     config.events.call("tooltipChange", null, {
-                        timestamp: dataUnderCursor[0].timestamp
+                        timestamp: dataUnderCursor[0].timestamp,
+                        data: dataUnderCursor
                     });
                 }
             }
@@ -3141,10 +3142,40 @@
             };
         };
         function setTimeInfo(timestamp, config) {
-            var formattedDate = d3.utcFormat("%c")(timestamp);
-            config.events.call("hover", null, {
-                formattedDate: formattedDate
-            });
+            if (timestamp) {
+                config.events.call("hover", null, {
+                    timestamp: timestamp
+                });
+            }
+        }
+        function getDataAtTimestamp(timestamp, data, groupKey) {
+            var epoch = new Date(timestamp).getTime();
+            var bisector = d3.bisector(function(d, x) {
+                return new Date(d.timestamp).getTime() - new Date(x).getTime();
+            }).left;
+            var info = {};
+            var idx = 0;
+            var d;
+            var foundData;
+            for (var x in data) {
+                if (x !== groupKey) {
+                    continue;
+                }
+                for (var y in data[x]) {
+                    if ([ "topAxis", "bottomAxis" ].indexOf(y) > -1) {
+                        continue;
+                    }
+                    d = data[x][y].data;
+                    idx = bisector(d, timestamp);
+                    if (!info[x]) {
+                        info[x] = {};
+                    }
+                    foundData = d[idx];
+                    foundData.metadata = data[x][y].metadata;
+                    info[x][y] = foundData;
+                }
+            }
+            return info;
         }
         function setTooltip(charts, groupKey, chartKey, timestamp, config) {
             for (var x in charts) {
@@ -3189,11 +3220,18 @@
                 for (var y in charts[x]) {
                     charts[x][y] = datahub.timeseries({
                         parent: config.container.select("." + y + " ." + x).node()
-                    }).setConfig(config.chartConfig[x][y]).on("hover", function(d) {
+                    }).setConfig(config.chartConfig[x][y]).on("hover", function() {
                         var groupKey = x;
                         var chartKey = y;
                         return function(d) {
                             setTooltip(charts, groupKey, chartKey, d[0].timestamp, config);
+                            var data = getDataAtTimestamp(d[0].timestamp, config.dataConverted, groupKey);
+                            config.events.call("tooltipChange", null, {
+                                data: data,
+                                timestamp: d[0].timestamp,
+                                info: d,
+                                config: config
+                            });
                         };
                     }()).on("mouseout", function() {
                         var latestHistoricalTimestamp = new Date(config.dataConverted.historical.wind.data.slice(-1)[0].timestamp);
@@ -3215,7 +3253,7 @@
         };
         var chart = dh.utils.pipeline(template, defaultConfig, data, charts);
         var weatherChart = function(config) {
-            var configCache, events = d3.dispatch("hover"), chartCache, uid = ~~(Math.random() * 1e4);
+            var configCache, events = d3.dispatch("hover", "tooltipChange"), chartCache, uid = ~~(Math.random() * 1e4);
             var onResize = dh.utils.throttle(function() {
                 configCache.width = configCache.parent.clientWidth;
                 render();
@@ -3248,6 +3286,7 @@
             };
             init(config, events);
             return {
+                on: dh.utils.rebind(events),
                 setConfig: setConfig,
                 setData: setData,
                 destroy: destroy

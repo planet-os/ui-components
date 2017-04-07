@@ -549,7 +549,7 @@
             else {
                 var dataUnderCursor = getHoverInfo(config, config.tooltipTimestamp)
                 setTooltip(config, dataUnderCursor)
-                config.events.call('tooltipChange', null, {timestamp: dataUnderCursor[0].timestamp})
+                config.events.call('tooltipChange', null, {timestamp: dataUnderCursor[0].timestamp, data: dataUnderCursor})
             }
         }
         if (config.dataIsEmpty || config.axisOnly || config.hide.indexOf('tooltip') > -1) {
