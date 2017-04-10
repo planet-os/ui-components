@@ -47,6 +47,7 @@
     }
 
     var defaultConfig = function(config) {
+        var leftMargin = 26
         var historicalChartConfig = {
             xTicks: config.historicalXTicks || d3.utcHour.every(12),
             resolution: 'minute',
@@ -58,51 +59,51 @@
             height: 80,
             width: config.chartWidth / 2,
             valueFormatter: function(d, i) { return Math.round(d.value * 100) / 100 },
-            hide: ['xTitle', 'yTitle', 'xAxis'], //['xTitle', 'yTitle', 'tooltip', 'xAxis', 'yAxis', 'shapes', 'xGrid', 'xTitle', 'yTitle']
-            margin: { top: 10, right: 4, bottom: 10, left: 24 }
+            hide: ['xTitle', 'yTitle', 'xAxis', 'tooltipLabel'],
+            margin: { top: 10, right: 4, bottom: 10, left: leftMargin }
         }
 
         var forecastChartConfig = datahub.utils.mergeAll({}, historicalChartConfig, {
             xTicks: config.forecastXTicks || d3.utcHour.every(12),
             axisXFormat: config.forecastXFormat || '%H:%M',
             resolution: 'hour',
-            hide: ['xAxis', 'yAxis', 'yTitle', 'xTitle'],
-            margin: { top: 10, right: 4, bottom: 10, left: 24 }
+            hide: ['xAxis', 'yAxis', 'yTitle', 'xTitle', 'tooltipLabel'],
+            margin: { top: 10, right: 4, bottom: 10, left: leftMargin }
         })
 
         var commonArrowsConfig = {
-            hide: ['xAxis', 'yAxis', 'xTitle', 'yTitle', 'tooltipDot'],
+            hide: ['xAxis', 'yAxis', 'xTitle', 'yTitle', 'tooltipDot', 'tooltipLabel'],
             chartType: 'arrow',
             height: 20,
             arrowSkip: config.historicalArrowSkip || 3,
-            margin: { top: 0, right: 4, bottom: 0, left: 24 }
+            margin: { top: 0, right: 4, bottom: 0, left: leftMargin }
         }
 
         var historicalArrowsConfig = datahub.utils.mergeAll({}, historicalChartConfig, commonArrowsConfig)
 
         var forecastArrowsConfig = datahub.utils.mergeAll({}, forecastChartConfig, commonArrowsConfig, {
             arrowSkip: config.forecastArrowSkip || 6,
-            margin: { top: 0, right: 4, bottom: 0, left: 24 }
+            margin: { top: 0, right: 4, bottom: 0, left: leftMargin }
         })
 
         var commonSingleAxis = {
             axisOnly: true,
             xAxisOnTop: true,
-            hide: ['yAxis', 'yTitle', 'tooltip'],
+            hide: ['yAxis', 'yTitle', 'tooltipLabel'],
             height: 20,
-            margin: { top: 20, right: 4, bottom: 0, left: 24 }
+            margin: { top: 20, right: 4, bottom: 0, left: leftMargin }
         }
 
         var historicalTopAxis = datahub.utils.mergeAll({}, historicalChartConfig, commonSingleAxis)
         var forecastTopAxis = datahub.utils.mergeAll({}, forecastChartConfig, commonSingleAxis, {
-            margin: {top: 20, right: 4, bottom: 0, left: 24 }
+            margin: {top: 20, right: 4, bottom: 0, left: leftMargin }
         })
         var historicalBottomAxis = datahub.utils.mergeAll({}, historicalChartConfig, commonSingleAxis, {
-            margin: {top: 0, right: 4, bottom: 20, left: 24 },
+            margin: {top: 0, right: 4, bottom: 20, left: leftMargin },
             xAxisOnTop: false
         })
         var forecastBottomAxis = datahub.utils.mergeAll({}, forecastChartConfig, commonSingleAxis, {
-            margin: {top: 0, right: 4, bottom: 20, left: 24 },
+            margin: {top: 0, right: 4, bottom: 20, left: leftMargin },
             xAxisOnTop: false
         })
 
@@ -179,7 +180,7 @@
         for(var x in charts) {
             if(x === groupKey) {
                 for(var y in charts[x]) {
-                    if(y !== chartKey) {
+                    if(y !== chartKey && charts[x][y]) {
                         charts[x][y].setConfig({tooltipTimestamp: timestamp})
                     }
                 }
@@ -233,14 +234,27 @@
                     .on('mouseout', function() {
                         var latestHistoricalTimestamp = new Date(config.dataConverted.historical.wind.data.slice(-1)[0].timestamp)
                         setTooltip(charts, 'historical', null, latestHistoricalTimestamp, config)
+                        config.events.call('mouseout', null, {})
+
+                        var data = getDataAtTimestamp(latestHistoricalTimestamp, config.dataConverted, 'historical')
+                        config.events.call('tooltipChange', null, {data: data, timestamp: latestHistoricalTimestamp, config: config})
                     })
                 if(config.domain) {
                     charts[x][y].setConfig({domain: config.domain[y]})
                 }
-                if(!config.dataIsEmpty) {
+
+                if(config.dataConverted) {
                     charts[x][y].setData([config.dataConverted[x][y]])
                 }
             }
+        }
+
+        if(config.dataConverted) {
+            var latestHistoricalTimestamp = new Date(config.dataConverted.historical.wind.data.slice(-1)[0].timestamp)
+            setTooltip(charts, 'historical', null, latestHistoricalTimestamp, config)
+
+            var data = getDataAtTimestamp(latestHistoricalTimestamp, config.dataConverted, 'historical')
+            config.events.call('tooltipChange', null, {data: data, timestamp: latestHistoricalTimestamp, config: config})
         }
 
         return {
@@ -257,7 +271,7 @@
 
     var weatherChart = function(config) {
         var configCache,
-            events = d3.dispatch('hover', 'tooltipChange'),
+            events = d3.dispatch('hover', 'tooltipChange', 'mouseout'),
             chartCache,
             uid = ~~(Math.random()*10000)
 

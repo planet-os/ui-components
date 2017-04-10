@@ -506,29 +506,36 @@
             circles.exit().remove()
         }
 
-        var labels = config.container.select('.tooltip')
-            .selectAll('text.tooltip-label')
-            .data(d)
-        labels.enter().append('text')
-            .merge(labels)
-            .attr('display', 'block')
-            .attr('class', function(dB, dI) {
-                return ['tooltip-label', dB.id, 'layer' + dI].join(' ')
-            })
-            .attr('transform', function(dB, dI) {
-                var x = dB.posX + config.margin.left
-                var y = dB.posY + config.margin.top
-                if(config.chartType ===  'arrow') {
-                    y = 0
-                }
-                return 'translate(' + [x, y] + ')'
-            })
-            .attr('dx', -4)
-            .attr('text-anchor', 'end')
-            .text(function(dB, dI) {
-                return config.valueFormatter ? config.valueFormatter(dB, dI) : dB.value
-            })
-        labels.exit().remove()
+        if(config.hide.indexOf('tooltipLabel') > -1) {
+            config.container.select('.tooltip')
+                .selectAll('text.tooltip-label')
+                .remove()
+        }
+        else {
+            var labels = config.container.select('.tooltip')
+                .selectAll('text.tooltip-label')
+                .data(d)
+            labels.enter().append('text')
+                .merge(labels)
+                .attr('display', 'block')
+                .attr('class', function(dB, dI) {
+                    return ['tooltip-label', dB.id, 'layer' + dI].join(' ')
+                })
+                .attr('transform', function(dB, dI) {
+                    var x = dB.posX + config.margin.left
+                    var y = dB.posY + config.margin.top
+                    if(config.chartType ===  'arrow') {
+                        y = 0
+                    }
+                    return 'translate(' + [x, y] + ')'
+                })
+                .attr('dx', -4)
+                .attr('text-anchor', 'end')
+                .text(function(dB, dI) {
+                    return config.valueFormatter ? config.valueFormatter(dB, dI) : dB.value
+                })
+            labels.exit().remove()
+        }
     }
 
     function hideTooltip(config) {
@@ -552,6 +559,13 @@
                 config.events.call('tooltipChange', null, {timestamp: dataUnderCursor[0].timestamp, data: dataUnderCursor})
             }
         }
+        // else if(!config.dataIsEmpty) {
+        //     var actualTimestamp = config.dataTimestamps[config.dataTimestamps.length - 1]
+        //     var dataUnderCursor = getHoverInfo(config, actualTimestamp)
+        //     // setTooltip(config, dataUnderCursor)
+        //     // config.events.call('tooltipChange', null, {timestamp: actualTimestamp, data: dataUnderCursor})
+        //     config.events.call('hover', null, dataUnderCursor)
+        // }
         if (config.dataIsEmpty || config.axisOnly || config.hide.indexOf('tooltip') > -1) {
             hideTooltip(config)
             return {}

@@ -3259,20 +3259,24 @@
                 }).attr("r", 2);
                 circles.exit().remove();
             }
-            var labels = config.container.select(".tooltip").selectAll("text.tooltip-label").data(d);
-            labels.enter().append("text").merge(labels).attr("display", "block").attr("class", function(dB, dI) {
-                return [ "tooltip-label", dB.id, "layer" + dI ].join(" ");
-            }).attr("transform", function(dB, dI) {
-                var x = dB.posX + config.margin.left;
-                var y = dB.posY + config.margin.top;
-                if (config.chartType === "arrow") {
-                    y = 0;
-                }
-                return "translate(" + [ x, y ] + ")";
-            }).attr("dx", -4).attr("text-anchor", "end").text(function(dB, dI) {
-                return config.valueFormatter ? config.valueFormatter(dB, dI) : dB.value;
-            });
-            labels.exit().remove();
+            if (config.hide.indexOf("tooltipLabel") > -1) {
+                config.container.select(".tooltip").selectAll("text.tooltip-label").remove();
+            } else {
+                var labels = config.container.select(".tooltip").selectAll("text.tooltip-label").data(d);
+                labels.enter().append("text").merge(labels).attr("display", "block").attr("class", function(dB, dI) {
+                    return [ "tooltip-label", dB.id, "layer" + dI ].join(" ");
+                }).attr("transform", function(dB, dI) {
+                    var x = dB.posX + config.margin.left;
+                    var y = dB.posY + config.margin.top;
+                    if (config.chartType === "arrow") {
+                        y = 0;
+                    }
+                    return "translate(" + [ x, y ] + ")";
+                }).attr("dx", -4).attr("text-anchor", "end").text(function(dB, dI) {
+                    return config.valueFormatter ? config.valueFormatter(dB, dI) : dB.value;
+                });
+                labels.exit().remove();
+            }
         }
         function hideTooltip(config) {
             config.container.select(".tooltip line").attr("display", "none");
@@ -3712,6 +3716,7 @@
             };
         };
         var defaultConfig = function(config) {
+            var leftMargin = 26;
             var historicalChartConfig = {
                 xTicks: config.historicalXTicks || d3.utcHour.every(12),
                 resolution: "minute",
@@ -3725,28 +3730,28 @@
                 valueFormatter: function(d, i) {
                     return Math.round(d.value * 100) / 100;
                 },
-                hide: [ "xTitle", "yTitle", "xAxis" ],
+                hide: [ "xTitle", "yTitle", "xAxis", "tooltipLabel" ],
                 margin: {
                     top: 10,
                     right: 4,
                     bottom: 10,
-                    left: 24
+                    left: leftMargin
                 }
             };
             var forecastChartConfig = datahub.utils.mergeAll({}, historicalChartConfig, {
                 xTicks: config.forecastXTicks || d3.utcHour.every(12),
                 axisXFormat: config.forecastXFormat || "%H:%M",
                 resolution: "hour",
-                hide: [ "xAxis", "yAxis", "yTitle", "xTitle" ],
+                hide: [ "xAxis", "yAxis", "yTitle", "xTitle", "tooltipLabel" ],
                 margin: {
                     top: 10,
                     right: 4,
                     bottom: 10,
-                    left: 24
+                    left: leftMargin
                 }
             });
             var commonArrowsConfig = {
-                hide: [ "xAxis", "yAxis", "xTitle", "yTitle", "tooltipDot" ],
+                hide: [ "xAxis", "yAxis", "xTitle", "yTitle", "tooltipDot", "tooltipLabel" ],
                 chartType: "arrow",
                 height: 20,
                 arrowSkip: config.historicalArrowSkip || 3,
@@ -3754,7 +3759,7 @@
                     top: 0,
                     right: 4,
                     bottom: 0,
-                    left: 24
+                    left: leftMargin
                 }
             };
             var historicalArrowsConfig = datahub.utils.mergeAll({}, historicalChartConfig, commonArrowsConfig);
@@ -3764,19 +3769,19 @@
                     top: 0,
                     right: 4,
                     bottom: 0,
-                    left: 24
+                    left: leftMargin
                 }
             });
             var commonSingleAxis = {
                 axisOnly: true,
                 xAxisOnTop: true,
-                hide: [ "yAxis", "yTitle", "tooltip" ],
+                hide: [ "yAxis", "yTitle", "tooltipLabel" ],
                 height: 20,
                 margin: {
                     top: 20,
                     right: 4,
                     bottom: 0,
-                    left: 24
+                    left: leftMargin
                 }
             };
             var historicalTopAxis = datahub.utils.mergeAll({}, historicalChartConfig, commonSingleAxis);
@@ -3785,7 +3790,7 @@
                     top: 20,
                     right: 4,
                     bottom: 0,
-                    left: 24
+                    left: leftMargin
                 }
             });
             var historicalBottomAxis = datahub.utils.mergeAll({}, historicalChartConfig, commonSingleAxis, {
@@ -3793,7 +3798,7 @@
                     top: 0,
                     right: 4,
                     bottom: 20,
-                    left: 24
+                    left: leftMargin
                 },
                 xAxisOnTop: false
             });
@@ -3802,7 +3807,7 @@
                     top: 0,
                     right: 4,
                     bottom: 20,
-                    left: 24
+                    left: leftMargin
                 },
                 xAxisOnTop: false
             });
@@ -3874,7 +3879,7 @@
             for (var x in charts) {
                 if (x === groupKey) {
                     for (var y in charts[x]) {
-                        if (y !== chartKey) {
+                        if (y !== chartKey && charts[x][y]) {
                             charts[x][y].setConfig({
                                 tooltipTimestamp: timestamp
                             });
@@ -3929,16 +3934,33 @@
                     }()).on("mouseout", function() {
                         var latestHistoricalTimestamp = new Date(config.dataConverted.historical.wind.data.slice(-1)[0].timestamp);
                         setTooltip(charts, "historical", null, latestHistoricalTimestamp, config);
+                        config.events.call("mouseout", null, {});
+                        var data = getDataAtTimestamp(latestHistoricalTimestamp, config.dataConverted, "historical");
+                        config.events.call("tooltipChange", null, {
+                            data: data,
+                            timestamp: latestHistoricalTimestamp,
+                            config: config
+                        });
                     });
                     if (config.domain) {
                         charts[x][y].setConfig({
                             domain: config.domain[y]
                         });
                     }
-                    if (!config.dataIsEmpty) {
+                    if (config.dataConverted) {
                         charts[x][y].setData([ config.dataConverted[x][y] ]);
                     }
                 }
+            }
+            if (config.dataConverted) {
+                var latestHistoricalTimestamp = new Date(config.dataConverted.historical.wind.data.slice(-1)[0].timestamp);
+                setTooltip(charts, "historical", null, latestHistoricalTimestamp, config);
+                var data = getDataAtTimestamp(latestHistoricalTimestamp, config.dataConverted, "historical");
+                config.events.call("tooltipChange", null, {
+                    data: data,
+                    timestamp: latestHistoricalTimestamp,
+                    config: config
+                });
             }
             return {
                 charts: charts
@@ -3946,7 +3968,7 @@
         };
         var chart = dh.utils.pipeline(template, defaultConfig, data, charts);
         var weatherChart = function(config) {
-            var configCache, events = d3.dispatch("hover", "tooltipChange"), chartCache, uid = ~~(Math.random() * 1e4);
+            var configCache, events = d3.dispatch("hover", "tooltipChange", "mouseout"), chartCache, uid = ~~(Math.random() * 1e4);
             var onResize = dh.utils.throttle(function() {
                 configCache.width = configCache.parent.clientWidth;
                 render();
