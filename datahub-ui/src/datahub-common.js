@@ -272,7 +272,7 @@
             .data([message])
         text.enter().append('text')
             .merge(text)
-            .attr('x', (config.scaleX.range()[1] - config.scaleX.range()[0]) / 2)
+            .attr('x', config.chartWidth / 2)
             .attr('y', function() {
                 return config.height / 2 - this.getBBox().height / 2
             })

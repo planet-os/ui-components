@@ -16,6 +16,7 @@
                             + '<g class="reference"></g>'
                         + '</g>'
                         + '<g class="tooltip"><line></line></g>'
+                        + '<g class="message-group"></g>'
                         + '<g class="events"><rect class="event-panel"></rect></g>'
                     + '</svg>'
                 + '</div>'
@@ -23,8 +24,6 @@
 
             containerNode = dh.utils.appendHtmlToNode(template, config.parent)
         }
-
-        var dataIsEmpty = !(config.data)
 
         var container = d3.select(containerNode)
         var width = config.width || config.parent.clientWidth
@@ -82,11 +81,14 @@
             })
         })
 
+        var dataIsAllNulls = !!values.length, !values.filter(function(d){ return d !== null }).length
+
         return {
             dataConverted: dataConverted,
             dataValues: values,
             dataTimestamps: timestamps,
-            dataIsEmpty: !dataConverted.length
+            dataIsEmpty: !dataConverted.length,
+            dataIsAllNulls: dataIsAllNulls
         }
     }
 
@@ -627,6 +629,7 @@
         stepShapes,
         // dh.common.printer,
         // areaShapes,
+        dh.common.message,
         axisComponentY,
         reference,
         eventsPanel,
