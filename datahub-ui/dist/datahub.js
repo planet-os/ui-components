@@ -413,7 +413,7 @@
                 message = "Values are all null";
             }
             var text = config.container.select(".message-group").selectAll("text").data([ message ]);
-            text.enter().append("text").merge(text).attr("x", (config.scaleX.range()[1] - config.scaleX.range()[0]) / 2).attr("y", function() {
+            text.enter().append("text").merge(text).attr("x", config.chartWidth / 2).attr("y", function() {
                 return config.height / 2 - this.getBBox().height / 2;
             }).text(function(d) {
                 return d;
@@ -2961,10 +2961,9 @@
         var template = function(config) {
             var containerNode = config.parent.querySelector(".datahub-timeseries-chart");
             if (!containerNode) {
-                var template = '<div class="datahub-timeseries-chart">' + '<div class="number-group"></div>' + '<div class="chart-group">' + "<svg>" + '<g class="panel">' + '<g class="shapes"></g>' + '<g class="grid x"></g>' + '<g class="axis x"></g>' + '<g class="axis y"></g>' + '<g class="axis-title x"><text></text></g>' + '<g class="axis-title y"><text></text></g>' + '<g class="reference"></g>' + "</g>" + '<g class="tooltip"><line></line></g>' + '<g class="events"><rect class="event-panel"></rect></g>' + "</svg>" + "</div>" + "</div>";
+                var template = '<div class="datahub-timeseries-chart">' + '<div class="number-group"></div>' + '<div class="chart-group">' + "<svg>" + '<g class="panel">' + '<g class="shapes"></g>' + '<g class="grid x"></g>' + '<g class="axis x"></g>' + '<g class="axis y"></g>' + '<g class="axis-title x"><text></text></g>' + '<g class="axis-title y"><text></text></g>' + '<g class="reference"></g>' + "</g>" + '<g class="tooltip"><line></line></g>' + '<g class="message-group"></g>' + '<g class="events"><rect class="event-panel"></rect></g>' + "</svg>" + "</div>" + "</div>";
                 containerNode = dh.utils.appendHtmlToNode(template, config.parent);
             }
-            var dataIsEmpty = !config.data;
             var container = d3.select(containerNode);
             var width = config.width || config.parent.clientWidth;
             var height = config.height || config.parent.clientHeight;
@@ -3005,11 +3004,15 @@
                     timestamps.push(arr[iB].timestamp);
                 });
             });
+            var dataIsAllNulls = !!values.length && !values.filter(function(d) {
+                return d !== null;
+            }).length;
             return {
                 dataConverted: dataConverted,
                 dataValues: values,
                 dataTimestamps: timestamps,
-                dataIsEmpty: !dataConverted.length
+                dataIsEmpty: !dataConverted.length,
+                dataIsAllNulls: dataIsAllNulls
             };
         };
         var scaleX = function(config) {
@@ -3346,7 +3349,7 @@
             config.container.select(".axis-title.y text").text(config.yAxisTitle || "").attr("dx", "0.5em").attr("dy", "1em");
             return {};
         };
-        var lineChart = dh.utils.pipeline(defaultConfig, template, data, scaleX, scaleY, axisX, axisY, axisComponentX, gridX, lineShapes, arrowShapes, stepShapes, axisComponentY, reference, eventsPanel, tooltipComponent, xAxisTitle, yAxisTitle);
+        var lineChart = dh.utils.pipeline(defaultConfig, template, data, scaleX, scaleY, axisX, axisY, axisComponentX, gridX, lineShapes, arrowShapes, stepShapes, dh.common.message, axisComponentY, reference, eventsPanel, tooltipComponent, xAxisTitle, yAxisTitle);
         var timeseries = function(config) {
             var configCache, events = d3.dispatch("hover", "click", "mouseout", "tooltipChange"), chartCache, uid = ~~(Math.random() * 1e4);
             var onResize = dh.utils.throttle(function() {

@@ -81,7 +81,7 @@
             })
         })
 
-        var dataIsAllNulls = !!values.length, !values.filter(function(d){ return d !== null }).length
+        var dataIsAllNulls = !!values.length && !values.filter(function(d){ return d !== null }).length
 
         return {
             dataConverted: dataConverted,
