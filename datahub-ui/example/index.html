@@ -470,502 +470,502 @@
     // multi chart
     ////////////////////////////////////////
 
-    var dataMulti = {
-        timestamp: datahub.data.generateTimestamps(),
-        barData: datahub.data.generateTimeSeries({min: 100, max: 10000})
-    }
-
-    var container = document.querySelector('.bar-chart')
-    datahub.multiChart({
-        parent: container,
-        width: container.clientWidth,
-        data: dataMulti
-    })
-
-    var dataMulti = {
-        timestamp: datahub.data.generateTimestamps(),
-        barData: datahub.data.generateTimeSeries(),
-        referenceData: datahub.data.generateTimeSeries()
-    }
-
-    dataMulti.barData.forEach(function(d) {
-        if(Math.random()>0.5){
-            d.value = d.value * -1
-        }
-    })
-
-    dataMulti.referenceData.forEach(function(d) {
-        if(Math.random()>0.5){
-            d.value = d.value * -1
-        }
-    })
-
-    var container = document.querySelector('.negative-bar-chart')
-    datahub.multiChart({
-        parent: container,
-        width: container.clientWidth,
-        data: dataMulti
-    })
-
-    var dataMulti = {
-        timestamp: datahub.data.generateTimestamps(),
-        barData: datahub.data.generateTimeSeries(),
-        referenceData: datahub.data.generateTimeSeries()
-    }
-
-    dataMulti.barData.forEach(function(d) {
-        d.value = d.value * -1
-    })
-
-    dataMulti.referenceData.forEach(function(d) {
-        d.value = d.value * -1
-    })
-
-    var container = document.querySelector('.reverse-bar-chart')
-    datahub.multiChart({
-        parent: container,
-        width: container.clientWidth,
-        data: dataMulti,
-        reverseY: true
-    })
-    .on('hover', function(d) { console.log(d) })
-
-    var dataMulti = {
-        timestamp: datahub.data.generateTimestamps(),
-        barData: datahub.data.generateTimeSeries()
-    }
-
-    dataMulti.barData.map(function(d) {
-        return d.value.map(function(dB) {
-            return Math.random()*50+50
-        })
-    })
-
-    var container = document.querySelector('.autoscale-bar-chart')
-    datahub.multiChart({
-        parent: container,
-        width: container.clientWidth,
-        data: dataMulti,
-        autoScaleY: true
-    })
-
-    var dataMulti = {
-        timestamp: datahub.data.generateTimestamps(),
-        barData: datahub.data.generateTimeSeries()
-    }
-
-    var container = document.querySelector('.domain-bar-chart')
-    datahub.multiChart({
-        parent: container,
-        width: container.clientWidth,
-        data: dataMulti,
-        domain: [0, 1000]
-    })
-
-    var dataMulti = {
-        timestamp: datahub.data.generateTimestamps(),
-        stackedBarData: datahub.data.generateTimeSeries({min: 1000, max: 10000})
-    }    
-
-    var container = document.querySelector('.formatted-bar-chart')
-    datahub.multiChart({
-        parent: container,
-        width: container.clientWidth,
-        data: dataMulti,
-        labelsRewriterY: function(d, i) {
-            var locale = d3.formatDefaultLocale({
-                "decimal": ",",
-                "thousands": "",
-                "grouping": [3],
-                "currency": ["€", ""]
-            })
-            var formattedValue = d3.formatPrefix('.1', d)(d)
-
-            var match = formattedValue.match(/[a-zA-Z]/)
-            if(match){
-                var idx = match.index
-                return '<tspan>' + formattedValue.slice(0, idx) + '</tspan><tspan dx="0.1em">' + formattedValue.slice(idx) + '</tspan>'
-            }
-            else {
-                return formattedValue
-            }
-        }
-    })
-
-    var dataMulti = {
-        timestamp: datahub.data.generateTimestamps(),
-        stackedBarData: datahub.data.generateTimeSeries({layerCount: 3})
-    }
-
-    var container = document.querySelector('.stacked-bar-chart')
-    datahub.multiChart({
-        parent: container,
-        width: container.clientWidth,
-        data: dataMulti
-    })
-
-    var dataMulti = {
-        timestamp: datahub.data.generateTimestamps(),
-        lineData: datahub.data.generateTimeSeries({layerCount: 2})
-    }
-
-    var container = document.querySelector('.multiline-chart')
-    datahub.multiChart({
-        parent: container,
-        width: container.clientWidth,
-        data: dataMulti
-    })
-
-    var dataMulti = {
-        timestamp: datahub.data.generateTimestamps(),
-        areaData: datahub.data.generateTimeSeries()
-    }
-
-    var container = document.querySelector('.area-chart')
-    datahub.multiChart({
-        parent: container,
-        width: container.clientWidth,
-        data: dataMulti
-    })
-
-    var dataMulti = {
-        timestamp: datahub.data.generateTimestamps(),
-        stackedAreaData: datahub.data.generateTimeSeries({layerCount: 3})
-    }
-
-    var container = document.querySelector('.stacked-area-chart')
-    datahub.multiChart({
-        parent: container,
-        width: container.clientWidth,
-        data: dataMulti
-    })
-
-    var dataMulti = {
-        timestamp: datahub.data.generateTimestamps(),
-        barData: datahub.data.generateTimeSeries(),
-        stackedBarData: datahub.data.generateTimeSeries({count: 8, layerCount: 3}),
-        estimateData: datahub.data.generateTimeSeries({count: 4, timeStart: '2016-09-01'}),
-        lineData: datahub.data.generateTimeSeries({layerCount: 2}),
-        areaData: datahub.data.generateTimeSeries(),
-        stackedAreaData: datahub.data.generateTimeSeries({layerCount: 3}),
-        referenceData: datahub.data.generateTimeSeries({count: 8}),
-        thresholdData: datahub.data.generateTimeSeries({count: 1, step: 12})
-    }
-
-    var container = document.querySelector('.multi-chart')
-    datahub.multiChart({
-        parent: container,
-        width: container.clientWidth,
-        height: 300,
-        margin: {
-            top: 50,
-            right: 40,
-            bottom: 90,
-            left: 60
-        },
-        axisXFormat: '%b',
-        axisTitleX: 'Unit',
-        axisTitleY: 'Unit',
-        chartTitle: 'Title'
-    })
-    .on('hover', function(d) { console.log(d) })
-    .setData(dataMulti)
-    .setConfig({chartTitle: 'Title2'})
-
-    var dataMulti = {
-        timestamp: datahub.data.generateTimestamps(),
-        barData: datahub.data.generateTimeSeries()
-    }
-
-    var container = document.querySelector('.data-change')
-    var chartTimer = datahub.multiChart({
-        parent: container,
-        width: container.clientWidth
-    })
-
-    function setData() {
-        var dataMulti = {
-            timestamp: datahub.data.generateTimestamps(),
-            barData: datahub.data.generateTimeSeries()
-        }
-        chartTimer.setData(dataMulti)
-    }
-
-    setInterval(setData, 1000)
-
-    var dataMulti = {
-        timestamp: datahub.data.generateTimestamps(),
-        barData: datahub.data.generateTimeSeries()
-    }
-
-    var container = document.querySelector('.data-empty')
-    var chart2 = datahub.multiChart({
-        parent: container,
-        width: container.clientWidth
-    })
-    .setData(dataMulti)
-
-    var dataMulti = {
-        timestamp: datahub.data.generateTimestamps(),
-        barData: null
-    }
-    chart2.setData(dataMulti)
-
-    var dataMulti = {
-        timestamp: datahub.data.generateTimestamps(),
-        stackedBarData: datahub.data.generateTimeSeries({count: 8, layerCount: 3}),
-        estimateData: datahub.data.generateTimeSeries({timeStart: '2016-09-01', count: 4, layerCount: 1})
-    }
-
-    var container = document.querySelector('.chart-types')
-    datahub.multiChart({
-        parent: container,
-        width: container.clientWidth,
-        data: dataMulti
-    })
-
-    var dataMulti = {
-        timestamp: datahub.data.generateTimestamps(),
-        barData: datahub.data.generateTimeSeries(),
-        referenceData: datahub.data.generateTimeSeries(),
-        thresholdData: datahub.data.generateTimeSeries({count: 1, step: 12})
-    }
-
-    var container = document.querySelector('.chart-features')
-    datahub.multiChart({
-        parent: container,
-        width: container.clientWidth,
-        data: dataMulti
-    })
-
-    var container = document.querySelector('.multiline-chart-empty')
-    datahub.multiChart({
-        parent: container,
-        width: container.clientWidth
-    })
-
-    var dataMulti = {
-        timestamp: datahub.data.generateTimestamps(),
-        barData: datahub.data.generateTimeSeries(),
-    }
-
-    var container = document.querySelector('.chart-dummy')
-    datahub.multiChart({
-        parent: container,
-        width: container.clientWidth,
-        data: dataMulti
-    })
-
-    var dataMulti = {
-        timestamp: datahub.data.generateTimestamps(),
-        stackedAreaData: datahub.data.generateTimeSeries({count: 12, layerCount: 3})
-    }
-
-    dataMulti.stackedAreaData[10].value = dataMulti.stackedAreaData[10].value.slice(0, 2)
-    dataMulti.stackedAreaData[6].value = dataMulti.stackedAreaData[6].value.slice(1, 2)
-
-    datahub.multiChart({
-        parent: document.querySelector('.gaps')
-    })
-    .setData(dataMulti)
-
-    var dataMulti = {
-        timestamp: datahub.data.generateTimestamps(),
-        lineData: datahub.data.generateTimeSeries({count: 12, layerCount: 3}),
-        areaData: datahub.data.generateTimeSeries({count: 12, layerCount: 3})
-    }
-
-    dataMulti.lineData.forEach(function(d) {
-        d.value =  d.value.map(function(dB, iB) {
-            return !!Math.round(Math.random()*3) ? dB : null
-        })
-    })
-
-    dataMulti.areaData.forEach(function(d) {
-        d.value =  d.value.map(function(dB, iB) {
-            return !!Math.round(Math.random()*3) ? dB : null
-        })
-    })
-
-    datahub.multiChart({
-        parent: document.querySelector('.gaps2')
-    })
-    .setData(dataMulti)
-
-    var dataMulti = {
-        timestamp: datahub.data.generateTimestamps(),
-        lineData: datahub.data.generateTimeSeries({count: 1, layerCount: 3}),
-        areaData: datahub.data.generateTimeSeries({count: 1, layerCount: 1})
-    }
-
-    datahub.multiChart({
-        parent: document.querySelector('.isolated')
-    })
-    .setData(dataMulti)
-
-    var dataMulti = {
-        timestamp: datahub.data.generateTimestamps(),
-        lineData: datahub.data.generateTimeSeries({count: 12, layerCount: 2})
-    }
-
-    var sliderChartContainer = document.querySelector('.slider-chart')
-
-    function renderMainChart(dataMulti) {
-        datahub.multiChart({
-            parent: sliderChartContainer,
-            width: sliderChartContainer.clientWidth,
-            data: dataMulti
-        })
-    }
-
-    var timeSliderContainer = document.querySelector('.time-slider')
-    var timeSlider = datahub.widget.timeSlider({
-        parent: timeSliderContainer,
-        timeRange: ['2016-01-01', '2017-01-01'],
-        initialTimeRange: ['2016-01-01', '2017-01-01'],
-        width: timeSliderContainer.clientWidth,
-        height: 40,
-        margin: {
-            top: 4,
-            right: 60,
-            bottom: 4,
-            left: 60
-        }
-    })
-
-    timeSlider.events.on('brush', function(d) {
-        // var timestamps = timeseries.map(function(d, i){ return d.timestamp })
-        // var startIndex = datahub.utils.bisection(timestamps, d.brushExtent.start)
-        // var endIndex = datahub.utils.bisection(timestamps, d.brushExtent.end)
-        // var timeseriesSlice = {
-        //     values: dataMulti.values.map(function(d, i) {
-        //         return d.slice(startIndex, endIndex)
-        //     }),
-        //     timestamps: dataMulti.timestamps.slice(startIndex, endIndex)
-        // }
-
-        // renderMainChart(timeseriesSlice)
-    })
-
-    renderMainChart(dataMulti)
-
-    // table chart
-    ////////////////////////////////////////
-
-    var table = datahub.tableChart({
-        parent: document.querySelector('.table-chart')
-    })
-
-    table.setConfig({
-            header: [
-                {key: 'name', label: 'Name'},
-                {key: 'actual', label: ['Actual', '2nd']},
-                {key: 'plan', label: 'Plan'}
-            ],
-            elements: [
-                [
-                    {key: 'name', value: 'Spain', label: 'Spain' },
-                    {key: 'actual', value: -20, label: -20 },
-                    {key: 'plan', value: -30, label: -30 }
-                ],
-                [
-                    {key: 'name', value: 'germany', label: 'Germany' },
-                    {key: 'actual', value: 10, label: 10 },
-                    {key: 'plan', value: 40, label: 40 }
-                ],
-                [
-                    {key: 'name', value: 'zzz', label: 'UK' },
-                    {key: 'actual', value: 30, label: [30, 'Wh'] },
-                    {key: 'plan', value: 40, label: 40 }
-                ],
-                [
-                    {key: 'name', value: 'mmm', label: 'Italy' },
-                    {key: 'actual', value: 10, label: 10 },
-                    {key: 'plan', value: 40, label: 40 }
-                ]
-            ],
-            valueKey: 'actual',
-            referenceKey: 'plan',
-            domain: [-160, 160],
-            labelsRewriterX: function(d, i) {
-                var label = this.textContent
-                if(typeof this.textContent === 'undefined') {
-                    return ''
-                }
-                var match = label.match(/[a-zA-Z]/)
-                if(match){
-                    var idx = match.index
-                    return '<tspan>' + label.slice(0, idx) + '</tspan><tspan dx="0.1em">' + label.slice(idx) + '</tspan>'
-                }
-                else {
-                    return label
-                }
-            },
-            sortFunc: function(a, b) {
-                var forceTop = 'zzz'
-                var matchA = a.filter(function(d) {
-                    return d.key === 'name'
-                })
-                var nameA = matchA[0].label.toLowerCase()
-
-                var matchB = b.filter(function(d) {
-                    return d.key === 'name'
-                })
-                var nameB = matchB[0].label.toLowerCase()
-
-                if(nameB === forceTop) {
-                    return 1
-                }
-                if(nameA === forceTop) {
-                    return -1
-                }
-                if(nameA < nameB) {
-                    return -1
-                }
-                if(nameA > nameB) {
-                    return 1
-                }
-                return 0
-            }
-        })
-
-    // vertical chart
-    ////////////////////////////////////////
-
-    var vertical = datahub.verticalChart({
-        parent: document.querySelector('.vertical-chart')
-    })
-
-    vertical.setConfig({
-        title: 'Title',
-        elements:[
-            {key: 'approved', label: 'Approved', value: 125},
-            {key: 'written', label: 'Written', value: 16},
-            {key: 'remains', label: 'Remains', value: -79}
-        ],
-        referenceBarSize: 100,
-        unit: '%'
-    })
-
-    // waterfall chart
-    ////////////////////////////////////////
-
-    var waterfall = datahub.waterfallChart({
-        parent: document.querySelector('.waterfall-chart')
-    })
-
-    waterfall.setConfig({
-        elements:[
-            {key: 'initial', label: 'Initial', value: 53},
-            {key: 'closed', label: 'Closed', value: -30},
-            {key: 'open', label: 'Open', value: 23},
-            {key: 'new', label: 'New', value: 15},
-            {key: 'total', label: 'Total', value: 38}
-        ]
-    })
-
-    // timeseries chart
-    ////////////////////////////////////////
+    // var dataMulti = {
+    //     timestamp: datahub.data.generateTimestamps(),
+    //     barData: datahub.data.generateTimeSeries({min: 100, max: 10000})
+    // }
+
+    // var container = document.querySelector('.bar-chart')
+    // datahub.multiChart({
+    //     parent: container,
+    //     width: container.clientWidth,
+    //     data: dataMulti
+    // })
+
+    // var dataMulti = {
+    //     timestamp: datahub.data.generateTimestamps(),
+    //     barData: datahub.data.generateTimeSeries(),
+    //     referenceData: datahub.data.generateTimeSeries()
+    // }
+
+    // dataMulti.barData.forEach(function(d) {
+    //     if(Math.random()>0.5){
+    //         d.value = d.value * -1
+    //     }
+    // })
+
+    // dataMulti.referenceData.forEach(function(d) {
+    //     if(Math.random()>0.5){
+    //         d.value = d.value * -1
+    //     }
+    // })
+
+    // var container = document.querySelector('.negative-bar-chart')
+    // datahub.multiChart({
+    //     parent: container,
+    //     width: container.clientWidth,
+    //     data: dataMulti
+    // })
+
+    // var dataMulti = {
+    //     timestamp: datahub.data.generateTimestamps(),
+    //     barData: datahub.data.generateTimeSeries(),
+    //     referenceData: datahub.data.generateTimeSeries()
+    // }
+
+    // dataMulti.barData.forEach(function(d) {
+    //     d.value = d.value * -1
+    // })
+
+    // dataMulti.referenceData.forEach(function(d) {
+    //     d.value = d.value * -1
+    // })
+
+    // var container = document.querySelector('.reverse-bar-chart')
+    // datahub.multiChart({
+    //     parent: container,
+    //     width: container.clientWidth,
+    //     data: dataMulti,
+    //     reverseY: true
+    // })
+    // .on('hover', function(d) { console.log(d) })
+
+    // var dataMulti = {
+    //     timestamp: datahub.data.generateTimestamps(),
+    //     barData: datahub.data.generateTimeSeries()
+    // }
+
+    // dataMulti.barData.map(function(d) {
+    //     return d.value.map(function(dB) {
+    //         return Math.random()*50+50
+    //     })
+    // })
+
+    // var container = document.querySelector('.autoscale-bar-chart')
+    // datahub.multiChart({
+    //     parent: container,
+    //     width: container.clientWidth,
+    //     data: dataMulti,
+    //     autoScaleY: true
+    // })
+
+    // var dataMulti = {
+    //     timestamp: datahub.data.generateTimestamps(),
+    //     barData: datahub.data.generateTimeSeries()
+    // }
+
+    // var container = document.querySelector('.domain-bar-chart')
+    // datahub.multiChart({
+    //     parent: container,
+    //     width: container.clientWidth,
+    //     data: dataMulti,
+    //     domain: [0, 1000]
+    // })
+
+    // var dataMulti = {
+    //     timestamp: datahub.data.generateTimestamps(),
+    //     stackedBarData: datahub.data.generateTimeSeries({min: 1000, max: 10000})
+    // }    
+
+    // var container = document.querySelector('.formatted-bar-chart')
+    // datahub.multiChart({
+    //     parent: container,
+    //     width: container.clientWidth,
+    //     data: dataMulti,
+    //     labelsRewriterY: function(d, i) {
+    //         var locale = d3.formatDefaultLocale({
+    //             "decimal": ",",
+    //             "thousands": "",
+    //             "grouping": [3],
+    //             "currency": ["€", ""]
+    //         })
+    //         var formattedValue = d3.formatPrefix('.1', d)(d)
+
+    //         var match = formattedValue.match(/[a-zA-Z]/)
+    //         if(match){
+    //             var idx = match.index
+    //             return '<tspan>' + formattedValue.slice(0, idx) + '</tspan><tspan dx="0.1em">' + formattedValue.slice(idx) + '</tspan>'
+    //         }
+    //         else {
+    //             return formattedValue
+    //         }
+    //     }
+    // })
+
+    // var dataMulti = {
+    //     timestamp: datahub.data.generateTimestamps(),
+    //     stackedBarData: datahub.data.generateTimeSeries({layerCount: 3})
+    // }
+
+    // var container = document.querySelector('.stacked-bar-chart')
+    // datahub.multiChart({
+    //     parent: container,
+    //     width: container.clientWidth,
+    //     data: dataMulti
+    // })
+
+    // var dataMulti = {
+    //     timestamp: datahub.data.generateTimestamps(),
+    //     lineData: datahub.data.generateTimeSeries({layerCount: 2})
+    // }
+
+    // var container = document.querySelector('.multiline-chart')
+    // datahub.multiChart({
+    //     parent: container,
+    //     width: container.clientWidth,
+    //     data: dataMulti
+    // })
+
+    // var dataMulti = {
+    //     timestamp: datahub.data.generateTimestamps(),
+    //     areaData: datahub.data.generateTimeSeries()
+    // }
+
+    // var container = document.querySelector('.area-chart')
+    // datahub.multiChart({
+    //     parent: container,
+    //     width: container.clientWidth,
+    //     data: dataMulti
+    // })
+
+    // var dataMulti = {
+    //     timestamp: datahub.data.generateTimestamps(),
+    //     stackedAreaData: datahub.data.generateTimeSeries({layerCount: 3})
+    // }
+
+    // var container = document.querySelector('.stacked-area-chart')
+    // datahub.multiChart({
+    //     parent: container,
+    //     width: container.clientWidth,
+    //     data: dataMulti
+    // })
+
+    // var dataMulti = {
+    //     timestamp: datahub.data.generateTimestamps(),
+    //     barData: datahub.data.generateTimeSeries(),
+    //     stackedBarData: datahub.data.generateTimeSeries({count: 8, layerCount: 3}),
+    //     estimateData: datahub.data.generateTimeSeries({count: 4, timeStart: '2016-09-01'}),
+    //     lineData: datahub.data.generateTimeSeries({layerCount: 2}),
+    //     areaData: datahub.data.generateTimeSeries(),
+    //     stackedAreaData: datahub.data.generateTimeSeries({layerCount: 3}),
+    //     referenceData: datahub.data.generateTimeSeries({count: 8}),
+    //     thresholdData: datahub.data.generateTimeSeries({count: 1, step: 12})
+    // }
+
+    // var container = document.querySelector('.multi-chart')
+    // datahub.multiChart({
+    //     parent: container,
+    //     width: container.clientWidth,
+    //     height: 300,
+    //     margin: {
+    //         top: 50,
+    //         right: 40,
+    //         bottom: 90,
+    //         left: 60
+    //     },
+    //     axisXFormat: '%b',
+    //     axisTitleX: 'Unit',
+    //     axisTitleY: 'Unit',
+    //     chartTitle: 'Title'
+    // })
+    // .on('hover', function(d) { console.log(d) })
+    // .setData(dataMulti)
+    // .setConfig({chartTitle: 'Title2'})
+
+    // var dataMulti = {
+    //     timestamp: datahub.data.generateTimestamps(),
+    //     barData: datahub.data.generateTimeSeries()
+    // }
+
+    // var container = document.querySelector('.data-change')
+    // var chartTimer = datahub.multiChart({
+    //     parent: container,
+    //     width: container.clientWidth
+    // })
+
+    // function setData() {
+    //     var dataMulti = {
+    //         timestamp: datahub.data.generateTimestamps(),
+    //         barData: datahub.data.generateTimeSeries()
+    //     }
+    //     chartTimer.setData(dataMulti)
+    // }
+
+    // setInterval(setData, 1000)
+
+    // var dataMulti = {
+    //     timestamp: datahub.data.generateTimestamps(),
+    //     barData: datahub.data.generateTimeSeries()
+    // }
+
+    // var container = document.querySelector('.data-empty')
+    // var chart2 = datahub.multiChart({
+    //     parent: container,
+    //     width: container.clientWidth
+    // })
+    // .setData(dataMulti)
+
+    // var dataMulti = {
+    //     timestamp: datahub.data.generateTimestamps(),
+    //     barData: null
+    // }
+    // chart2.setData(dataMulti)
+
+    // var dataMulti = {
+    //     timestamp: datahub.data.generateTimestamps(),
+    //     stackedBarData: datahub.data.generateTimeSeries({count: 8, layerCount: 3}),
+    //     estimateData: datahub.data.generateTimeSeries({timeStart: '2016-09-01', count: 4, layerCount: 1})
+    // }
+
+    // var container = document.querySelector('.chart-types')
+    // datahub.multiChart({
+    //     parent: container,
+    //     width: container.clientWidth,
+    //     data: dataMulti
+    // })
+
+    // var dataMulti = {
+    //     timestamp: datahub.data.generateTimestamps(),
+    //     barData: datahub.data.generateTimeSeries(),
+    //     referenceData: datahub.data.generateTimeSeries(),
+    //     thresholdData: datahub.data.generateTimeSeries({count: 1, step: 12})
+    // }
+
+    // var container = document.querySelector('.chart-features')
+    // datahub.multiChart({
+    //     parent: container,
+    //     width: container.clientWidth,
+    //     data: dataMulti
+    // })
+
+    // var container = document.querySelector('.multiline-chart-empty')
+    // datahub.multiChart({
+    //     parent: container,
+    //     width: container.clientWidth
+    // })
+
+    // var dataMulti = {
+    //     timestamp: datahub.data.generateTimestamps(),
+    //     barData: datahub.data.generateTimeSeries(),
+    // }
+
+    // var container = document.querySelector('.chart-dummy')
+    // datahub.multiChart({
+    //     parent: container,
+    //     width: container.clientWidth,
+    //     data: dataMulti
+    // })
+
+    // var dataMulti = {
+    //     timestamp: datahub.data.generateTimestamps(),
+    //     stackedAreaData: datahub.data.generateTimeSeries({count: 12, layerCount: 3})
+    // }
+
+    // dataMulti.stackedAreaData[10].value = dataMulti.stackedAreaData[10].value.slice(0, 2)
+    // dataMulti.stackedAreaData[6].value = dataMulti.stackedAreaData[6].value.slice(1, 2)
+
+    // datahub.multiChart({
+    //     parent: document.querySelector('.gaps')
+    // })
+    // .setData(dataMulti)
+
+    // var dataMulti = {
+    //     timestamp: datahub.data.generateTimestamps(),
+    //     lineData: datahub.data.generateTimeSeries({count: 12, layerCount: 3}),
+    //     areaData: datahub.data.generateTimeSeries({count: 12, layerCount: 3})
+    // }
+
+    // dataMulti.lineData.forEach(function(d) {
+    //     d.value =  d.value.map(function(dB, iB) {
+    //         return !!Math.round(Math.random()*3) ? dB : null
+    //     })
+    // })
+
+    // dataMulti.areaData.forEach(function(d) {
+    //     d.value =  d.value.map(function(dB, iB) {
+    //         return !!Math.round(Math.random()*3) ? dB : null
+    //     })
+    // })
+
+    // datahub.multiChart({
+    //     parent: document.querySelector('.gaps2')
+    // })
+    // .setData(dataMulti)
+
+    // var dataMulti = {
+    //     timestamp: datahub.data.generateTimestamps(),
+    //     lineData: datahub.data.generateTimeSeries({count: 1, layerCount: 3}),
+    //     areaData: datahub.data.generateTimeSeries({count: 1, layerCount: 1})
+    // }
+
+    // datahub.multiChart({
+    //     parent: document.querySelector('.isolated')
+    // })
+    // .setData(dataMulti)
+
+    // var dataMulti = {
+    //     timestamp: datahub.data.generateTimestamps(),
+    //     lineData: datahub.data.generateTimeSeries({count: 12, layerCount: 2})
+    // }
+
+    // var sliderChartContainer = document.querySelector('.slider-chart')
+
+    // function renderMainChart(dataMulti) {
+    //     datahub.multiChart({
+    //         parent: sliderChartContainer,
+    //         width: sliderChartContainer.clientWidth,
+    //         data: dataMulti
+    //     })
+    // }
+
+    // var timeSliderContainer = document.querySelector('.time-slider')
+    // var timeSlider = datahub.widget.timeSlider({
+    //     parent: timeSliderContainer,
+    //     timeRange: ['2016-01-01', '2017-01-01'],
+    //     initialTimeRange: ['2016-01-01', '2017-01-01'],
+    //     width: timeSliderContainer.clientWidth,
+    //     height: 40,
+    //     margin: {
+    //         top: 4,
+    //         right: 60,
+    //         bottom: 4,
+    //         left: 60
+    //     }
+    // })
+
+    // timeSlider.events.on('brush', function(d) {
+    //     // var timestamps = timeseries.map(function(d, i){ return d.timestamp })
+    //     // var startIndex = datahub.utils.bisection(timestamps, d.brushExtent.start)
+    //     // var endIndex = datahub.utils.bisection(timestamps, d.brushExtent.end)
+    //     // var timeseriesSlice = {
+    //     //     values: dataMulti.values.map(function(d, i) {
+    //     //         return d.slice(startIndex, endIndex)
+    //     //     }),
+    //     //     timestamps: dataMulti.timestamps.slice(startIndex, endIndex)
+    //     // }
+
+    //     // renderMainChart(timeseriesSlice)
+    // })
+
+    // renderMainChart(dataMulti)
+
+    // // table chart
+    // ////////////////////////////////////////
+
+    // var table = datahub.tableChart({
+    //     parent: document.querySelector('.table-chart')
+    // })
+
+    // table.setConfig({
+    //         header: [
+    //             {key: 'name', label: 'Name'},
+    //             {key: 'actual', label: ['Actual', '2nd']},
+    //             {key: 'plan', label: 'Plan'}
+    //         ],
+    //         elements: [
+    //             [
+    //                 {key: 'name', value: 'Spain', label: 'Spain' },
+    //                 {key: 'actual', value: -20, label: -20 },
+    //                 {key: 'plan', value: -30, label: -30 }
+    //             ],
+    //             [
+    //                 {key: 'name', value: 'germany', label: 'Germany' },
+    //                 {key: 'actual', value: 10, label: 10 },
+    //                 {key: 'plan', value: 40, label: 40 }
+    //             ],
+    //             [
+    //                 {key: 'name', value: 'zzz', label: 'UK' },
+    //                 {key: 'actual', value: 30, label: [30, 'Wh'] },
+    //                 {key: 'plan', value: 40, label: 40 }
+    //             ],
+    //             [
+    //                 {key: 'name', value: 'mmm', label: 'Italy' },
+    //                 {key: 'actual', value: 10, label: 10 },
+    //                 {key: 'plan', value: 40, label: 40 }
+    //             ]
+    //         ],
+    //         valueKey: 'actual',
+    //         referenceKey: 'plan',
+    //         domain: [-160, 160],
+    //         labelsRewriterX: function(d, i) {
+    //             var label = this.textContent
+    //             if(typeof this.textContent === 'undefined') {
+    //                 return ''
+    //             }
+    //             var match = label.match(/[a-zA-Z]/)
+    //             if(match){
+    //                 var idx = match.index
+    //                 return '<tspan>' + label.slice(0, idx) + '</tspan><tspan dx="0.1em">' + label.slice(idx) + '</tspan>'
+    //             }
+    //             else {
+    //                 return label
+    //             }
+    //         },
+    //         sortFunc: function(a, b) {
+    //             var forceTop = 'zzz'
+    //             var matchA = a.filter(function(d) {
+    //                 return d.key === 'name'
+    //             })
+    //             var nameA = matchA[0].label.toLowerCase()
+
+    //             var matchB = b.filter(function(d) {
+    //                 return d.key === 'name'
+    //             })
+    //             var nameB = matchB[0].label.toLowerCase()
+
+    //             if(nameB === forceTop) {
+    //                 return 1
+    //             }
+    //             if(nameA === forceTop) {
+    //                 return -1
+    //             }
+    //             if(nameA < nameB) {
+    //                 return -1
+    //             }
+    //             if(nameA > nameB) {
+    //                 return 1
+    //             }
+    //             return 0
+    //         }
+    //     })
+
+    // // vertical chart
+    // ////////////////////////////////////////
+
+    // var vertical = datahub.verticalChart({
+    //     parent: document.querySelector('.vertical-chart')
+    // })
+
+    // vertical.setConfig({
+    //     title: 'Title',
+    //     elements:[
+    //         {key: 'approved', label: 'Approved', value: 125},
+    //         {key: 'written', label: 'Written', value: 16},
+    //         {key: 'remains', label: 'Remains', value: -79}
+    //     ],
+    //     referenceBarSize: 100,
+    //     unit: '%'
+    // })
+
+    // // waterfall chart
+    // ////////////////////////////////////////
+
+    // var waterfall = datahub.waterfallChart({
+    //     parent: document.querySelector('.waterfall-chart')
+    // })
+
+    // waterfall.setConfig({
+    //     elements:[
+    //         {key: 'initial', label: 'Initial', value: 53},
+    //         {key: 'closed', label: 'Closed', value: -30},
+    //         {key: 'open', label: 'Open', value: 23},
+    //         {key: 'new', label: 'New', value: 15},
+    //         {key: 'total', label: 'Total', value: 38}
+    //     ]
+    // })
+
+    // // timeseries chart
+    // ////////////////////////////////////////
 
     var commonDataConfig = {
         layerCount: 1,
@@ -992,22 +992,22 @@
         }
     }
 
-    // chart 1
-    var dataConfig1 = commonDataConfig
-    var chartConfig1 = commonChartConfig
-    var data = datahub.data.generateTimeSeriesSplit(dataConfig1)
-    datahub.timeseries({
-            parent: document.querySelector('.timeseries-area')
-        })
-        .on('hover', function(d) {
-            // console.log(d)
-        })
-        .setConfig(chartConfig1)
-        .setData(data)
+    // // chart 1
+    // var dataConfig1 = commonDataConfig
+    // var chartConfig1 = commonChartConfig
+    // var data = datahub.data.generateTimeSeriesSplit(dataConfig1)
+    // datahub.timeseries({
+    //         parent: document.querySelector('.timeseries-area')
+    //     })
+    //     .on('hover', function(d) {
+    //         // console.log(d)
+    //     })
+    //     .setConfig(chartConfig1)
+    //     .setData(data)
 
     // chart 2
     var dataConfig2 = datahub.utils.mergeAll({}, commonDataConfig, {
-        layerCount: 2,
+        layerCount: 1,
         count: 100,
     })
     var chartConfig2 = datahub.utils.mergeAll({}, commonChartConfig, {
@@ -1016,6 +1016,14 @@
         yTicks: 3
     })
     var data = datahub.data.generateTimeSeriesSplit(dataConfig2)
+
+    
+    data[0].data.forEach(function(d, i) {
+        d.value = null
+    })
+
+    console.log(data)
+
     datahub.timeseries({
             parent: document.querySelector('.timeseries-line')
         })
@@ -1026,229 +1034,228 @@
         .setData(data)
 
     // chart 3
-    var dataConfig3 = datahub.utils.mergeAll({}, commonDataConfig, {
-        layerCount: 1,
-        count: 30,
-    })
-    var chartConfig3 = datahub.utils.mergeAll({}, commonChartConfig, {
-        chartType: 'step',
-        stepRange: 7
-    })
-    var data = datahub.data.generateTimeSeriesSplit(dataConfig3)
-    datahub.timeseries({
-            parent: document.querySelector('.timeseries-step')
-        })
-        .on('hover', function(d) {
-            // console.log(d)
-        })
-        .setConfig(chartConfig3)
-        .setData(data)
+    // var dataConfig3 = datahub.utils.mergeAll({}, commonDataConfig, {
+    //     layerCount: 1,
+    //     count: 30,
+    // })
+    // var chartConfig3 = datahub.utils.mergeAll({}, commonChartConfig, {
+    //     chartType: 'step',
+    //     stepRange: 7
+    // })
+    // var data = datahub.data.generateTimeSeriesSplit(dataConfig3)
+    // datahub.timeseries({
+    //         parent: document.querySelector('.timeseries-step')
+    //     })
+    //     .on('hover', function(d) {
+    //         // console.log(d)
+    //     })
+    //     .setConfig(chartConfig3)
+    //     .setData(data)
 
-    // weather chart
-    ////////////////////////////////////////
-    var data = datahub.data.generateWeatherChartData()
-    console.log(data)
-    var chart = datahub.weatherChart({
-        parent: document.querySelector('.weather-chart')
-    })
-    .on('tooltipChange', function(e){ console.log(e) })
-    .setData(data)
-    //hide: ['xTitle', 'yTitle', 'tooltip', 'xAxis', 'yAxis', 'shapes', 'xGrid', 'xTitle', 'yTitle', 'tooltipDot']
+    // // weather chart
+    // ////////////////////////////////////////
+    // var data = datahub.data.generateWeatherChartData()
+    // var chart = datahub.weatherChart({
+    //     parent: document.querySelector('.weather-chart')
+    // })
+    // // .on('tooltipChange', function(e){ console.log(e) })
+    // .setData(data)
+    // //hide: ['xTitle', 'yTitle', 'tooltip', 'xAxis', 'yAxis', 'shapes', 'xGrid', 'xTitle', 'yTitle', 'tooltipDot']
 
-    // other widgets
-    ////////////////////////////////////////
+    // // other widgets
+    // ////////////////////////////////////////
 
-    var number = datahub.widget.number({
-            parent: document.querySelector('.number-widget.big'),
-            title: 'title',
-            value: 'value',
-            info: 'info'
-        })
-        .on('click', function(d){ console.log(d) })
+    // var number = datahub.widget.number({
+    //         parent: document.querySelector('.number-widget.big'),
+    //         title: 'title',
+    //         value: 'value',
+    //         info: 'info'
+    //     })
+    //     .on('click', function(d){ console.log(d) })
 
-    number.setTitle('NET PRODUCTION')
-        .setValue('236,43GWh<div class="dh-tag">3,10%</div>')
-        .setInfo('Plan: 231,64GWh')
+    // number.setTitle('NET PRODUCTION')
+    //     .setValue('236,43GWh<div class="dh-tag">3,10%</div>')
+    //     .setInfo('Plan: 231,64GWh')
 
-    datahub.widget.number({
-        parent: document.querySelector('.number-widget.medium'),
-        value: '236,43GWh',
-        info: 'Net Production'
-    })
+    // datahub.widget.number({
+    //     parent: document.querySelector('.number-widget.medium'),
+    //     value: '236,43GWh',
+    //     info: 'Net Production'
+    // })
 
-    datahub.widget.number({
-        parent: document.querySelector('.number-widget.small'),
-        value: '16,00%',
-        info: 'MTD Actual'
-    })
+    // datahub.widget.number({
+    //     parent: document.querySelector('.number-widget.small'),
+    //     value: '16,00%',
+    //     info: 'MTD Actual'
+    // })
 
-    var table = datahub.widget.table({
-        parent: document.querySelector('.table-widget'),
-        header: [{
-            key: 'header1',
-            label: 'Header 1',
-            sortable: true
-        }],
-        elements: [['Element 1']]
-    })
+    // var table = datahub.widget.table({
+    //     parent: document.querySelector('.table-widget'),
+    //     header: [{
+    //         key: 'header1',
+    //         label: 'Header 1',
+    //         sortable: true
+    //     }],
+    //     elements: [['Element 1']]
+    // })
 
-    table.setHeader([{
-        key: 'country',
-        label: 'Country',
-        sortable: true
-    }, {
-        key: 'production',
-        label: 'Production',
-        sortable: true
-    }, {
-        key: 'revenues',
-        label: 'Revenues',
-    }])
+    // table.setHeader([{
+    //     key: 'country',
+    //     label: 'Country',
+    //     sortable: true
+    // }, {
+    //     key: 'production',
+    //     label: 'Production',
+    //     sortable: true
+    // }, {
+    //     key: 'revenues',
+    //     label: 'Revenues',
+    // }])
 
-    table.setElements([
-        ['Spain', '1<span class="dh-tag">3,10%</span>', '<span class="dh-negative">(2)</span>'],
-        ['Germany', '7 <span class="dh-negative-arrow"></span>', '8 <span class="dh-positive-arrow"></span>'],
-        ['United Kingdom', '<span class="dh-positive-cell">1<span>', 2],
-        ['Poland', '95% <span class="dh-dim">/ 80%</span>', 8],
-        ['Netherlands', 1, 2],
-        ['Italy', 7, 8],
-    ])
+    // table.setElements([
+    //     ['Spain', '1<span class="dh-tag">3,10%</span>', '<span class="dh-negative">(2)</span>'],
+    //     ['Germany', '7 <span class="dh-negative-arrow"></span>', '8 <span class="dh-positive-arrow"></span>'],
+    //     ['United Kingdom', '<span class="dh-positive-cell">1<span>', 2],
+    //     ['Poland', '95% <span class="dh-dim">/ 80%</span>', 8],
+    //     ['Netherlands', 1, 2],
+    //     ['Italy', 7, 8],
+    // ])
 
-    var heightSelector = datahub.widget.buttonGroup({
-        parent: document.querySelector('.button-group.vertical'),
-        elements: [{
-            label: 'All',
-            key: 'all'
-        }, {
-            label: '200',
-            key: '200'
-        }, {
-            label: '180',
-            key: '180'
-        }, {
-            label: '160',
-            key: '160'
-        }],
-        defaultElementKey: 'all',
-        isExclusive: true
-    })
+    // var heightSelector = datahub.widget.buttonGroup({
+    //     parent: document.querySelector('.button-group.vertical'),
+    //     elements: [{
+    //         label: 'All',
+    //         key: 'all'
+    //     }, {
+    //         label: '200',
+    //         key: '200'
+    //     }, {
+    //         label: '180',
+    //         key: '180'
+    //     }, {
+    //         label: '160',
+    //         key: '160'
+    //     }],
+    //     defaultElementKey: 'all',
+    //     isExclusive: true
+    // })
 
-    heightSelector.events.on('click', function(d) {
-        console.log(d)
-    })
+    // heightSelector.events.on('click', function(d) {
+    //     console.log(d)
+    // })
 
-    datahub.widget.buttonGroup({
-        parent: document.querySelector('.button-group.horizontal'),
-        elements: [{
-            label: 'All',
-            key: 'all'
-        }, {
-            label: '200',
-            key: '200'
-        }, {
-            label: '180',
-            key: '180'
-        }, {
-            label: '160',
-            key: '160'
-        }],
-        defaultElementKey: 'all'
-    })
+    // datahub.widget.buttonGroup({
+    //     parent: document.querySelector('.button-group.horizontal'),
+    //     elements: [{
+    //         label: 'All',
+    //         key: 'all'
+    //     }, {
+    //         label: '200',
+    //         key: '200'
+    //     }, {
+    //         label: '180',
+    //         key: '180'
+    //     }, {
+    //         label: '160',
+    //         key: '160'
+    //     }],
+    //     defaultElementKey: 'all'
+    // })
 
-    datahub.widget.buttonGroup({
-        parent: document.querySelector('.button-group.exclusive'),
-        elements: [{
-            label: 'All',
-            key: 'all'
-        }, {
-            label: '200',
-            key: '200'
-        }, {
-            label: '180',
-            key: '180'
-        }, {
-            label: '160',
-            key: '160'
-        }],
-        defaultElementKey: 'all',
-        isExclusive: true
-    })
+    // datahub.widget.buttonGroup({
+    //     parent: document.querySelector('.button-group.exclusive'),
+    //     elements: [{
+    //         label: 'All',
+    //         key: 'all'
+    //     }, {
+    //         label: '200',
+    //         key: '200'
+    //     }, {
+    //         label: '180',
+    //         key: '180'
+    //     }, {
+    //         label: '160',
+    //         key: '160'
+    //     }],
+    //     defaultElementKey: 'all',
+    //     isExclusive: true
+    // })
 
-    datahub.widget.buttonGroup({
-        parent: document.querySelector('.legend'),
-        elements: [{
-            label: 'Legend element 1 <span class="units">(MWh)</span>',
-            key: 'element1',
-            className: 'color-1'
-        }, {
-            label: 'Legend element 2 <span class="units">(MWh)</span>',
-            key: 'element2',
-            className: 'color-2'
-        }],
-        defaultElementKey: 'element1'
-    })
+    // datahub.widget.buttonGroup({
+    //     parent: document.querySelector('.legend'),
+    //     elements: [{
+    //         label: 'Legend element 1 <span class="units">(MWh)</span>',
+    //         key: 'element1',
+    //         className: 'color-1'
+    //     }, {
+    //         label: 'Legend element 2 <span class="units">(MWh)</span>',
+    //         key: 'element2',
+    //         className: 'color-2'
+    //     }],
+    //     defaultElementKey: 'element1'
+    // })
 
-    var alert = datahub.widget.alertMessage({
-        parent: document.querySelector('.alert-message1'),
-        level: 'low',
-        message: 'Alert message'
-    })
+    // var alert = datahub.widget.alertMessage({
+    //     parent: document.querySelector('.alert-message1'),
+    //     level: 'low',
+    //     message: 'Alert message'
+    // })
 
-    alert.setLevel('low')
-    alert.setMessage('Alert message, low')
+    // alert.setLevel('low')
+    // alert.setMessage('Alert message, low')
 
-    datahub.widget.alertMessage({
-        parent: document.querySelector('.alert-message2'),
-        level: 'medium',
-        message: 'Alert message, medium'
-    })
+    // datahub.widget.alertMessage({
+    //     parent: document.querySelector('.alert-message2'),
+    //     level: 'medium',
+    //     message: 'Alert message, medium'
+    // })
 
-    datahub.widget.alertMessage({
-        parent: document.querySelector('.alert-message3'),
-        level: 'high',
-        message: 'Alert message, high'
-    })
+    // datahub.widget.alertMessage({
+    //     parent: document.querySelector('.alert-message3'),
+    //     level: 'high',
+    //     message: 'Alert message, high'
+    // })
 
-    var monthCalendar = datahub.widget.monthCalendar({
-            parent: document.querySelector('.month-calendar'),
-            defaultDate: (new Date()).toString(),
-        })
-        .on('change', setDate)
+    // var monthCalendar = datahub.widget.monthCalendar({
+    //         parent: document.querySelector('.month-calendar'),
+    //         defaultDate: (new Date()).toString(),
+    //     })
+    //     .on('change', setDate)
 
-    monthCalendar.setDate('2015-10-01T04:00:00.000Z')
+    // monthCalendar.setDate('2015-10-01T04:00:00.000Z')
 
-    function setDate(d) {
-        console.log(monthCalendar.getFormattedDate('%Y/%m/%d %H:%M'));
-        document.querySelector('.selected-date').innerText = d.iso
-    }
+    // function setDate(d) {
+    //     console.log(monthCalendar.getFormattedDate('%Y/%m/%d %H:%M'));
+    //     document.querySelector('.selected-date').innerText = d.iso
+    // }
 
-    var dropdown = datahub.widget.dropdown({
-        parent: document.querySelector('.dropdown1'),
-        elements: [{
-            label: 'Element 1',
-            key: 'element1'
-        }],
-        selected: 'Element 1',
-        title: 'title1'
-    })
-    .on('change', function(d){ console.log(d) })
+    // var dropdown = datahub.widget.dropdown({
+    //     parent: document.querySelector('.dropdown1'),
+    //     elements: [{
+    //         label: 'Element 1',
+    //         key: 'element1'
+    //     }],
+    //     selected: 'Element 1',
+    //     title: 'title1'
+    // })
+    // .on('change', function(d){ console.log(d) })
 
-    dropdown.setElements([
-        {
-            label: 'Element 1',
-            key: 'element1'
-        }, {
-            label: 'Element 2',
-            key: 'element2'
-        }
-    ])
-    dropdown.setSelected('Element 2')
+    // dropdown.setElements([
+    //     {
+    //         label: 'Element 1',
+    //         key: 'element1'
+    //     }, {
+    //         label: 'Element 2',
+    //         key: 'element2'
+    //     }
+    // ])
+    // dropdown.setSelected('Element 2')
 
-    datahub.widget.dropdownCalendar({
-        parent: document.querySelector('.dropdown-calendar'),
-        defaultDate: (new Date()).toString()
-    })
-    .on('change', function(d){ console.log(d) })
+    // datahub.widget.dropdownCalendar({
+    //     parent: document.querySelector('.dropdown-calendar'),
+    //     defaultDate: (new Date()).toString()
+    // })
+    // .on('change', function(d){ console.log(d) })
 
     // maps
     ////////////////////////////////////////

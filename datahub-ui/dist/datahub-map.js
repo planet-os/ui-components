@@ -53,6 +53,16 @@
         var appendHtmlToNode = function(htmlString, parent) {
             return parent.appendChild(document.importNode(new DOMParser().parseFromString(htmlString, "text/html").body.childNodes[0], true));
         };
+        var svgToNode = function(svgString, svg) {
+            var parentElement = svg.parentNode;
+            var emptySvg = svg.cloneNode(false);
+            parentElement.removeChild(svg);
+            parentElement.appendChild(emptySvg);
+            return appendSvgToNode(svgString, emptySvg);
+        };
+        var appendSvgToNode = function(svgString, parent) {
+            return parent.appendChild(document.importNode(new DOMParser().parseFromString('<svg xmlns="http://www.w3.org/2000/svg">' + svgString + "</svg>", "application/xml").documentElement.firstChild, true));
+        };
         var once = function once(fn, context) {
             var result;
             return function() {
@@ -218,6 +228,8 @@
             mergeAll: mergeAll,
             htmlToNode: htmlToNode,
             appendHtmlToNode: appendHtmlToNode,
+            svgToNode: svgToNode,
+            appendSvgToNode: appendSvgToNode,
             once: once,
             throttle: throttle,
             arrayStats: arrayStats,
@@ -246,6 +258,10 @@
         };
         var setApiKey = function(apiKey) {
             apiConfig.apiKey = apiKey;
+            return this;
+        };
+        var setApiConfig = function(_apiConfig) {
+            apiConfig = datahub.utils.mergeAll(apiConfig, _apiConfig);
             return this;
         };
         var generateGeojson = function() {
@@ -601,10 +617,19 @@
                 }
                 console.log("Point API data", json, uri);
                 var variablesMetadata = {};
+                var timeVariableIDs = [];
                 var ctx = json.metadata.contexts;
                 var dataVars, dataVarTmp;
                 for (var x in ctx) {
                     dataVars = ctx[x].dataVariables;
+                    if (ctx[x].axes && Object.keys(ctx[x].axes)) {
+                        var axes = Object.keys(ctx[x].axes).map(function(d, i) {
+                            return d.toLowerCase().trim();
+                        });
+                        if (axes.indexOf("time") > -1) {
+                            timeVariableIDs = timeVariableIDs.concat(Object.keys(dataVars));
+                        }
+                    }
                     for (var y in dataVars) {
                         dataVarTmp = dataVars[y];
                         dataVarTmp.key = y;
@@ -635,7 +660,8 @@
                     variables: variableList,
                     datahubLink: datahubLink,
                     variableData: variablesData[variableName],
-                    variableMetadata: variablesMetadata[variableName]
+                    variableMetadata: variablesMetadata[variableName],
+                    timeVariableIDs: timeVariableIDs
                 });
             });
             return this;
@@ -674,7 +700,8 @@
             pointsToFeatures: pointsToFeatures,
             generateGeojsonPoints: generateGeojsonPoints,
             getWorldVector: getWorldVector,
-            setApiKey: setApiKey
+            setApiKey: setApiKey,
+            setApiConfig: setApiConfig
         };
     }(datahub, root.d3);
     !function(dh, d3, colorBrewer) {
