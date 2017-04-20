@@ -39,6 +39,22 @@
         return parent.appendChild(document.importNode(new DOMParser().parseFromString(htmlString, 'text/html').body.childNodes[0], true))
     }
 
+    var svgToNode = function(svgString, svg) {
+        var parentElement = svg.parentNode
+        var emptySvg = svg.cloneNode(false)
+        parentElement.removeChild(svg)
+        parentElement.appendChild(emptySvg)
+        return appendSvgToNode(svgString, emptySvg)
+    }
+
+    var appendSvgToNode = function(svgString, parent) {
+        return parent.appendChild(document.importNode(
+            new DOMParser()
+                .parseFromString('<svg xmlns="http://www.w3.org/2000/svg">' + svgString + '</svg>', 'application/xml')
+                .documentElement.firstChild,
+            true))
+    }
+
     var once = function once(fn, context) {
         var result
         return function() {
@@ -232,6 +248,8 @@
         mergeAll: mergeAll,
         htmlToNode: htmlToNode,
         appendHtmlToNode: appendHtmlToNode,
+        svgToNode: svgToNode,
+        appendSvgToNode: appendSvgToNode,
         once: once,
         throttle: throttle,
         arrayStats: arrayStats,

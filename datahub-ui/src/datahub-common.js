@@ -325,8 +325,8 @@
         }
         config.container.selectAll('g.axis.y')
             .selectAll('text')
-            .html(function(d, i) {
-                return config.labelsRewriterY(d, i, config)
+            .each(function(d, i) {
+                datahub.utils.svgToNode(config.labelsRewriterY(d, i, config), this)
             })
 
         return {}
