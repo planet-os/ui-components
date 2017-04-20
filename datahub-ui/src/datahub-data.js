@@ -12,12 +12,18 @@
         return this
     }
 
+    var setApiConfig = function(_apiConfig) {
+        apiConfig = datahub.utils.mergeAll(apiConfig, _apiConfig)
+
+        return this
+    }
+
     var generateGeojson = function() {
 
         return {
             "type": "Feature",
             "properties": {
-                "name": "",
+                "name": ""
             },
             "geometry": {
                 "type": "LineString",
@@ -407,10 +413,19 @@
             console.log('Point API data', json, uri)
 
             var variablesMetadata = {}
+            var timeVariableIDs = []
             var ctx = json.metadata.contexts
             var dataVars, dataVarTmp
             for (var x in ctx) {
                 dataVars = ctx[x].dataVariables
+                if(ctx[x].axes && Object.keys(ctx[x].axes)) {
+                    var axes = Object.keys(ctx[x].axes).map(function(d, i) {
+                        return d.toLowerCase().trim()
+                    })
+                    if(axes.indexOf('time') > -1) {
+                        timeVariableIDs = timeVariableIDs.concat(Object.keys(dataVars));
+                    }
+                }
                 for (var y in dataVars) {
                     dataVarTmp = dataVars[y]
                     dataVarTmp.key = y
@@ -442,7 +457,8 @@
                 variables: variableList,
                 datahubLink: datahubLink,
                 variableData: variablesData[variableName],
-                variableMetadata: variablesMetadata[variableName]
+                variableMetadata: variablesMetadata[variableName],
+                timeVariableIDs: timeVariableIDs
             })
         })
 
@@ -488,6 +504,7 @@
         pointsToFeatures: pointsToFeatures,
         generateGeojsonPoints: generateGeojsonPoints,
         getWorldVector: getWorldVector,
-        setApiKey: setApiKey
+        setApiKey: setApiKey,
+        setApiConfig: setApiConfig
     }
 }(datahub, root.d3))
