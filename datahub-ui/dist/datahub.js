@@ -1760,9 +1760,7 @@
             return api;
         };
         var selectorMap = function(config) {
-            var selectionMap = rasterMap({
-                parent: config.parent
-            }).init();
+            var selectionMap = rasterMap(config).init();
             var events = d3.dispatch("mapCloseClick", "rectangleDraw", "rectangleClick", "markerClick", "markerDraw", "geojsonClick");
             var internalMap = selectionMap._getMap();
             internalMap.zoomControl.setPosition("bottomright");
@@ -1808,7 +1806,6 @@
             internalMap.on("draw:created", function(e) {
                 var layer = e.layer;
                 removeAllPolygons();
-                var coordinates;
                 if (e.layerType === "rectangle") {
                     layer.addTo(drawnItems).on("click", function(e) {
                         removeAllPolygons();
@@ -1825,7 +1822,7 @@
                 }
             }, this);
             function addMarker(latLng) {
-                var marker = L.marker(latLng, {
+                L.marker(latLng, {
                     interactive: true
                 }).on("click", function(e) {
                     removeAllPolygons();
@@ -1840,12 +1837,22 @@
                 drawControl._toolbars.draw._modes.marker.handler.disable();
                 return this;
             }
-            function getPolyFromCoordinates(coords) {
+            function getFeatureFromCoordinates(coords) {
                 return {
                     type: "Feature",
                     geometry: {
                         type: "Polygon",
                         coordinates: [ coords.concat([ coords[0] ]) ]
+                    },
+                    properties: {}
+                };
+            }
+            function getPolyFeatureFromPoly(poly) {
+                return {
+                    type: "Feature",
+                    geometry: {
+                        type: poly.type,
+                        coordinates: poly.coordinates
                     },
                     properties: {}
                 };
@@ -1863,7 +1870,7 @@
             }
             selectionMap.addRectangle = function(coords) {
                 removeAllPolygons();
-                var poly = getPolyFromCoordinates(coords);
+                var poly = getFeatureFromCoordinates(coords);
                 addGeojson(poly, function() {
                     events.call("rectangleClick", this, arguments);
                 });
@@ -1874,17 +1881,19 @@
                 removeAllPolygons();
                 data.forEach(function(geojson) {
                     geojson[1].id = geojson[0];
-                    var geojsonLayer = L.GeoJSON.geometryToLayer(geojson[1]).on("click", function(e) {
-                        drawnItems.removeLayer(this);
+                    console.log(444, geojson);
+                    var poly = getPolyFeatureFromPoly(geojson[1]);
+                    addGeojson(poly, function() {
                         events.call("geojsonClick", this, geojson);
-                        zoomToBoundingBox();
-                    }, this);
-                    geojsonLayer.addTo(drawnItems);
+                    });
                 });
                 zoomToBoundingBox();
                 return this;
             };
             function zoomToBoundingBox() {
+                if (config.disableAutoZoom) {
+                    return this;
+                }
                 var bounds = drawnItems.getBounds();
                 if (bounds._southWest) {
                     internalMap.fitBounds(bounds);
@@ -1896,6 +1905,7 @@
             selectionMap.removeAllPolygons = removeAllPolygons;
             selectionMap.zoomToBoundingBox = zoomToBoundingBox;
             selectionMap.addMarker = addMarker;
+            selectionMap.on = dh.utils.rebind(events);
             return selectionMap;
         };
         var rasterMap = function(_config) {
