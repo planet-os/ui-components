@@ -171,9 +171,7 @@
 
     var selectorMap = function(config) {
 
-        var selectionMap = rasterMap({
-                parent: config.parent
-            })
+        var selectionMap = rasterMap(config)
             .init()
 
         var events = d3.dispatch('mapCloseClick', 'rectangleDraw', 'rectangleClick', 'markerClick', 
@@ -229,7 +227,6 @@
             var layer = e.layer
             removeAllPolygons()
 
-            var coordinates
             if (e.layerType === 'rectangle') {
                 layer.addTo(drawnItems)
                     .on('click', function(e) {
@@ -253,7 +250,7 @@
         }, this)
 
         function addMarker(latLng) {
-            var marker = L.marker(latLng, {
+            L.marker(latLng, {
                     interactive: true
                 })
                 .on('click', function(e) {
@@ -273,12 +270,23 @@
             return this
         }
 
-        function getPolyFromCoordinates(coords) {
+        function getFeatureFromCoordinates(coords) {
             return {
                 "type": "Feature",
                 "geometry": {
                     "type": "Polygon",
                     "coordinates": [coords.concat([coords[0]])]
+                },
+                "properties": {}
+            }
+        }
+
+        function getPolyFeatureFromPoly(poly) {
+            return {
+                "type": "Feature",
+                "geometry": {
+                    "type": poly.type,
+                    "coordinates": poly.coordinates
                 },
                 "properties": {}
             }
@@ -303,8 +311,9 @@
         selectionMap.addRectangle = function(coords) {
             removeAllPolygons()
 
-            var poly = getPolyFromCoordinates(coords)
-            addGeojson(poly, function(){ 
+            var poly = getFeatureFromCoordinates(coords)
+
+            addGeojson(poly, function(){
                 events.call('rectangleClick', this, arguments)
             })
 
@@ -317,15 +326,12 @@
 
             data.forEach(function(geojson) {
                 geojson[1].id = geojson[0]
-                var geojsonLayer = L.GeoJSON.geometryToLayer(geojson[1])
-                    .on('click', function(e) {
-                        drawnItems.removeLayer(this)
-                        events.call('geojsonClick', this, geojson)
+                console.log(444, geojson)
+                var poly = getPolyFeatureFromPoly(geojson[1])
 
-                        zoomToBoundingBox()
-                    }, this)
-
-                geojsonLayer.addTo(drawnItems)
+                addGeojson(poly, function(){
+                    events.call('geojsonClick', this, geojson)
+                })
             })
 
             zoomToBoundingBox()
@@ -333,6 +339,9 @@
         }
 
         function zoomToBoundingBox() {
+            if(config.disableAutoZoom){
+                return this
+            }
             var bounds = drawnItems.getBounds()
             if (bounds._southWest) {
                 internalMap.fitBounds(bounds)
@@ -345,6 +354,7 @@
         selectionMap.removeAllPolygons = removeAllPolygons
         selectionMap.zoomToBoundingBox = zoomToBoundingBox
         selectionMap.addMarker = addMarker
+        selectionMap.on = dh.utils.rebind(events)
 
         return selectionMap
     }
