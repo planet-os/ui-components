@@ -19,6 +19,8 @@
             }
         };
         var mergeAll = function(target, varArgs) {
+            // Object.assign shim from
+            // https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Object/assign
             var to = Object(target);
             for (var index = 1; index < arguments.length; index++) {
                 var nextSource = arguments[index];
@@ -67,6 +69,7 @@
             return function() {
                 var that = this;
                 if (!wait) {
+                    //callback.apply(this, arguments)
                     wait = true;
                     clearTimeout(timer);
                     timer = setTimeout(function() {
@@ -1809,6 +1812,7 @@
                 return d;
             });
             shapes.enter().append("circle").merge(shapes).attr("class", function(d, i, a) {
+                // return ['dot', 'layer' + i, d[0].id, d[0].className].join(' ')
                 return [ "dot", "layer" + d.layer ].join(" ");
             }).attr("cx", function(d) {
                 return config.lineScaleX(d.timestamp);
@@ -1915,6 +1919,7 @@
             return {};
         };
         var active = function(config) {
+            // if config.activeDate is the date Object use it straight, if it's text convert to date object
             var activeTs = !config.activeDate || config.activeDate.getTime === undefined ? new Date(config.activeDate).getTime() : config.activeDate.getTime();
             var selectedTimestamp = config.data.timestamp.filter(function(d) {
                 return d.getTime() === activeTs;
@@ -1943,7 +1948,38 @@
             shapes.exit().remove();
             return {};
         };
-        var multi = dh.utils.pipeline(dh.common.defaultConfig, dataAdapter, template, scaleX, scaleY, eventsPanel, dh.common.axisX, dh.common.axisY, stripes, active, areaShapes, referenceBarShapes, stackedBarShapes, stackedAreaShapes, barShapes, estimateBarShapes, lineShapes, dotShapes, thresholdLineShape, dh.common.axisComponentY, dh.common.labelsRewriterY, dh.common.message, dh.common.axisComponentX, dh.common.axisTitleComponentX, dh.common.axisTitleComponentY, dh.common.chartTitleComponent);
+        var multi = dh.utils.pipeline(dh.common.defaultConfig, dataAdapter, // dh.common.printer,
+        template, scaleX, scaleY, eventsPanel, // chart.axesFormatAutoconfig,
+        dh.common.axisX, dh.common.axisY, stripes, active, areaShapes, referenceBarShapes, stackedBarShapes, stackedAreaShapes, barShapes, estimateBarShapes, lineShapes, dotShapes, thresholdLineShape, dh.common.axisComponentY, dh.common.labelsRewriterY, dh.common.message, dh.common.axisComponentX, dh.common.axisTitleComponentX, // dh.common.axisXFormatterRotate30,
+        dh.common.axisTitleComponentY, dh.common.chartTitleComponent);
+        /**
+     * A configurable line/bar/area chart.
+     * @namespace multiChart
+     * @name multiChart
+     * @param {object} config The initial configuration can be passed on init or later using multiChart.setConfig.
+     * @param {object} config.parent The parent DOM element.
+     * @param {number} [config.width=parent.innerWidth] External width of the chart.
+     * @param {number} [config.height=parent.innerHeight] External height of the chart.
+     * @param {object} [config.margin={top:50, right:50, bottom:100, left:50}] Margins around a chart panel.
+     * @param {string} [config.axisXFormat='%b'] Label x labels format, as passed to d3.utcFormat.
+     * @param {string} [config.axisTitleX] X axis title.
+     * @param {string} [config.axisTitleY] Y axis title.
+     * @param {string} [config.chartTitle] Chart title.
+     * @param {object} [config.data] Data can be passed on init or later using multichart.setData.
+     * @param {boolean} [config.reverseY] Reverse the Y axis so higher values are on the bottom.
+     * @param {boolean} [config.autoScaleY] Auto range the scale from y data instead of clamping min to zero or negative.
+     * @param {Array.<number>} [config.domain] [min, max] domain of the y scale.
+     * @param {function} [config.labelsRewriterY] Y axis label rewriting function. Receives (label, index) and has to return a string or a DOM string.
+     * @returns {object} A multichart instance.
+     * @example
+     * datahub.multiChart({
+     *     parent: document.querySelector('.chart'),
+     *     data: {
+     *         timestamp: datahub.data.generateTimestamps(),
+     *         barData: datahub.data.generateTimeSeries()
+     *     }
+     * })
+     */
         var multiChart = function(config) {
             var configCache, events = d3.dispatch("hover", "click", "mouseout", "active"), chartCache, uid = ~~(Math.random() * 1e4);
             var onResize = dh.utils.throttle(function() {
@@ -1954,6 +1990,21 @@
             var render = function() {
                 chartCache = multi(configCache);
             };
+            /**
+         * Set the data.
+         * @name setData
+         * @param {object} data A data object.
+         * @returns {object} The multiChart instance.
+         * @memberof multiChart
+         * @example
+         * datahub.multiChart({
+         *     parent: document.querySelector('.chart'),
+         * })
+         * .setData({
+         *     timestamp: datahub.data.generateTimestamps(),
+         *     barData: datahub.data.generateTimeSeries()
+         * })
+         */
             var setData = function(data) {
                 var d = data ? JSON.parse(JSON.stringify(data)) : {};
                 configCache = dh.utils.mergeAll({}, configCache);
@@ -1961,6 +2012,20 @@
                 render();
                 return this;
             };
+            /**
+         * Set the config after its instantiation.
+         * @name setConfig
+         * @param {object} config The same config format as on init.
+         * @returns {object} The multiChart instance.
+         * @memberof multiChart
+         * @example
+         * datahub.multiChart({
+         *     parent: document.querySelector('.chart'),
+         * })
+         * .setConfig({
+         *     width: 100
+         * })
+         */
             var setConfig = function(config) {
                 configCache = dh.utils.mergeAll(configCache, config);
                 render();
@@ -1971,11 +2036,35 @@
                     events: events
                 }));
             };
+            /**
+         * Destroys DOM elements and unbind events.
+         * @name destroy
+         * @memberof multiChart
+         * @example
+         * var chart = datahub.multiChart({
+         *     parent: document.querySelector('.chart'),
+         * })
+         * chart.destroy()
+         */
             var destroy = function() {
                 d3.select(window).on("resize." + uid, null);
                 configCache.parent.innerHTML = null;
             };
             init(config, events);
+            /**
+         * Events binder.
+         * @function on
+         * @param {string} eventName The name of the event: 'hover', 'click', 'mouseout', 'active'
+         * @param {function} callback The callback for this event
+         * @memberof multiChart
+         * @example
+         * datahub.multiChart({
+         *     parent: document.querySelector('.chart'),
+         * })
+         * .on('hover', function(e) {
+         *     console.log(e.index, e.timestamp, e.data, e.config, e.event)
+         * })
+         */
             return {
                 on: dh.utils.rebind(events),
                 setConfig: setConfig,
@@ -2168,6 +2257,17 @@
                     event: d3.event
                 });
             });
+            // var eventPanel = config.container.select('.events')
+            //     .selectAll('rect.event-panel')
+            //     .data([0])
+            // eventPanel.enter().append('rect')
+            //     .attr('class', 'event-panel')
+            //     .merge(eventPanel)
+            //     .on('mousemove', function(d) {
+            //         config.events.call('barHover', null, {})
+            //         console.log(111)
+            //     })
+            // eventPanel.exit().remove()
             return {};
         };
         var stripes = function(config) {
@@ -2494,6 +2594,7 @@
             shapes.enter().append("path").merge(shapes).attr("class", function(d, i, a, b) {
                 return [ "shape", id, "layer" + d.layer, config.chartType ].join(" ");
             }).attr("d", function(d, i) {
+                // return 'M' + d.join() + (d.layer === 1 ? 'Z' : '')
                 return "M" + d.join();
             });
             shapes.exit().remove();
@@ -2517,6 +2618,7 @@
             arrows.enter().append("path").attr("class", function(d) {
                 return "arrow";
             }).merge(arrows).attr("d", arrowPath).attr("transform", function(d) {
+                // console.log(d.value)
                 return "translate(" + config.scaleX(d.timestamp) + ", 0) scale(0.5) rotate(" + d.value + ", 6, 12)";
             });
             arrows.exit().remove();
@@ -2634,6 +2736,13 @@
                     });
                 }
             }
+            // else if(!config.dataIsEmpty) {
+            //     var actualTimestamp = config.dataTimestamps[config.dataTimestamps.length - 1]
+            //     var dataUnderCursor = getHoverInfo(config, actualTimestamp)
+            //     // setTooltip(config, dataUnderCursor)
+            //     // config.events.call('tooltipChange', null, {timestamp: actualTimestamp, data: dataUnderCursor})
+            //     config.events.call('hover', null, dataUnderCursor)
+            // }
             if (config.dataIsEmpty || config.axisOnly || config.hide.indexOf("tooltip") > -1) {
                 hideTooltip(config);
                 return {};
@@ -2663,7 +2772,9 @@
             config.container.select(".axis-title.y text").text(config.yAxisTitle || "").attr("dx", "0.5em").attr("dy", "1em");
             return {};
         };
-        var lineChart = dh.utils.pipeline(defaultConfig, template, data, scaleX, scaleY, axisX, axisY, axisComponentX, gridX, lineShapes, arrowShapes, stepShapes, dh.common.message, axisComponentY, reference, eventsPanel, tooltipComponent, xAxisTitle, yAxisTitle);
+        var lineChart = dh.utils.pipeline(defaultConfig, template, data, scaleX, scaleY, axisX, axisY, axisComponentX, gridX, lineShapes, arrowShapes, stepShapes, // dh.common.printer,
+        // areaShapes,
+        dh.common.message, axisComponentY, reference, eventsPanel, tooltipComponent, xAxisTitle, yAxisTitle);
         var timeseries = function(config) {
             var configCache, events = d3.dispatch("hover", "click", "mouseout", "tooltipChange"), chartCache, uid = ~~(Math.random() * 1e4);
             var onResize = dh.utils.throttle(function() {

@@ -775,6 +775,35 @@
         dh.common.chartTitleComponent
     )
 
+    /**
+     * A configurable line/bar/area chart.
+     * @namespace multiChart
+     * @name multiChart
+     * @param {object} config The initial configuration can be passed on init or later using multiChart.setConfig.
+     * @param {object} config.parent The parent DOM element.
+     * @param {number} [config.width=parent.innerWidth] External width of the chart.
+     * @param {number} [config.height=parent.innerHeight] External height of the chart.
+     * @param {object} [config.margin={top:50, right:50, bottom:100, left:50}] Margins around a chart panel.
+     * @param {string} [config.axisXFormat='%b'] Label x labels format, as passed to d3.utcFormat.
+     * @param {string} [config.axisTitleX] X axis title.
+     * @param {string} [config.axisTitleY] Y axis title.
+     * @param {string} [config.chartTitle] Chart title.
+     * @param {object} [config.data] Data can be passed on init or later using multichart.setData.
+     * @param {boolean} [config.reverseY] Reverse the Y axis so higher values are on the bottom.
+     * @param {boolean} [config.autoScaleY] Auto range the scale from y data instead of clamping min to zero or negative.
+     * @param {Array.<number>} [config.domain] [min, max] domain of the y scale.
+     * @param {function} [config.labelsRewriterY] Y axis label rewriting function. Receives (label, index) and has to return a string or a DOM string.
+     * @returns {object} A multichart instance.
+     * @example
+     * datahub.multiChart({
+     *     parent: document.querySelector('.chart'),
+     *     data: {
+     *         timestamp: datahub.data.generateTimestamps(),
+     *         barData: datahub.data.generateTimeSeries()
+     *     }
+     * })
+     */
+
     var multiChart = function(config) {
         var configCache,
             events = d3.dispatch('hover', 'click', 'mouseout', 'active'),
@@ -792,6 +821,21 @@
             chartCache = multi(configCache)
         }
 
+        /**
+         * Set the data.
+         * @name setData
+         * @param {object} data A data object.
+         * @returns {object} The multiChart instance.
+         * @memberof multiChart
+         * @example
+         * datahub.multiChart({
+         *     parent: document.querySelector('.chart'),
+         * })
+         * .setData({
+         *     timestamp: datahub.data.generateTimestamps(),
+         *     barData: datahub.data.generateTimeSeries()
+         * })
+         */
         var setData = function(data) {
             var d = data ? JSON.parse(JSON.stringify(data)) : {}
             configCache = dh.utils.mergeAll({}, configCache)
@@ -800,6 +844,20 @@
             return this
         }
 
+        /**
+         * Set the config after its instantiation.
+         * @name setConfig
+         * @param {object} config The same config format as on init.
+         * @returns {object} The multiChart instance.
+         * @memberof multiChart
+         * @example
+         * datahub.multiChart({
+         *     parent: document.querySelector('.chart'),
+         * })
+         * .setConfig({
+         *     width: 100
+         * })
+         */
         var setConfig = function(config) {
             configCache = dh.utils.mergeAll(configCache, config)
             render()
@@ -810,6 +868,16 @@
             setConfig(dh.utils.mergeAll(config, {events: events}))
         }
 
+        /**
+         * Destroys DOM elements and unbind events.
+         * @name destroy
+         * @memberof multiChart
+         * @example
+         * var chart = datahub.multiChart({
+         *     parent: document.querySelector('.chart'),
+         * })
+         * chart.destroy()
+         */
         var destroy = function() {
             d3.select(window).on('resize.' + uid, null)
             configCache.parent.innerHTML = null
@@ -817,6 +885,20 @@
 
         init(config, events)
 
+        /**
+         * Events binder.
+         * @function on
+         * @param {string} eventName The name of the event: 'hover', 'click', 'mouseout', 'active'
+         * @param {function} callback The callback for this event
+         * @memberof multiChart
+         * @example
+         * datahub.multiChart({
+         *     parent: document.querySelector('.chart'),
+         * })
+         * .on('hover', function(e) {
+         *     console.log(e.index, e.timestamp, e.data, e.config, e.event)
+         * })
+         */
         return {
             on: dh.utils.rebind(events),
             setConfig: setConfig,
