@@ -269,6 +269,31 @@
         charts
     )
 
+    /**
+     * A weather chart built on top of datahub.timeseries.
+     * @namespace weatherChart
+     * @name weatherChart
+     * @param {object} config The initial configuration can be passed on init or later using weatherChart.setConfig.
+     * @param {object} config.parent The parent DOM element.
+     * @param {object} config.data Data can be passed on init or later using weatherChart.setData.
+     * @param {number} [config.width=parent.innerWidth] External width of the chart.
+     * @param {number} [config.height=parent.innerHeight] External height of the chart.
+     * @param {number} [config.historicalXTicks=d3.utcHour.every(12)] Target historical x tick count, as passed to d3.axis.ticks.
+     * @param {string} [config.historicalXFormat='%H:%M'] Historical x tick format, as passed to d3.axis.tickFormat.
+     * @param {number} [config.forecastXTicks=d3.utcHour.every(12)] Target forecast x tick count, as passed to d3.axis.ticks.
+     * @param {string} [config.forecastXFormat='%H:%M'] Forecast x tick format, as passed to d3.axis.tickFormat.
+     * @param {number} [config.historicalArrowSkip=3] Only keeping 1 historical arrow out of n.
+     * @param {number} [config.forecastArrowSkip=6] Only keeping 1 forecast arrow out of n.
+     * @returns {object} A weatherChart instance.
+     * @example
+     * var data = datahub.data.generateWeatherChartData()
+     * var chart = datahub.weatherChart({
+     *     parent: document.querySelector('.weather-chart'),
+     *     data: data
+     * })
+     * .on('tooltipChange', function(e){ console.log(e) })
+     * .setData(data)
+     */
     var weatherChart = function(config) {
         var configCache,
             events = d3.dispatch('hover', 'tooltipChange', 'mouseout'),
@@ -286,6 +311,20 @@
             chartCache = chart(configCache)
         }
 
+        /**
+         * Set the data.
+         * @name setData
+         * @param {object} data A data object.
+         * @returns {object} The weatherChart instance.
+         * @memberof weatherChart
+         * @instance
+         * @example
+         * var data = datahub.data.generateWeatherChartData()
+         * var chart = datahub.weatherChart({
+         *     parent: document.querySelector('.weather-chart')
+         * })
+         * .setData(data)
+         */
         var setData = function(data) {
             var d = data ? JSON.parse(JSON.stringify(data)) : {}
             configCache = dh.utils.mergeAll({}, configCache, {data: d})
@@ -293,6 +332,21 @@
             return this
         }
 
+        /**
+         * Set the config after its instantiation.
+         * @name setConfig
+         * @instance
+         * @param {object} config The same config format as on init.
+         * @returns {object} The weatherChart instance.
+         * @memberof weatherChart
+         * @example
+         * datahub.multiChart({
+         *     parent: document.querySelector('.chart'),
+         * })
+         * .setConfig({
+         *     width: 100
+         * })
+         */
         var setConfig = function(config) {
             configCache = dh.utils.mergeAll(configCache, config)
             render()
@@ -303,6 +357,17 @@
             setConfig(dh.utils.mergeAll(config, {events: events}))
         }
 
+        /**
+         * Destroys DOM elements and unbind events.
+         * @name destroy
+         * @memberof weatherChart
+         * @instance
+         * @example
+         * var chart = datahub.weatherChart({
+         *     parent: document.querySelector('.chart'),
+         * })
+         * chart.destroy()
+         */
         var destroy = function() {
             d3.select(window).on('resize.' + uid, null)
             configCache.parent.innerHTML = null

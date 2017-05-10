@@ -204,6 +204,30 @@
         bars
     )
 
+    /**
+     * A vertical positive/negative bar chart with reference bar.
+     * @namespace verticalChart
+     * @name verticalChart
+     * @param {object} config The initial configuration can be passed on init or later using verticalChart.setConfig.
+     * @param {object} config.parent The parent DOM element.
+     * @param {Array.<object>} config.elements Data in the form {key, label, value}.
+     * @param {number} config.referenceBarSize The size of the reference bar in px.
+     * @param {string} config.title The chart title.
+     * @param {string} config.unit The axis unit.
+     * @returns {object} A verticalChart instance.
+     * @example
+     * datahub.verticalChart({
+     *     parent: document.querySelector('.vertical-chart')
+     *     title: 'Title',
+     *     elements:[
+     *         {key: 'approved', label: 'Approved', value: 125},
+     *         {key: 'written', label: 'Written', value: 16},
+     *         {key: 'remains', label: 'Remains', value: -79}
+     *     ],
+     *     referenceBarSize: 100,
+     *     unit: '%'
+     * })
+     */
     var verticalChart = function(config) {
         var configCache,
             events = d3.dispatch('barHover'),
@@ -221,13 +245,28 @@
             chartCache = multi(configCache)
         }
 
-        var setData = function(data) {
-            var d = data ? JSON.parse(JSON.stringify(data)) : {}
-            configCache = dh.utils.mergeAll({}, configCache, {data: d})
-            render()
-            return this
-        }
-
+        /**
+         * Set the config after its instantiation.
+         * @name setConfig
+         * @param {object} config The same config format as on init.
+         * @returns {object} The verticalChart instance.
+         * @memberof verticalChart
+         * @instance
+         * @example
+         * datahub.verticalChart({
+         *     parent: document.querySelector('.vertical-chart')
+         * })
+         * .setConfig({
+         *     title: 'Title',
+         *     elements:[
+         *         {key: 'approved', label: 'Approved', value: 125},
+         *         {key: 'written', label: 'Written', value: 16},
+         *         {key: 'remains', label: 'Remains', value: -79}
+         *     ],
+         *     referenceBarSize: 100,
+         *     unit: '%'
+         * })
+         */
         var setConfig = function(config) {
             configCache = dh.utils.mergeAll(configCache, config)
             render()
@@ -238,6 +277,17 @@
             setConfig(dh.utils.mergeAll(config, {events: events}))
         }
 
+        /**
+         * Destroys DOM elements and unbind events.
+         * @name destroy
+         * @memberof verticalChart
+         * @instance
+         * @example
+         * var chart = datahub.verticalChart({
+         *     parent: document.querySelector('.chart'),
+         * })
+         * chart.destroy()
+         */
         var destroy = function() {
             d3.select(window).on('resize.' + uid, null)
             configCache.parent.innerHTML = null
@@ -248,7 +298,6 @@
         return {
             on: dh.utils.rebind(events),
             setConfig: setConfig,
-            setData: setData,
             destroy: destroy
         }
     }

@@ -227,6 +227,26 @@
         number
     )
 
+    /**
+     * A waterfall chart designed for a specific use case.
+     * @namespace waterfallChart
+     * @name waterfallChart
+     * @param {object} config The initial configuration can be passed on init or later using waterfallChart.setConfig.
+     * @param {object} config.parent The parent DOM element.
+     * @param {Array.<object>} config.elements Data in the form {key, label, value}.
+     * @returns {object} A waterfallChart instance.
+     * @example
+     * var waterfall = datahub.waterfallChart({
+     *     parent: document.querySelector('.waterfall-chart')
+     *     elements:[
+     *         {key: 'initial', label: 'Initial', value: 53},
+     *         {key: 'closed', label: 'Closed', value: -30},
+     *         {key: 'open', label: 'Open', value: 23},
+     *         {key: 'new', label: 'New', value: 15},
+     *         {key: 'total', label: 'Total', value: 38}
+     *     ]
+     * })
+     */
     var waterfallChart = function(config) {
         var configCache,
             events = d3.dispatch('barHover'),
@@ -251,6 +271,27 @@
             return this
         }
 
+        /**
+         * Set the config after its instantiation.
+         * @name setConfig
+         * @param {object} config The same config format as on init.
+         * @returns {object} The waterfallChart instance.
+         * @memberof waterfallChart
+         * @instance
+         * @example
+         * datahub.waterfallChart({
+         *     parent: document.querySelector('.waterfall-chart')
+         * })
+         * .setConfig({
+         *     elements:[
+         *         {key: 'initial', label: 'Initial', value: 53},
+         *         {key: 'closed', label: 'Closed', value: -30},
+         *         {key: 'open', label: 'Open', value: 23},
+         *         {key: 'new', label: 'New', value: 15},
+         *         {key: 'total', label: 'Total', value: 38}
+         *     ]
+         * })
+         */
         var setConfig = function(config) {
             configCache = dh.utils.mergeAll(configCache, config)
             render()
@@ -261,6 +302,17 @@
             setConfig(dh.utils.mergeAll(config, {events: events}))
         }
 
+        /**
+         * Destroys DOM elements and unbind events.
+         * @name destroy
+         * @memberof waterfallChart
+         * @instance
+         * @example
+         * var chart = datahub.waterfallChart({
+         *     parent: document.querySelector('.chart'),
+         * })
+         * chart.destroy()
+         */
         var destroy = function() {
             d3.select(window).on('resize.' + uid, null)
             configCache.parent.innerHTML = null

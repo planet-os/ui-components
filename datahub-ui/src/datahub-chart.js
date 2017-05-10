@@ -781,17 +781,17 @@
      * @name multiChart
      * @param {object} config The initial configuration can be passed on init or later using multiChart.setConfig.
      * @param {object} config.parent The parent DOM element.
+     * @param {object} [config.data] Data can be passed on init or later using multichart.setData.
      * @param {number} [config.width=parent.innerWidth] External width of the chart.
      * @param {number} [config.height=parent.innerHeight] External height of the chart.
-     * @param {object} [config.margin={top:50, right:50, bottom:100, left:50}] Margins around a chart panel.
+     * @param {object} [config.margin={top:50, right:50, bottom:100, left:50}] Margins around the chart panel.
      * @param {string} [config.axisXFormat='%b'] Label x labels format, as passed to d3.utcFormat.
      * @param {string} [config.axisTitleX] X axis title.
      * @param {string} [config.axisTitleY] Y axis title.
      * @param {string} [config.chartTitle] Chart title.
-     * @param {object} [config.data] Data can be passed on init or later using multichart.setData.
      * @param {boolean} [config.reverseY] Reverse the Y axis so higher values are on the bottom.
      * @param {boolean} [config.autoScaleY] Auto range the scale from y data instead of clamping min to zero or negative.
-     * @param {Array.<number>} [config.domain] [min, max] domain of the y scale.
+     * @param {Array.<number>} [config.domain] [min, max] domain of the y scale, defaults to data extent.
      * @param {function} [config.labelsRewriterY] Y axis label rewriting function. Receives (label, index) and has to return a string or a DOM string.
      * @returns {object} A multichart instance.
      * @example
@@ -827,6 +827,7 @@
          * @param {object} data A data object.
          * @returns {object} The multiChart instance.
          * @memberof multiChart
+         * @instance
          * @example
          * datahub.multiChart({
          *     parent: document.querySelector('.chart'),
@@ -850,6 +851,7 @@
          * @param {object} config The same config format as on init.
          * @returns {object} The multiChart instance.
          * @memberof multiChart
+         * @instance
          * @example
          * datahub.multiChart({
          *     parent: document.querySelector('.chart'),
@@ -872,6 +874,7 @@
          * Destroys DOM elements and unbind events.
          * @name destroy
          * @memberof multiChart
+         * @instance
          * @example
          * var chart = datahub.multiChart({
          *     parent: document.querySelector('.chart'),
@@ -891,6 +894,7 @@
          * @param {string} eventName The name of the event: 'hover', 'click', 'mouseout', 'active'
          * @param {function} callback The callback for this event
          * @memberof multiChart
+         * @instance
          * @example
          * datahub.multiChart({
          *     parent: document.querySelector('.chart'),

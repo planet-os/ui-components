@@ -169,6 +169,18 @@
         return api
     }
 
+    /**
+     * An extension of rasterMap for vectors and interactive selection. See {@link #rasterMap}.
+     * @namespace selectorMap
+     * @name selectorMap
+     * @param {object} config The initial configuration.
+     * @param {object} [config.disableAutoZoom=false] Prevent the map to autozoom to vectors bbox.
+     * @returns {object} A selectorMap instance.
+     * @example
+     * datahub.map.selectorMap({
+     *     parent: document.querySelector('.map')
+     * })
+     */
     var selectorMap = function(config) {
 
         var selectionMap = rasterMap(config)
@@ -263,6 +275,12 @@
             zoomToBoundingBox()
         }
 
+        /**
+         * Remove all polygons.
+         * @name removeAllPolygons
+         * @memberof selectorMap
+         * @instance
+         */
         function removeAllPolygons() {
             drawnItems.clearLayers()
             drawControl._toolbars.draw._modes.rectangle.handler.disable()
@@ -308,6 +326,12 @@
             return this
         }
 
+        /**
+         * Add a rectangle vector.
+         * @name addRectangle
+         * @memberof selectorMap
+         * @instance
+         */
         selectionMap.addRectangle = function(coords) {
             removeAllPolygons()
 
@@ -321,12 +345,18 @@
             return this
         }
 
+        /**
+         * Add multiple polygons.
+         * @name addPolygons
+         * @param {Array.<object>} data An array of geojson.
+         * @memberof selectorMap
+         * @instance
+         */
         selectionMap.addPolygons = function(data) {
             removeAllPolygons()
 
             data.forEach(function(geojson) {
                 geojson[1].id = geojson[0]
-                console.log(444, geojson)
                 var poly = getPolyFeatureFromPoly(geojson[1])
 
                 addGeojson(poly, function(){
@@ -338,6 +368,12 @@
             return this
         }
 
+        /**
+         * Zoom to vectors bbox.
+         * @name zoomToBoundingBox
+         * @memberof selectorMap
+         * @instance
+         */
         function zoomToBoundingBox() {
             if(config.disableAutoZoom){
                 return this
@@ -354,13 +390,45 @@
         selectionMap.removeAllPolygons = removeAllPolygons
         selectionMap.zoomToBoundingBox = zoomToBoundingBox
         selectionMap.addMarker = addMarker
+
+        /**
+         * Events binder.
+         * @function on
+         * @param {string} eventName The name of the event: 'mapCloseClick', 'rectangleDraw', 'rectangleClick', 'markerClick',
+         'markerDraw', 'geojsonClick'
+         * @param {function} callback The callback for this event
+         * @memberof selectorMap
+         * @instance
+         */
         selectionMap.on = dh.utils.rebind(events)
 
         return selectionMap
     }
 
-
-
+    /**
+     * A map with a raster layer.
+     * @namespace rasterMap
+     * @name rasterMap
+     * @param {object} config The initial configuration.
+     * @param {object} config.parent The parent DOM element.
+     * @param {object} config.colorScale The colorScale to use for raster, one of datahub.palette.
+     * @param {string} config.basemapName The name of the basemap: 'basemapDark', 'basemapLight'.
+     * @param {boolean} [config.showLabels=true] Show the map label layer.
+     * @param {boolean} [config.showTooltip=true] Show tooltips when hovering raster.
+     * @param {function} [config.polygonTooltipFunc] The function to format vector tooltip, has passed to L.geoJson.bindTooltip().
+     * @param {function} [config.mapConfig] Overrides Leaflet map config, as passed to L.map().
+     * @returns {object} A rasterMap instance.
+     * @example
+     * datahub.map.rasterMap({
+     *     parent: document.querySelector('.map'),
+     *     colorScale: datahub.palette.equalizedSpectral,
+     *     showLabels: false,
+     *     mapConfig: {
+     *         zoomControl: false
+     *     }
+     * })
+     * .init()
+     */
     var rasterMap = function(_config) {
 
         var containerNode = L.DomUtil.create('div', 'datahub-map')
@@ -405,6 +473,17 @@
 
         var map, gridLayer, geojsonLayer, tooltipLayer, marker, gridData, cachedBBoxPolygon
 
+        /**
+         * Initialize the map.
+         * @name init
+         * @memberof rasterMap
+         * @instance
+         * @example
+         * datahub.map.rasterMap({
+         *     parent: document.querySelector('.map')
+         * })
+         * .init()
+         */
         function init() {
             L.Icon.Default.imagePath = config.imagePath
 
@@ -497,6 +576,21 @@
             return this
         }
 
+        /**
+         * Render an image on the map.
+         * @name renderImage
+         * @param {object} image The url of the image to overlay, as passed to L.imageOverlay.
+         * @param {object} metadata Should contains a bbox array for L.imageOverlay(image, bbox).
+         * @memberof rasterMap
+         * @instance
+         * @example
+         * datahub.map.rasterMap({
+         *     parent: document.querySelector('.map')
+         * })
+         * .init()
+         * .renderImage('https://upload.wikimedia.org/wikipedia/commons/a/af/Tux.png',
+         *      {bbox: {latMin: 0, latMax: 10, lonMin: 0, lonMax: 10}})
+         */
         function renderImage(image, metadata) {
             var bbox = metadata.bbox
             var imageBounds = [
@@ -508,18 +602,54 @@
             return this
         }
 
+        /**
+         * Make the map visible.
+         * @name show
+         * @memberof rasterMap
+         * @instance
+         * @example
+         * datahub.map.rasterMap({
+         *     parent: document.querySelector('.map')
+         * })
+         * .init()
+         * .show()
+         */
         function show() {
             config.container.style.display = 'block'
             states.isVisible = true
             return this
         }
 
+        /**
+         * Make the map invisible.
+         * @name hide
+         * @memberof rasterMap
+         * @instance
+         * @example
+         * datahub.map.rasterMap({
+         *     parent: document.querySelector('.map')
+         * })
+         * .init()
+         * .hide()
+         */
         function hide() {
             config.container.style.display = 'none'
             states.isVisible = false
             return this
         }
 
+        /**
+         * Reset the size to fit the container.
+         * @name resize
+         * @memberof rasterMap
+         * @instance
+         * @example
+         * datahub.map.rasterMap({
+         *     parent: document.querySelector('.map')
+         * })
+         * .init()
+         * .resize()
+         */
         function resize() {
             map.invalidateSize()
 
@@ -531,6 +661,13 @@
             return this
         }
 
+        /**
+         * Zoom to fit a polygon.
+         * @name zoomToPolygonBoundingBox
+         * @param {object} polygon A valid geojson.
+         * @memberof rasterMap
+         * @instance
+         */
         function zoomToPolygonBoundingBox(polygon) {
             var bboxGeojsonLayer = L.geoJson(polygon)
             map.fitBounds(bboxGeojsonLayer.getBounds())
@@ -539,6 +676,13 @@
             return this
         }
 
+        /**
+         * Add a polygon.
+         * @name renderPolygon
+         * @param {object} polygon A valid geojson.
+         * @memberof rasterMap
+         * @instance
+         */
         function renderPolygon(polygon) {
             var onEachFeature = function(feature, layer) {
                 layer.on({
@@ -593,6 +737,13 @@
             return this
         }
 
+        /**
+         * Add a marker.
+         * @name addMarker
+         * @param {object} coordinates Marker coordinates.
+         * @memberof rasterMap
+         * @instance
+         */
         function addMarker(coordinates) {
             removeMarker()
 
@@ -609,6 +760,12 @@
             return this
         }
 
+        /**
+         * Remove all markers.
+         * @name addMarker
+         * @memberof rasterMap
+         * @instance
+         */
         function removeMarker() {
             if (marker) {
                 marker.remove()
@@ -617,6 +774,13 @@
             return this
         }
 
+        /**
+         * Render a raster layer from data.
+         * @name addMarker
+         * @param {object} data The grid data.
+         * @memberof rasterMap
+         * @instance
+         */
         function renderRaster(data) {
             gridData = data
             var dataSorted = data.uniqueValues.sort(function(a, b) {
@@ -630,8 +794,15 @@
             return this
         }
 
-        function hideZoomControl(bool) {
-            if (bool) {
+        /**
+         * Hide all zoom controls.
+         * @name hideZoomControl
+         * @param {boolean=true} showIt Show the controls or not.
+         * @memberof rasterMap
+         * @instance
+         */
+        function hideZoomControl(showIt) {
+            if (showIt) {
                 map.addControl(map.zoomControl)
                 map.doubleClickZoom.enable()
                 map.boxZoom.enable()
@@ -645,6 +816,12 @@
             return this
         }
 
+        /**
+         * Show a preset vector world map.
+         * @name renderVectorMap
+         * @memberof rasterMap
+         * @instance
+         */
         function renderVectorMap() {
             datahub.data.getWorldVector(function(geojson) {
                 renderPolygon(geojson)
@@ -653,6 +830,23 @@
             return this
         }
 
+        /**
+         * Events binder.
+         * @function on
+         * @param {string} eventName The name of the event: 'click', 'mousemove', 'mouseenter', 'mouseleave',
+         'featureClick', 'featureMousEnter', 'featureMousLeave', 'markerClick'
+         * @param {function} callback The callback for this event
+         * @memberof rasterMap
+         * @instance
+         * @example
+         * datahub.map.rasterMap({
+         *     parent: document.querySelector('.map')
+         * })
+         * .init()
+         * .on('markerClick', function(e) {
+         *     console.log(e)
+         * })
+         */
         return {
             init: init,
             show: show,

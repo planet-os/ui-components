@@ -1769,6 +1769,18 @@
             };
             return api;
         };
+        /**
+     * An extension of rasterMap for vectors and interactive selection. See {@link #rasterMap}.
+     * @namespace selectorMap
+     * @name selectorMap
+     * @param {object} config The initial configuration.
+     * @param {object} [config.disableAutoZoom=false] Prevent the map to autozoom to vectors bbox.
+     * @returns {object} A selectorMap instance.
+     * @example
+     * datahub.map.selectorMap({
+     *     parent: document.querySelector('.map')
+     * })
+     */
         var selectorMap = function(config) {
             var selectionMap = rasterMap(config).init();
             var events = d3.dispatch("mapCloseClick", "rectangleDraw", "rectangleClick", "markerClick", "markerDraw", "geojsonClick");
@@ -1841,6 +1853,12 @@
                 }, this).addTo(drawnItems);
                 zoomToBoundingBox();
             }
+            /**
+         * Remove all polygons.
+         * @name removeAllPolygons
+         * @memberof selectorMap
+         * @instance
+         */
             function removeAllPolygons() {
                 drawnItems.clearLayers();
                 drawControl._toolbars.draw._modes.rectangle.handler.disable();
@@ -1878,6 +1896,12 @@
                 geojsonLayer.addTo(drawnItems);
                 return this;
             }
+            /**
+         * Add a rectangle vector.
+         * @name addRectangle
+         * @memberof selectorMap
+         * @instance
+         */
             selectionMap.addRectangle = function(coords) {
                 removeAllPolygons();
                 var poly = getFeatureFromCoordinates(coords);
@@ -1887,11 +1911,17 @@
                 zoomToBoundingBox();
                 return this;
             };
+            /**
+         * Add multiple polygons.
+         * @name addPolygons
+         * @param {Array.<object>} data An array of geojson.
+         * @memberof selectorMap
+         * @instance
+         */
             selectionMap.addPolygons = function(data) {
                 removeAllPolygons();
                 data.forEach(function(geojson) {
                     geojson[1].id = geojson[0];
-                    console.log(444, geojson);
                     var poly = getPolyFeatureFromPoly(geojson[1]);
                     addGeojson(poly, function() {
                         events.call("geojsonClick", this, geojson);
@@ -1900,6 +1930,12 @@
                 zoomToBoundingBox();
                 return this;
             };
+            /**
+         * Zoom to vectors bbox.
+         * @name zoomToBoundingBox
+         * @memberof selectorMap
+         * @instance
+         */
             function zoomToBoundingBox() {
                 if (config.disableAutoZoom) {
                     return this;
@@ -1915,9 +1951,42 @@
             selectionMap.removeAllPolygons = removeAllPolygons;
             selectionMap.zoomToBoundingBox = zoomToBoundingBox;
             selectionMap.addMarker = addMarker;
+            /**
+         * Events binder.
+         * @function on
+         * @param {string} eventName The name of the event: 'mapCloseClick', 'rectangleDraw', 'rectangleClick', 'markerClick',
+         'markerDraw', 'geojsonClick'
+         * @param {function} callback The callback for this event
+         * @memberof selectorMap
+         * @instance
+         */
             selectionMap.on = dh.utils.rebind(events);
             return selectionMap;
         };
+        /**
+     * A map with a raster layer.
+     * @namespace rasterMap
+     * @name rasterMap
+     * @param {object} config The initial configuration.
+     * @param {object} config.parent The parent DOM element.
+     * @param {object} config.colorScale The colorScale to use for raster, one of datahub.palette.
+     * @param {string} config.basemapName The name of the basemap: 'basemapDark', 'basemapLight'.
+     * @param {boolean} [config.showLabels=true] Show the map label layer.
+     * @param {boolean} [config.showTooltip=true] Show tooltips when hovering raster.
+     * @param {function} [config.polygonTooltipFunc] The function to format vector tooltip, has passed to L.geoJson.bindTooltip().
+     * @param {function} [config.mapConfig] Overrides Leaflet map config, as passed to L.map().
+     * @returns {object} A rasterMap instance.
+     * @example
+     * datahub.map.rasterMap({
+     *     parent: document.querySelector('.map'),
+     *     colorScale: datahub.palette.equalizedSpectral,
+     *     showLabels: false,
+     *     mapConfig: {
+     *         zoomControl: false
+     *     }
+     * })
+     * .init()
+     */
         var rasterMap = function(_config) {
             var containerNode = L.DomUtil.create("div", "datahub-map");
             var container = _config.parent.appendChild(containerNode);
@@ -1950,6 +2019,17 @@
                 isVisible: true
             };
             var map, gridLayer, geojsonLayer, tooltipLayer, marker, gridData, cachedBBoxPolygon;
+            /**
+         * Initialize the map.
+         * @name init
+         * @memberof rasterMap
+         * @instance
+         * @example
+         * datahub.map.rasterMap({
+         *     parent: document.querySelector('.map')
+         * })
+         * .init()
+         */
             function init() {
                 L.Icon.Default.imagePath = config.imagePath;
                 map = L.map(config.container, mapConfig).on("click", function(e) {
@@ -2025,22 +2105,73 @@
                 var tooltipLayer = L.featureGroup().bindTooltip("").addTo(map);
                 return this;
             }
+            /**
+         * Render an image on the map.
+         * @name renderImage
+         * @param {object} image The url of the image to overlay, as passed to L.imageOverlay.
+         * @param {object} metadata Should contains a bbox array for L.imageOverlay(image, bbox).
+         * @memberof rasterMap
+         * @instance
+         * @example
+         * datahub.map.rasterMap({
+         *     parent: document.querySelector('.map')
+         * })
+         * .init()
+         * .renderImage('https://upload.wikimedia.org/wikipedia/commons/a/af/Tux.png',
+         *      {bbox: {latMin: 0, latMax: 10, lonMin: 0, lonMax: 10}})
+         */
             function renderImage(image, metadata) {
                 var bbox = metadata.bbox;
                 var imageBounds = [ [ bbox.latMax, bbox.lonMin ], [ bbox.latMin, bbox.lonMax ] ];
                 L.imageOverlay(image, imageBounds).addTo(map);
                 return this;
             }
+            /**
+         * Make the map visible.
+         * @name show
+         * @memberof rasterMap
+         * @instance
+         * @example
+         * datahub.map.rasterMap({
+         *     parent: document.querySelector('.map')
+         * })
+         * .init()
+         * .show()
+         */
             function show() {
                 config.container.style.display = "block";
                 states.isVisible = true;
                 return this;
             }
+            /**
+         * Make the map invisible.
+         * @name hide
+         * @memberof rasterMap
+         * @instance
+         * @example
+         * datahub.map.rasterMap({
+         *     parent: document.querySelector('.map')
+         * })
+         * .init()
+         * .hide()
+         */
             function hide() {
                 config.container.style.display = "none";
                 states.isVisible = false;
                 return this;
             }
+            /**
+         * Reset the size to fit the container.
+         * @name resize
+         * @memberof rasterMap
+         * @instance
+         * @example
+         * datahub.map.rasterMap({
+         *     parent: document.querySelector('.map')
+         * })
+         * .init()
+         * .resize()
+         */
             function resize() {
                 map.invalidateSize();
                 if (cachedBBoxPolygon) {
@@ -2050,12 +2181,26 @@
                 }
                 return this;
             }
+            /**
+         * Zoom to fit a polygon.
+         * @name zoomToPolygonBoundingBox
+         * @param {object} polygon A valid geojson.
+         * @memberof rasterMap
+         * @instance
+         */
             function zoomToPolygonBoundingBox(polygon) {
                 var bboxGeojsonLayer = L.geoJson(polygon);
                 map.fitBounds(bboxGeojsonLayer.getBounds());
                 cachedBBoxPolygon = polygon;
                 return this;
             }
+            /**
+         * Add a polygon.
+         * @name renderPolygon
+         * @param {object} polygon A valid geojson.
+         * @memberof rasterMap
+         * @instance
+         */
             function renderPolygon(polygon) {
                 var onEachFeature = function(feature, layer) {
                     layer.on({
@@ -2105,6 +2250,13 @@
                 }
                 return this;
             }
+            /**
+         * Add a marker.
+         * @name addMarker
+         * @param {object} coordinates Marker coordinates.
+         * @memberof rasterMap
+         * @instance
+         */
             function addMarker(coordinates) {
                 removeMarker();
                 marker = L.marker(coordinates, {
@@ -2116,12 +2268,25 @@
                 }).addTo(map);
                 return this;
             }
+            /**
+         * Remove all markers.
+         * @name addMarker
+         * @memberof rasterMap
+         * @instance
+         */
             function removeMarker() {
                 if (marker) {
                     marker.remove();
                 }
                 return this;
             }
+            /**
+         * Render a raster layer from data.
+         * @name addMarker
+         * @param {object} data The grid data.
+         * @memberof rasterMap
+         * @instance
+         */
             function renderRaster(data) {
                 gridData = data;
                 var dataSorted = data.uniqueValues.sort(function(a, b) {
@@ -2131,8 +2296,15 @@
                 gridLayer.setColorScale(colorScale).setData(data);
                 return this;
             }
-            function hideZoomControl(bool) {
-                if (bool) {
+            /**
+         * Hide all zoom controls.
+         * @name hideZoomControl
+         * @param {boolean=true} showIt Show the controls or not.
+         * @memberof rasterMap
+         * @instance
+         */
+            function hideZoomControl(showIt) {
+                if (showIt) {
                     map.addControl(map.zoomControl);
                     map.doubleClickZoom.enable();
                     map.boxZoom.enable();
@@ -2145,12 +2317,35 @@
                 }
                 return this;
             }
+            /**
+         * Show a preset vector world map.
+         * @name renderVectorMap
+         * @memberof rasterMap
+         * @instance
+         */
             function renderVectorMap() {
                 datahub.data.getWorldVector(function(geojson) {
                     renderPolygon(geojson);
                 });
                 return this;
             }
+            /**
+         * Events binder.
+         * @function on
+         * @param {string} eventName The name of the event: 'click', 'mousemove', 'mouseenter', 'mouseleave',
+         'featureClick', 'featureMousEnter', 'featureMousLeave', 'markerClick'
+         * @param {function} callback The callback for this event
+         * @memberof rasterMap
+         * @instance
+         * @example
+         * datahub.map.rasterMap({
+         *     parent: document.querySelector('.map')
+         * })
+         * .init()
+         * .on('markerClick', function(e) {
+         *     console.log(e)
+         * })
+         */
             return {
                 init: init,
                 show: show,
@@ -2690,17 +2885,17 @@
      * @name multiChart
      * @param {object} config The initial configuration can be passed on init or later using multiChart.setConfig.
      * @param {object} config.parent The parent DOM element.
+     * @param {object} [config.data] Data can be passed on init or later using multichart.setData.
      * @param {number} [config.width=parent.innerWidth] External width of the chart.
      * @param {number} [config.height=parent.innerHeight] External height of the chart.
-     * @param {object} [config.margin={top:50, right:50, bottom:100, left:50}] Margins around a chart panel.
+     * @param {object} [config.margin={top:50, right:50, bottom:100, left:50}] Margins around the chart panel.
      * @param {string} [config.axisXFormat='%b'] Label x labels format, as passed to d3.utcFormat.
      * @param {string} [config.axisTitleX] X axis title.
      * @param {string} [config.axisTitleY] Y axis title.
      * @param {string} [config.chartTitle] Chart title.
-     * @param {object} [config.data] Data can be passed on init or later using multichart.setData.
      * @param {boolean} [config.reverseY] Reverse the Y axis so higher values are on the bottom.
      * @param {boolean} [config.autoScaleY] Auto range the scale from y data instead of clamping min to zero or negative.
-     * @param {Array.<number>} [config.domain] [min, max] domain of the y scale.
+     * @param {Array.<number>} [config.domain] [min, max] domain of the y scale, defaults to data extent.
      * @param {function} [config.labelsRewriterY] Y axis label rewriting function. Receives (label, index) and has to return a string or a DOM string.
      * @returns {object} A multichart instance.
      * @example
@@ -2728,6 +2923,7 @@
          * @param {object} data A data object.
          * @returns {object} The multiChart instance.
          * @memberof multiChart
+         * @instance
          * @example
          * datahub.multiChart({
          *     parent: document.querySelector('.chart'),
@@ -2750,6 +2946,7 @@
          * @param {object} config The same config format as on init.
          * @returns {object} The multiChart instance.
          * @memberof multiChart
+         * @instance
          * @example
          * datahub.multiChart({
          *     parent: document.querySelector('.chart'),
@@ -2772,6 +2969,7 @@
          * Destroys DOM elements and unbind events.
          * @name destroy
          * @memberof multiChart
+         * @instance
          * @example
          * var chart = datahub.multiChart({
          *     parent: document.querySelector('.chart'),
@@ -2789,6 +2987,7 @@
          * @param {string} eventName The name of the event: 'hover', 'click', 'mouseout', 'active'
          * @param {function} callback The callback for this event
          * @memberof multiChart
+         * @instance
          * @example
          * datahub.multiChart({
          *     parent: document.querySelector('.chart'),
@@ -3199,9 +3398,6 @@
             if (config.dataIsEmpty) {
                 return {};
             }
-            var resolution = config.axisXTimeResolution || "minute";
-            var intervalFuncName = "utc" + dh.utils.capitalize(resolution);
-            var timeResolution = d3[intervalFuncName];
             var axisFunc = config.xAxisOnTop ? "axisTop" : "axisBottom";
             var axisX = d3[axisFunc]().scale(config.scaleX).ticks(config.xTicks || null).tickFormat(d3.utcFormat(config.axisXFormat || "%H:%M"));
             return {
@@ -3338,10 +3534,6 @@
                 config.container.select(".shapes").selectAll("path.arrow").remove();
                 return {};
             }
-            var test = config.dataConverted[0].data.filter(function(d, i) {
-                var skip = config.arrowSkip || 3;
-                return i % skip === 0;
-            });
             var arrowPath = "M6 0L12 10L8 10L8 24L4 24L4 10L0 10Z";
             var arrows = config.container.select(".shapes").selectAll("path.arrow").data(config.dataConverted[0].data.filter(function(d, i) {
                 var skip = config.arrowSkip || 3;
@@ -3507,6 +3699,39 @@
         var lineChart = dh.utils.pipeline(defaultConfig, template, data, scaleX, scaleY, axisX, axisY, axisComponentX, gridX, lineShapes, arrowShapes, stepShapes, // dh.common.printer,
         // areaShapes,
         dh.common.message, axisComponentY, reference, eventsPanel, tooltipComponent, xAxisTitle, yAxisTitle);
+        /**
+     * A line/area/step/arrow timeseries chart.
+     * @namespace timeseries
+     * @name timeseries
+     * @param {object} config The initial configuration can be passed on init or later using timeseries.setConfig.
+     * @param {object} config.parent The parent DOM element.
+     * @param {object} config.data Data can be passed on init or later using timeseries.setData.
+     * @param {number} config.reference Value for the reference line.
+     * @param {Date} config.tooltipTimestamp Timestamp of element to highlight.
+     * @param {number} [config.width=parent.innerWidth] External width of the chart.
+     * @param {number} [config.height=parent.innerHeight] External height of the chart.
+     * @param {string} [config.chartType='line'] Chart type: 'line', 'area', 'step', 'arrow'.
+     * @param {object} [config.margin={top:0, right:0, bottom:10, left:10}] Margins around the chart panel.
+     * @param {Array.<string>} [config.hide] An array of names of elements to hide: 'xTitle', 'yTitle', 'tooltip', 'xAxis', 'yAxis', 'shapes', 'xGrid', 'xTitle', 'yTitle', 'tooltipDot'.
+     * @param {Array.<number>} [config.domain] [min, max] domain of the y scale, defaults to data extent.
+     * @param {string} [config.xTicks=d3.utcMinute.every(20)] Target x tick count, as passed to d3.axis.ticks.
+     * @param {string} [config.axisXFormat='%H:%M'] X tick format, as passed to d3.axis.tickFormat.
+     * @param {string} [config.yTicks=6] Target y tick count, as passed to d3.axis.ticks.
+     * @param {string} [config.axisYFormat='.2'] Y tick format, as passed to d3.axis.format.
+     * @param {string} [config.yAxisTitle] Y axis title.
+     * @param {string} [config.xTitleFormat=d3.utcFormat('%c')] Format of the hovered timestamp close to the x axis.
+     * @param {function} [config.valueFormatter] Formatter for the tooltip value. Receives (data, index) and should return a string.
+     * @param {number} [config.stepRange=3] Only for type:step, band range above and below the line.
+     * @param {boolean} [config.axisOnly=false] A minimal version of the chart only showing the x axis.
+     * @param {number} [config.arrowSkip=3] Only for type:arrow, keeping 1 arrow out of n.
+     * @returns {object} A timeseries instance.
+     * @example
+     * datahub.timeseries({
+     *     parent: document.querySelector('.timeseries-area'),
+     *     chartType: 'area',
+     *     data: datahub.data.generateTimeSeriesSplit()
+     * })
+     */
         var timeseries = function(config) {
             var configCache, events = d3.dispatch("hover", "click", "mouseout", "tooltipChange"), chartCache, uid = ~~(Math.random() * 1e4);
             var onResize = dh.utils.throttle(function() {
@@ -3517,6 +3742,19 @@
             var render = function() {
                 chartCache = lineChart(configCache);
             };
+            /**
+         * Set the data.
+         * @name setData
+         * @param {object} data A data object.
+         * @returns {object} The timeseries instance.
+         * @memberof timeseries
+         * @instance
+         * @example
+         * datahub.timeseries({
+         *     parent: document.querySelector('.timeseries-area')
+         * })
+         * .setData(datahub.data.generateTimeSeriesSplit())
+         */
             var setData = function(data) {
                 var d = data ? JSON.parse(JSON.stringify(data)) : {};
                 configCache = dh.utils.mergeAll({}, configCache, {
@@ -3525,6 +3763,22 @@
                 render();
                 return this;
             };
+            /**
+         * Set the config after its instantiation.
+         * @name setConfig
+         * @instance
+         * @param {object} config The same config format as on init.
+         * @returns {object} The timeseries instance.
+         * @memberof timeseries
+         * @instance
+         * @example
+         * datahub.timeseries({
+         *     parent: document.querySelector('.chart'),
+         * })
+         * .setConfig({
+         *     width: 100
+         * })
+         */
             var setConfig = function(config) {
                 configCache = dh.utils.mergeAll({}, configCache, config);
                 render();
@@ -3535,11 +3789,37 @@
                     events: events
                 }));
             };
+            /**
+         * Destroys DOM elements and unbind events.
+         * @name destroy
+         * @memberof timeseries
+         * @instance
+         * @example
+         * var chart = datahub.timeseries({
+         *     parent: document.querySelector('.chart'),
+         * })
+         * chart.destroy()
+         */
             var destroy = function() {
                 d3.select(window).on("resize." + uid, null);
                 configCache.parent.innerHTML = null;
             };
             init(config, events);
+            /**
+         * Events binder.
+         * @function on
+         * @param {string} eventName The name of the event: 'hover', 'click', 'mouseout', 'tooltipChange'
+         * @param {function} callback The callback for this event
+         * @memberof timeseries
+         * @instance
+         * @example
+         * datahub.timeseries({
+         *     parent: document.querySelector('.chart'),
+         * })
+         * .on('hover', function(e) {
+         *     console.log(e)
+         * })
+         */
             return {
                 on: dh.utils.rebind(events),
                 setConfig: setConfig,
@@ -3655,6 +3935,30 @@
             return {};
         };
         var multi = dh.utils.pipeline(template, header, number, scaleX, verticalLines, bars);
+        /**
+     * A vertical positive/negative bar chart with reference bar.
+     * @namespace verticalChart
+     * @name verticalChart
+     * @param {object} config The initial configuration can be passed on init or later using verticalChart.setConfig.
+     * @param {object} config.parent The parent DOM element.
+     * @param {Array.<object>} config.elements Data in the form {key, label, value}.
+     * @param {number} config.referenceBarSize The size of the reference bar in px.
+     * @param {string} config.title The chart title.
+     * @param {string} config.unit The axis unit.
+     * @returns {object} A verticalChart instance.
+     * @example
+     * datahub.verticalChart({
+     *     parent: document.querySelector('.vertical-chart')
+     *     title: 'Title',
+     *     elements:[
+     *         {key: 'approved', label: 'Approved', value: 125},
+     *         {key: 'written', label: 'Written', value: 16},
+     *         {key: 'remains', label: 'Remains', value: -79}
+     *     ],
+     *     referenceBarSize: 100,
+     *     unit: '%'
+     * })
+     */
         var verticalChart = function(config) {
             var configCache, events = d3.dispatch("barHover"), chartCache, uid = ~~(Math.random() * 1e4);
             var onResize = dh.utils.throttle(function() {
@@ -3665,14 +3969,28 @@
             var render = function() {
                 chartCache = multi(configCache);
             };
-            var setData = function(data) {
-                var d = data ? JSON.parse(JSON.stringify(data)) : {};
-                configCache = dh.utils.mergeAll({}, configCache, {
-                    data: d
-                });
-                render();
-                return this;
-            };
+            /**
+         * Set the config after its instantiation.
+         * @name setConfig
+         * @param {object} config The same config format as on init.
+         * @returns {object} The verticalChart instance.
+         * @memberof verticalChart
+         * @instance
+         * @example
+         * datahub.verticalChart({
+         *     parent: document.querySelector('.vertical-chart')
+         * })
+         * .setConfig({
+         *     title: 'Title',
+         *     elements:[
+         *         {key: 'approved', label: 'Approved', value: 125},
+         *         {key: 'written', label: 'Written', value: 16},
+         *         {key: 'remains', label: 'Remains', value: -79}
+         *     ],
+         *     referenceBarSize: 100,
+         *     unit: '%'
+         * })
+         */
             var setConfig = function(config) {
                 configCache = dh.utils.mergeAll(configCache, config);
                 render();
@@ -3683,6 +4001,17 @@
                     events: events
                 }));
             };
+            /**
+         * Destroys DOM elements and unbind events.
+         * @name destroy
+         * @memberof verticalChart
+         * @instance
+         * @example
+         * var chart = datahub.verticalChart({
+         *     parent: document.querySelector('.chart'),
+         * })
+         * chart.destroy()
+         */
             var destroy = function() {
                 d3.select(window).on("resize." + uid, null);
                 configCache.parent.innerHTML = null;
@@ -3691,7 +4020,6 @@
             return {
                 on: dh.utils.rebind(events),
                 setConfig: setConfig,
-                setData: setData,
                 destroy: destroy
             };
         };
@@ -3835,6 +4163,26 @@
             return {};
         };
         var multi = dh.utils.pipeline(template, scaleX, scaleY, bars, connectors, number);
+        /**
+     * A waterfall chart designed for a specific use case.
+     * @namespace waterfallChart
+     * @name waterfallChart
+     * @param {object} config The initial configuration can be passed on init or later using waterfallChart.setConfig.
+     * @param {object} config.parent The parent DOM element.
+     * @param {Array.<object>} config.elements Data in the form {key, label, value}.
+     * @returns {object} A waterfallChart instance.
+     * @example
+     * var waterfall = datahub.waterfallChart({
+     *     parent: document.querySelector('.waterfall-chart')
+     *     elements:[
+     *         {key: 'initial', label: 'Initial', value: 53},
+     *         {key: 'closed', label: 'Closed', value: -30},
+     *         {key: 'open', label: 'Open', value: 23},
+     *         {key: 'new', label: 'New', value: 15},
+     *         {key: 'total', label: 'Total', value: 38}
+     *     ]
+     * })
+     */
         var waterfallChart = function(config) {
             var configCache, events = d3.dispatch("barHover"), chartCache, uid = ~~(Math.random() * 1e4);
             var onResize = dh.utils.throttle(function() {
@@ -3853,6 +4201,27 @@
                 render();
                 return this;
             };
+            /**
+         * Set the config after its instantiation.
+         * @name setConfig
+         * @param {object} config The same config format as on init.
+         * @returns {object} The waterfallChart instance.
+         * @memberof waterfallChart
+         * @instance
+         * @example
+         * datahub.waterfallChart({
+         *     parent: document.querySelector('.waterfall-chart')
+         * })
+         * .setConfig({
+         *     elements:[
+         *         {key: 'initial', label: 'Initial', value: 53},
+         *         {key: 'closed', label: 'Closed', value: -30},
+         *         {key: 'open', label: 'Open', value: 23},
+         *         {key: 'new', label: 'New', value: 15},
+         *         {key: 'total', label: 'Total', value: 38}
+         *     ]
+         * })
+         */
             var setConfig = function(config) {
                 configCache = dh.utils.mergeAll(configCache, config);
                 render();
@@ -3863,6 +4232,17 @@
                     events: events
                 }));
             };
+            /**
+         * Destroys DOM elements and unbind events.
+         * @name destroy
+         * @memberof waterfallChart
+         * @instance
+         * @example
+         * var chart = datahub.waterfallChart({
+         *     parent: document.querySelector('.chart'),
+         * })
+         * chart.destroy()
+         */
             var destroy = function() {
                 d3.select(window).on("resize." + uid, null);
                 configCache.parent.innerHTML = null;
@@ -4147,6 +4527,31 @@
             };
         };
         var chart = dh.utils.pipeline(template, defaultConfig, data, charts);
+        /**
+     * A weather chart built on top of datahub.timeseries.
+     * @namespace weatherChart
+     * @name weatherChart
+     * @param {object} config The initial configuration can be passed on init or later using weatherChart.setConfig.
+     * @param {object} config.parent The parent DOM element.
+     * @param {object} config.data Data can be passed on init or later using weatherChart.setData.
+     * @param {number} [config.width=parent.innerWidth] External width of the chart.
+     * @param {number} [config.height=parent.innerHeight] External height of the chart.
+     * @param {number} [config.historicalXTicks=d3.utcHour.every(12)] Target historical x tick count, as passed to d3.axis.ticks.
+     * @param {string} [config.historicalXFormat='%H:%M'] Historical x tick format, as passed to d3.axis.tickFormat.
+     * @param {number} [config.forecastXTicks=d3.utcHour.every(12)] Target forecast x tick count, as passed to d3.axis.ticks.
+     * @param {string} [config.forecastXFormat='%H:%M'] Forecast x tick format, as passed to d3.axis.tickFormat.
+     * @param {number} [config.historicalArrowSkip=3] Only keeping 1 historical arrow out of n.
+     * @param {number} [config.forecastArrowSkip=6] Only keeping 1 forecast arrow out of n.
+     * @returns {object} A weatherChart instance.
+     * @example
+     * var data = datahub.data.generateWeatherChartData()
+     * var chart = datahub.weatherChart({
+     *     parent: document.querySelector('.weather-chart'),
+     *     data: data
+     * })
+     * .on('tooltipChange', function(e){ console.log(e) })
+     * .setData(data)
+     */
         var weatherChart = function(config) {
             var configCache, events = d3.dispatch("hover", "tooltipChange", "mouseout"), chartCache, uid = ~~(Math.random() * 1e4);
             var onResize = dh.utils.throttle(function() {
@@ -4157,6 +4562,20 @@
             var render = function() {
                 chartCache = chart(configCache);
             };
+            /**
+         * Set the data.
+         * @name setData
+         * @param {object} data A data object.
+         * @returns {object} The weatherChart instance.
+         * @memberof weatherChart
+         * @instance
+         * @example
+         * var data = datahub.data.generateWeatherChartData()
+         * var chart = datahub.weatherChart({
+         *     parent: document.querySelector('.weather-chart')
+         * })
+         * .setData(data)
+         */
             var setData = function(data) {
                 var d = data ? JSON.parse(JSON.stringify(data)) : {};
                 configCache = dh.utils.mergeAll({}, configCache, {
@@ -4165,6 +4584,21 @@
                 render();
                 return this;
             };
+            /**
+         * Set the config after its instantiation.
+         * @name setConfig
+         * @instance
+         * @param {object} config The same config format as on init.
+         * @returns {object} The weatherChart instance.
+         * @memberof weatherChart
+         * @example
+         * datahub.multiChart({
+         *     parent: document.querySelector('.chart'),
+         * })
+         * .setConfig({
+         *     width: 100
+         * })
+         */
             var setConfig = function(config) {
                 configCache = dh.utils.mergeAll(configCache, config);
                 render();
@@ -4175,6 +4609,17 @@
                     events: events
                 }));
             };
+            /**
+         * Destroys DOM elements and unbind events.
+         * @name destroy
+         * @memberof weatherChart
+         * @instance
+         * @example
+         * var chart = datahub.weatherChart({
+         *     parent: document.querySelector('.chart'),
+         * })
+         * chart.destroy()
+         */
             var destroy = function() {
                 d3.select(window).on("resize." + uid, null);
                 configCache.parent.innerHTML = null;

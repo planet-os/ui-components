@@ -144,10 +144,6 @@
             return {}
         }
 
-        var resolution = config.axisXTimeResolution || 'minute'
-        var intervalFuncName = 'utc' + dh.utils.capitalize(resolution)
-
-        var timeResolution = d3[intervalFuncName]
         var axisFunc = config.xAxisOnTop ? 'axisTop' : 'axisBottom'
         var axisX = d3[axisFunc]()
             .scale(config.scaleX)
@@ -362,11 +358,6 @@
                 .remove()
             return {}
         }
-
-        var test = config.dataConverted[0].data.filter(function(d, i) {
-                var skip = config.arrowSkip || 3
-                return (i % skip) === 0;
-            })
 
         var arrowPath = 'M6 0L12 10L8 10L8 24L4 24L4 10L0 10Z';
         var arrows = config.container.select('.shapes')
@@ -638,6 +629,39 @@
         yAxisTitle
     )
 
+    /**
+     * A line/area/step/arrow timeseries chart.
+     * @namespace timeseries
+     * @name timeseries
+     * @param {object} config The initial configuration can be passed on init or later using timeseries.setConfig.
+     * @param {object} config.parent The parent DOM element.
+     * @param {object} config.data Data can be passed on init or later using timeseries.setData.
+     * @param {number} config.reference Value for the reference line.
+     * @param {Date} config.tooltipTimestamp Timestamp of element to highlight.
+     * @param {number} [config.width=parent.innerWidth] External width of the chart.
+     * @param {number} [config.height=parent.innerHeight] External height of the chart.
+     * @param {string} [config.chartType='line'] Chart type: 'line', 'area', 'step', 'arrow'.
+     * @param {object} [config.margin={top:0, right:0, bottom:10, left:10}] Margins around the chart panel.
+     * @param {Array.<string>} [config.hide] An array of names of elements to hide: 'xTitle', 'yTitle', 'tooltip', 'xAxis', 'yAxis', 'shapes', 'xGrid', 'xTitle', 'yTitle', 'tooltipDot'.
+     * @param {Array.<number>} [config.domain] [min, max] domain of the y scale, defaults to data extent.
+     * @param {string} [config.xTicks=d3.utcMinute.every(20)] Target x tick count, as passed to d3.axis.ticks.
+     * @param {string} [config.axisXFormat='%H:%M'] X tick format, as passed to d3.axis.tickFormat.
+     * @param {string} [config.yTicks=6] Target y tick count, as passed to d3.axis.ticks.
+     * @param {string} [config.axisYFormat='.2'] Y tick format, as passed to d3.axis.format.
+     * @param {string} [config.yAxisTitle] Y axis title.
+     * @param {string} [config.xTitleFormat=d3.utcFormat('%c')] Format of the hovered timestamp close to the x axis.
+     * @param {function} [config.valueFormatter] Formatter for the tooltip value. Receives (data, index) and should return a string.
+     * @param {number} [config.stepRange=3] Only for type:step, band range above and below the line.
+     * @param {boolean} [config.axisOnly=false] A minimal version of the chart only showing the x axis.
+     * @param {number} [config.arrowSkip=3] Only for type:arrow, keeping 1 arrow out of n.
+     * @returns {object} A timeseries instance.
+     * @example
+     * datahub.timeseries({
+     *     parent: document.querySelector('.timeseries-area'),
+     *     chartType: 'area',
+     *     data: datahub.data.generateTimeSeriesSplit()
+     * })
+     */
     var timeseries = function(config) {
         var configCache,
             events = d3.dispatch('hover', 'click', 'mouseout', 'tooltipChange'),
@@ -655,6 +679,19 @@
             chartCache = lineChart(configCache)
         }
 
+        /**
+         * Set the data.
+         * @name setData
+         * @param {object} data A data object.
+         * @returns {object} The timeseries instance.
+         * @memberof timeseries
+         * @instance
+         * @example
+         * datahub.timeseries({
+         *     parent: document.querySelector('.timeseries-area')
+         * })
+         * .setData(datahub.data.generateTimeSeriesSplit())
+         */
         var setData = function(data) {
             var d = data ? JSON.parse(JSON.stringify(data)) : {}
             configCache = dh.utils.mergeAll({}, configCache, {data: d})
@@ -662,6 +699,22 @@
             return this
         }
 
+        /**
+         * Set the config after its instantiation.
+         * @name setConfig
+         * @instance
+         * @param {object} config The same config format as on init.
+         * @returns {object} The timeseries instance.
+         * @memberof timeseries
+         * @instance
+         * @example
+         * datahub.timeseries({
+         *     parent: document.querySelector('.chart'),
+         * })
+         * .setConfig({
+         *     width: 100
+         * })
+         */
         var setConfig = function(config) {
             configCache = dh.utils.mergeAll({}, configCache, config)
             render()
@@ -672,6 +725,17 @@
             setConfig(dh.utils.mergeAll({}, config, {events: events}))
         }
 
+        /**
+         * Destroys DOM elements and unbind events.
+         * @name destroy
+         * @memberof timeseries
+         * @instance
+         * @example
+         * var chart = datahub.timeseries({
+         *     parent: document.querySelector('.chart'),
+         * })
+         * chart.destroy()
+         */
         var destroy = function() {
             d3.select(window).on('resize.' + uid, null)
             configCache.parent.innerHTML = null
@@ -679,6 +743,21 @@
 
         init(config, events)
 
+        /**
+         * Events binder.
+         * @function on
+         * @param {string} eventName The name of the event: 'hover', 'click', 'mouseout', 'tooltipChange'
+         * @param {function} callback The callback for this event
+         * @memberof timeseries
+         * @instance
+         * @example
+         * datahub.timeseries({
+         *     parent: document.querySelector('.chart'),
+         * })
+         * .on('hover', function(e) {
+         *     console.log(e)
+         * })
+         */
         return {
             on: dh.utils.rebind(events),
             setConfig: setConfig,
