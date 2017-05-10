@@ -26,12 +26,10 @@
     "build-chart-min": "uglifyjs $npm_package_srcChart -c -m --wrap datahub -o dist/datahub-chart-min.js",
     "build-map": "uglifyjs $npm_package_srcMap -b --comments all --wrap datahub -o dist/datahub-map.js",
     "build-map-min": "uglifyjs $npm_package_srcMap -c -m --wrap datahub -o dist/datahub-map-min.js",
-    "build-doc": "documentation serve dist/datahub.js",
     "build-doc-watch": "documentation serve -w true dist/datahub.js",
-    "build-doc-md": "documentation readme dist/datahub.js",
     "build-doc-html": "documentation build -f \"html\" dist/datahub.js -o doc",
     "build-watch": "npm-watch",
-    "build-all": "npm run build; npm run build-min; npm run build-chart; npm run build-chart-min; npm run build-map; npm run build-map-min; npm run build-doc"
+    "build-all": "npm run build; npm run build-min; npm run build-chart; npm run build-chart-min; npm run build-map; npm run build-map-min; npm run build-doc-html"
   },
   "homepage": "https://github.com/planet-os/ui-components#readme",
   "dependencies": {
