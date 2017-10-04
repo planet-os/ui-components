@@ -316,3 +316,23 @@
 .datahub-waterfall-chart .number-container .value {
     display: flex;
 }
+
+.datahub-timeseries-chart svg {
+    display: block;
+}
+
+.datahub-weather-chart .chart-row {
+    display: flex;
+}
+
+.datahub-weather-chart .chart-row > div{
+    flex: 1;
+}
+
+.datahub-weather-chart svg {
+    overflow: visible;
+}
+
+.datahub-weather-chart svg .tooltip {
+    pointer-events: none;
+}

@@ -1,8 +1,8 @@
 {
   "name": "datahub-ui",
-  "version": "0.8.6",
+  "version": "0.8.20",
   "description": "Reusable components for Planet OS Datahub",
-  "main": "dist/datahub.js",
+  "main": "index.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/planet-os/ui-components.git"
@@ -16,19 +16,34 @@
   "bugs": {
     "url": "https://github.com/planet-os/ui-components/issues"
   },
+  "src": "src/start.js src/*utils.js src/*common.js src/*data.js src/*widget.js src/*legend.js src/*palette.js src/*map.js src/*chart.js src/end.js",
+  "srcChart": "src/start-chart.js src/*utils.js src/*common.js src/*data.js src/*widget.js src/*chart.js src/end.js",
+  "srcMap": "src/start.js src/*utils.js src/*data.js src/*palette.js src/*legend.js src/*map.js src/end.js",
   "scripts": {
-    "build": "rollup index-rollup.js -o dist/datahub.js -f umd -n datahub -g d3:d3,leaflet:L,d3-scale-chromatic:d3",
-    "build-watch": "rollup index-rollup.js -o dist/datahub.js -w -f umd -n datahub -g d3:d3,leaflet:L,d3-scale-chromatic:d3",
-    "build-min": "rollup index-rollup.js -f umd -n datahub -g d3:d3,leaflet:L,d3-scale-chromatic:d3 | uglifyjs -o ./dist/datahub-min.js -c -m"
+    "build": "uglifyjs $npm_package_src -b --comments all --wrap datahub -o dist/datahub.js",
+    "build-min": "uglifyjs $npm_package_src -c -m --wrap datahub -o dist/datahub-min.js",
+    "build-chart": "uglifyjs $npm_package_srcChart -b --comments all --wrap datahub -o dist/datahub-chart.js",
+    "build-chart-min": "uglifyjs $npm_package_srcChart -c -m --wrap datahub -o dist/datahub-chart-min.js",
+    "build-map": "uglifyjs $npm_package_srcMap -b --comments all --wrap datahub -o dist/datahub-map.js",
+    "build-map-min": "uglifyjs $npm_package_srcMap -c -m --wrap datahub -o dist/datahub-map-min.js",
+    "build-doc-watch": "documentation serve -w true dist/datahub.js",
+    "build-doc-html": "documentation build -f \"html\" dist/datahub.js -o doc",
+    "build-watch": "npm-watch",
+    "build-all": "npm run build; npm run build-min; npm run build-chart; npm run build-chart-min; npm run build-map; npm run build-map-min; npm run build-doc-html"
   },
   "homepage": "https://github.com/planet-os/ui-components#readme",
   "dependencies": {
+    "d3": "^4.4.0"
+  },
+  "peerDependencies": {
     "leaflet": "^1.0.2",
-    "d3": "^4.4.0",
     "d3-scale-chromatic": "^1.1.0"
   },
   "devDependencies": {
-    "rollup": "^0.41.4",
-    "rollup-watch": "^3.2.2"
+    "npm-watch": "^0.1.8"
+  },
+  "watch": {
+    "build": "src/*.js",
+    "build-chart": "src/*.js"
   }
 }
