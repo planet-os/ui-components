@@ -1,4 +1,4 @@
-(function(exports, global) {
+(function(exports) {
     var datahub = exports = typeof exports === "object" ? exports : {};
     var root = typeof global === "object" ? global : window;
     if (typeof module === "object" && module.exports) {
@@ -4644,7 +4644,4 @@
     if (typeof module === "object" && module.exports) {
         module.exports = exports;
     }
-    global["datahub"] = exports;
-})({}, function() {
-    return this;
-}());
+})(typeof datahub == "undefined" ? datahub = {} : datahub);

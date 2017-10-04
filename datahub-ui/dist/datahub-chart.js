@@ -1,4 +1,4 @@
-(function(exports, global) {
+(function(exports) {
     var datahub = exports = typeof exports === "object" ? exports : {};
     var root = typeof global === "object" ? global : window;
     if (typeof module === "object" && module.exports) {
@@ -3707,17 +3707,7 @@
         };
         dh.weatherChart = weatherChart;
     }(datahub, root.d3);
-    var datahub = exports = typeof exports === "object" ? exports : {};
-    var root = typeof global === "object" ? global : window;
-    if (typeof module === "object" && module.exports) {
-        root.d3 = require("d3");
-    } else {
-        root.d3 = root.d3;
-    }
     if (typeof module === "object" && module.exports) {
         module.exports = exports;
     }
-    global["datahub"] = exports;
-})({}, function() {
-    return this;
-}());
+})(typeof datahub == "undefined" ? datahub = {} : datahub);
