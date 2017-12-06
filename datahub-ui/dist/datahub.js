@@ -2085,15 +2085,17 @@
                 }
                 map.createPane("labels");
                 var basemaps = {};
-                basemaps.basemapDark = L.tileLayer("https://api.mapbox.com/styles/v1/planetos/ciusdqjc200w12jmlg0dys640/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoicGxhbmV0b3MiLCJhIjoiZjZkNDE4MTE5NWNhOGYyMmZhZmNhMDQwMDg0YWMyNGUifQ.htlwo6U82iekTcpGtDR_dQ", {
+                basemaps.basemapDark = L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}.png", {
+                    attribution: "©OpenStreetMap, ©CartoDB",
                     tileSize: 256,
                     maxZoom: 19
                 });
-                basemaps.basemapLight = L.tileLayer("https://api.mapbox.com/styles/v1/planetos/civ28flwe002c2ino04a6jiqs/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoicGxhbmV0b3MiLCJhIjoiZjZkNDE4MTE5NWNhOGYyMmZhZmNhMDQwMDg0YWMyNGUifQ.htlwo6U82iekTcpGtDR_dQ", {
+                basemaps.basemapLight = L.tileLayer("https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png", {
+                    attribution: "©OpenStreetMap, ©CartoDB",
                     tileSize: 256,
                     maxZoom: 19
                 });
-                basemaps.labelLight = L.tileLayer("http://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}.png", {
+                basemaps.labelLight = L.tileLayer("https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}.png", {
                     attribution: "©OpenStreetMap, ©CartoDB",
                     pane: "labels"
                 });
