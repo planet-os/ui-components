@@ -520,7 +520,14 @@
   };
 
   function setTooltip(config, d) {
-    var x = d[0].posX + config.margin.left;
+    var x = config.margin.left;
+    var firstDataset = config.dataConverted[0].data;
+    var lastTimestamp = firstDataset[firstDataset.length - 1].timestamp;
+    if (d[0].timestamp === lastTimestamp && d[1]) {
+      x += d[1].posX;
+    } else {
+      x += d[0].posX;
+    }
     config.container
       .select(".tooltip line")
       .attr("y1", 0)
