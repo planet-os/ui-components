@@ -269,25 +269,36 @@
               var groupKey = x;
               var chartKey = y;
               return function(d) {
-                setTooltip(charts, groupKey, chartKey, d[0].timestamp, config);
+                if (d[0]) {
+                  setTooltip(
+                    charts,
+                    groupKey,
+                    chartKey,
+                    d[0].timestamp,
+                    config
+                  );
 
-                var data = getDataAtTimestamp(
-                  d[0].timestamp,
-                  config.dataConverted,
-                  groupKey
-                );
-                config.events.call("tooltipChange", null, {
-                  data: data,
-                  timestamp: d[0].timestamp,
-                  info: d,
-                  config: config
-                });
+                  var data = getDataAtTimestamp(
+                    d[0].timestamp,
+                    config.dataConverted,
+                    groupKey
+                  );
+                  config.events.call("tooltipChange", null, {
+                    data: data,
+                    timestamp: d[0].timestamp,
+                    info: d,
+                    config: config
+                  });
+                }
               };
             })()
           )
           .on("mouseout", function() {
             var latestHistoricalTimestamp = new Date(
-              config.dataConverted.historical.wind.data.slice(-1)[0].timestamp
+              config.dataConverted
+                ? config.dataConverted.historical.wind.data.slice(-1)[0]
+                    .timestamp
+                : Date.now()
             );
             setTooltip(
               charts,

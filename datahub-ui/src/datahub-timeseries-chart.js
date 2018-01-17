@@ -474,23 +474,25 @@
 
   function getHoverInfo(config, timestamp) {
     var dataUnderCursor = [];
-    config.dataConverted.forEach(function(d, i) {
-      var bisector = d3.bisector(function(dB, x) {
-        return dB.timestamp.getTime() - x.getTime();
-      }).left;
-      var found = bisector(d.data, timestamp);
+    if (config.dataConverted[0].data.length) {
+      config.dataConverted.forEach(function(d, i) {
+        var bisector = d3.bisector(function(dB, x) {
+          return dB.timestamp.getTime() - x.getTime();
+        }).left;
+        var found = bisector(d.data, timestamp);
 
-      var d1 = d.data[Math.min(found, d.data.length - 1)];
-      var d0 = d.data[Math.max(found - 1, 0)];
-      var datum = timestamp - d0.timestamp > d1.timestamp - timestamp ? d1 : d0;
+        var d1 = d.data[Math.min(found, d.data.length - 1)];
+        var d0 = d.data[Math.max(found - 1, 0)];
+        var datum =
+          timestamp - d0.timestamp > d1.timestamp - timestamp ? d1 : d0;
 
-      var posX = Math.round(config.scaleX(datum.timestamp));
-      var posY = Math.round(config.scaleY(datum.value));
-      var eventData = { event: d3.event, posX: posX, posY: posY };
-      datum = dh.utils.mergeAll({}, datum, d.metadata, eventData);
-      dataUnderCursor.push(datum);
-    });
-
+        var posX = Math.round(config.scaleX(datum.timestamp));
+        var posY = Math.round(config.scaleY(datum.value));
+        var eventData = { event: d3.event, posX: posX, posY: posY };
+        datum = dh.utils.mergeAll({}, datum, d.metadata, eventData);
+        dataUnderCursor.push(datum);
+      });
+    }
     return dataUnderCursor;
   }
 
@@ -508,6 +510,8 @@
         config.events.call("hover", null, dataUnderCursor);
       })
       .on("mouseout", function(d) {
+        hideTooltip(config);
+        config.container.selectAll(".axis-title.x text").text(null);
         config.events.call("mouseout", null, {});
       })
       .on("click", function(d) {
@@ -520,6 +524,9 @@
   };
 
   function setTooltip(config, d) {
+    if (!config.dataConverted[0].data.length) {
+      return (config.datasetIndex = 0);
+    }
     config.datasetIndex = getDatasetIndex();
     function getDatasetIndex() {
       var firstDataset = config.dataConverted[0].data;
@@ -612,6 +619,15 @@
         });
       labels.exit().remove();
     }
+
+    function removeInactiveLayerinfo() {
+      var inactive = config.datasetIndex === 1 ? 0 : 1;
+      config.container
+        .select(".tooltip")
+        .selectAll(".layer" + inactive)
+        .remove();
+    }
+    removeInactiveLayerinfo();
   }
 
   function hideTooltip(config) {
@@ -665,7 +681,7 @@
     ) {
       return {};
     }
-    var xTitleFormat = config.xTitleFormat || d3.utcFormat("%c");
+    var xTitleFormat = config.xTitleFormat || d3.utcFormat("%X");
     var titleContainer = config.container.select(".axis-title.x");
     var title = titleContainer.select("text");
 

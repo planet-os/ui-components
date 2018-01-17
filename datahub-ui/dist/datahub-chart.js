@@ -1043,7 +1043,9 @@
             var brush = config.container.selectAll("g.brush").data([ 0 ]);
             var brushMerged = brush.enter().append("g").attr("class", "brush").attr("transform", "translate(" + [ 0, config.margin.top ] + ")").merge(brush).attr("transform", "translate(" + [ 0, config.margin.top ] + ")").call(brushX).call(brushX.move, config.scaleX.range());
             brush.exit().remove();
-            if (config.initialTimeRange) {}
+            if (config.initialTimeRange) {
+                // brush.call(brushX.move, config.scaleX.range())
+            }
             return {
                 events: events
             };
@@ -1722,7 +1724,8 @@
             var bar = stackedBar.enter().append("g").attr("class", "stack").merge(stackedBar).selectAll("rect.stacked-bar").data(function(d, i) {
                 d.forEach(function(dB) {
                     dB.index = d.index;
-                });
+                    // dB.id = dB.data.id && dB.data.id.length ? dB.data.id[d.index] : null
+                                });
                 return d;
             });
             bar.enter().append("rect").attr("class", "stacked-bar").merge(bar).attr("class", function(d, a, b) {
@@ -1948,10 +1951,13 @@
             shapes.exit().remove();
             return {};
         };
-        var multi = dh.utils.pipeline(dh.common.defaultConfig, dataAdapter, // dh.common.printer,
-        template, scaleX, scaleY, eventsPanel, // chart.axesFormatAutoconfig,
-        dh.common.axisX, dh.common.axisY, stripes, active, areaShapes, referenceBarShapes, stackedBarShapes, stackedAreaShapes, barShapes, estimateBarShapes, lineShapes, dotShapes, thresholdLineShape, dh.common.axisComponentY, dh.common.labelsRewriterY, dh.common.message, dh.common.axisComponentX, dh.common.axisTitleComponentX, // dh.common.axisXFormatterRotate30,
-        dh.common.axisTitleComponentY, dh.common.chartTitleComponent);
+        var multi = dh.utils.pipeline(dh.common.defaultConfig, dataAdapter, 
+        // dh.common.printer,
+        template, scaleX, scaleY, eventsPanel, 
+        // chart.axesFormatAutoconfig,
+        dh.common.axisX, dh.common.axisY, stripes, active, areaShapes, referenceBarShapes, stackedBarShapes, stackedAreaShapes, barShapes, estimateBarShapes, lineShapes, dotShapes, thresholdLineShape, dh.common.axisComponentY, dh.common.labelsRewriterY, dh.common.message, dh.common.axisComponentX, dh.common.axisTitleComponentX, 
+        // dh.common.axisXFormatterRotate30,
+        dh.common.axisTitleComponentY, dh.common.chartTitleComponent)
         /**
      * A configurable line/bar/area chart.
      * @namespace multiChart
@@ -1979,7 +1985,7 @@
      *         barData: datahub.data.generateTimeSeries()
      *     }
      * })
-     */
+     */;
         var multiChart = function(config) {
             var configCache, events = d3.dispatch("hover", "click", "mouseout", "active"), chartCache, uid = ~~(Math.random() * 1e4);
             var onResize = dh.utils.throttle(function() {
@@ -1989,7 +1995,7 @@
             d3.select(window).on("resize." + uid, onResize);
             var render = function() {
                 chartCache = multi(configCache);
-            };
+            }
             /**
          * Set the data.
          * @name setData
@@ -2005,14 +2011,14 @@
          *     timestamp: datahub.data.generateTimestamps(),
          *     barData: datahub.data.generateTimeSeries()
          * })
-         */
+         */;
             var setData = function(data) {
                 var d = data ? JSON.parse(JSON.stringify(data)) : {};
                 configCache = dh.utils.mergeAll({}, configCache);
                 configCache.data = d;
                 render();
                 return this;
-            };
+            }
             /**
          * Set the config after its instantiation.
          * @name setConfig
@@ -2027,7 +2033,7 @@
          * .setConfig({
          *     width: 100
          * })
-         */
+         */;
             var setConfig = function(config) {
                 configCache = dh.utils.mergeAll(configCache, config);
                 render();
@@ -2037,7 +2043,7 @@
                 setConfig(dh.utils.mergeAll(config, {
                     events: events
                 }));
-            };
+            }
             /**
          * Destroys DOM elements and unbind events.
          * @name destroy
@@ -2048,12 +2054,12 @@
          *     parent: document.querySelector('.chart'),
          * })
          * chart.destroy()
-         */
+         */;
             var destroy = function() {
                 d3.select(window).on("resize." + uid, null);
                 configCache.parent.innerHTML = null;
             };
-            init(config, events);
+            init(config, events)
             /**
          * Events binder.
          * @function on
@@ -2068,7 +2074,7 @@
          * .on('hover', function(e) {
          *     console.log(e.index, e.timestamp, e.data, e.config, e.event)
          * })
-         */
+         */;
             return {
                 on: dh.utils.rebind(events),
                 setConfig: setConfig,
@@ -2272,7 +2278,7 @@
             //         console.log(111)
             //     })
             // eventPanel.exit().remove()
-            return {};
+                        return {};
         };
         var stripes = function(config) {
             var ticks = config.scaleX.ticks();
@@ -2635,24 +2641,26 @@
         };
         function getHoverInfo(config, timestamp) {
             var dataUnderCursor = [];
-            config.dataConverted.forEach(function(d, i) {
-                var bisector = d3.bisector(function(dB, x) {
-                    return dB.timestamp.getTime() - x.getTime();
-                }).left;
-                var found = bisector(d.data, timestamp);
-                var d1 = d.data[Math.min(found, d.data.length - 1)];
-                var d0 = d.data[Math.max(found - 1, 0)];
-                var datum = timestamp - d0.timestamp > d1.timestamp - timestamp ? d1 : d0;
-                var posX = Math.round(config.scaleX(datum.timestamp));
-                var posY = Math.round(config.scaleY(datum.value));
-                var eventData = {
-                    event: d3.event,
-                    posX: posX,
-                    posY: posY
-                };
-                datum = dh.utils.mergeAll({}, datum, d.metadata, eventData);
-                dataUnderCursor.push(datum);
-            });
+            if (config.dataConverted[0].data.length) {
+                config.dataConverted.forEach(function(d, i) {
+                    var bisector = d3.bisector(function(dB, x) {
+                        return dB.timestamp.getTime() - x.getTime();
+                    }).left;
+                    var found = bisector(d.data, timestamp);
+                    var d1 = d.data[Math.min(found, d.data.length - 1)];
+                    var d0 = d.data[Math.max(found - 1, 0)];
+                    var datum = timestamp - d0.timestamp > d1.timestamp - timestamp ? d1 : d0;
+                    var posX = Math.round(config.scaleX(datum.timestamp));
+                    var posY = Math.round(config.scaleY(datum.value));
+                    var eventData = {
+                        event: d3.event,
+                        posX: posX,
+                        posY: posY
+                    };
+                    datum = dh.utils.mergeAll({}, datum, d.metadata, eventData);
+                    dataUnderCursor.push(datum);
+                });
+            }
             return dataUnderCursor;
         }
         var eventsPanel = function(config) {
@@ -2665,6 +2673,8 @@
                 var dataUnderCursor = getHoverInfo(config, mouseTimestamp);
                 config.events.call("hover", null, dataUnderCursor);
             }).on("mouseout", function(d) {
+                hideTooltip(config);
+                config.container.selectAll(".axis-title.x text").text(null);
                 config.events.call("mouseout", null, {});
             }).on("click", function(d) {
                 config.events.call("click", null, {
@@ -2676,7 +2686,16 @@
             };
         };
         function setTooltip(config, d) {
-            var x = d[0].posX + config.margin.left;
+            if (!config.dataConverted[0].data.length) {
+                return config.datasetIndex = 0;
+            }
+            config.datasetIndex = getDatasetIndex();
+            function getDatasetIndex() {
+                var firstDataset = config.dataConverted[0].data;
+                var lastTimestamp = firstDataset[firstDataset.length - 1].timestamp;
+                return d[0].timestamp === lastTimestamp && d[1] ? 1 : 0;
+            }
+            var x = config.margin.left + d[config.datasetIndex].posX;
             config.container.select(".tooltip line").attr("y1", 0).attr("y2", config.height).attr("x1", x).attr("x2", x).attr("display", "block");
             if (!d || !d[0] || typeof d[0].value === "undefined" || d[0].value === null || config.hide.indexOf("tooltip") > -1) {
                 config.container.select(".tooltip").selectAll("text.tooltip-label").remove();
@@ -2713,6 +2732,11 @@
                 });
                 labels.exit().remove();
             }
+            function removeInactiveLayerinfo() {
+                var inactive = config.datasetIndex === 1 ? 0 : 1;
+                config.container.select(".tooltip").selectAll(".layer" + inactive).remove();
+            }
+            removeInactiveLayerinfo();
         }
         function hideTooltip(config) {
             config.container.select(".tooltip line").attr("display", "none");
@@ -2740,7 +2764,7 @@
             //     // config.events.call('tooltipChange', null, {timestamp: actualTimestamp, data: dataUnderCursor})
             //     config.events.call('hover', null, dataUnderCursor)
             // }
-            if (config.dataIsEmpty || config.axisOnly || config.hide.indexOf("tooltip") > -1) {
+                        if (config.dataIsEmpty || config.axisOnly || config.hide.indexOf("tooltip") > -1) {
                 hideTooltip(config);
                 return {};
             }
@@ -2752,11 +2776,11 @@
             if (config.dataIsEmpty || config.axisOnly || config.hide.indexOf("xTitle") > -1) {
                 return {};
             }
-            var xTitleFormat = config.xTitleFormat || d3.utcFormat("%c");
+            var xTitleFormat = config.xTitleFormat || d3.utcFormat("%X");
             var titleContainer = config.container.select(".axis-title.x");
             var title = titleContainer.select("text");
             config.events.on("hover.title", function(d) {
-                var timestamp = d[0].timestamp;
+                var timestamp = d[config.datasetIndex].timestamp;
                 titleContainer.attr("transform", "translate(" + [ config.chartWidth, config.chartHeight ] + ")");
                 title.text(xTitleFormat(timestamp)).attr("dy", -8).attr("text-anchor", "end");
             });
@@ -2769,66 +2793,65 @@
             config.container.select(".axis-title.y text").text(config.yAxisTitle || "").attr("dx", "0.5em").attr("dy", "1em");
             return {};
         };
-        var lineChart = dh.utils.pipeline(defaultConfig, template, data, scaleX, scaleY, axisX, axisY, axisComponentX, gridX, lineShapes, arrowShapes, stepShapes, // dh.common.printer,
+        var lineChart = dh.utils.pipeline(defaultConfig, template, data, scaleX, scaleY, axisX, axisY, axisComponentX, gridX, lineShapes, arrowShapes, stepShapes, 
+        // dh.common.printer,
         // areaShapes,
         dh.common.message, axisComponentY, reference, eventsPanel, tooltipComponent, xAxisTitle, yAxisTitle);
         /**
-     * A line/area/step/arrow timeseries chart.
-     * @namespace timeseries
-     * @name timeseries
-     * @param {object} config The initial configuration can be passed on init or later using timeseries.setConfig.
-     * @param {object} config.parent The parent DOM element.
-     * @param {object} config.data Data can be passed on init or later using timeseries.setData.
-     * @param {number} config.reference Value for the reference line.
-     * @param {Date} config.tooltipTimestamp Timestamp of element to highlight.
-     * @param {number} [config.width=parent.innerWidth] External width of the chart.
-     * @param {number} [config.height=parent.innerHeight] External height of the chart.
-     * @param {string} [config.chartType='line'] Chart type: 'line', 'area', 'step', 'arrow'.
-     * @param {object} [config.margin={top:0, right:0, bottom:10, left:10}] Margins around the chart panel.
-     * @param {Array.<string>} [config.hide] An array of names of elements to hide: 'xTitle', 'yTitle', 'tooltip', 'xAxis', 'yAxis', 'shapes', 'xGrid', 'xTitle', 'yTitle', 'tooltipDot'.
-     * @param {Array.<number>} [config.domain] [min, max] domain of the y scale, defaults to data extent.
-     * @param {string} [config.xTicks=d3.utcMinute.every(20)] Target x tick count, as passed to d3.axis.ticks.
-     * @param {string} [config.axisXFormat='%H:%M'] X tick format, as passed to d3.axis.tickFormat.
-     * @param {string} [config.yTicks=6] Target y tick count, as passed to d3.axis.ticks.
-     * @param {string} [config.axisYFormat='.2'] Y tick format, as passed to d3.axis.format.
-     * @param {string} [config.yAxisTitle] Y axis title.
-     * @param {string} [config.xTitleFormat=d3.utcFormat('%c')] Format of the hovered timestamp close to the x axis.
-     * @param {function} [config.valueFormatter] Formatter for the tooltip value. Receives (data, index) and should return a string.
-     * @param {number} [config.stepRange=3] Only for type:step, band range above and below the line.
-     * @param {boolean} [config.axisOnly=false] A minimal version of the chart only showing the x axis.
-     * @param {number} [config.arrowSkip=3] Only for type:arrow, keeping 1 arrow out of n.
-     * @returns {object} A timeseries instance.
-     * @example
-     * datahub.timeseries({
-     *     parent: document.querySelector('.timeseries-area'),
-     *     chartType: 'area',
-     *     data: datahub.data.generateTimeSeriesSplit()
-     * })
-     */
-        var timeseries = function(config) {
+   * A line/area/step/arrow timeseries chart.
+   * @namespace timeseries
+   * @name timeseries
+   * @param {object} config The initial configuration can be passed on init or later using timeseries.setConfig.
+   * @param {object} config.parent The parent DOM element.
+   * @param {object} config.data Data can be passed on init or later using timeseries.setData.
+   * @param {number} config.reference Value for the reference line.
+   * @param {Date} config.tooltipTimestamp Timestamp of element to highlight.
+   * @param {number} [config.width=parent.innerWidth] External width of the chart.
+   * @param {number} [config.height=parent.innerHeight] External height of the chart.
+   * @param {string} [config.chartType='line'] Chart type: 'line', 'area', 'step', 'arrow'.
+   * @param {object} [config.margin={top:0, right:0, bottom:10, left:10}] Margins around the chart panel.
+   * @param {Array.<string>} [config.hide] An array of names of elements to hide: 'xTitle', 'yTitle', 'tooltip', 'xAxis', 'yAxis', 'shapes', 'xGrid', 'xTitle', 'yTitle', 'tooltipDot'.
+   * @param {Array.<number>} [config.domain] [min, max] domain of the y scale, defaults to data extent.
+   * @param {string} [config.xTicks=d3.utcMinute.every(20)] Target x tick count, as passed to d3.axis.ticks.
+   * @param {string} [config.axisXFormat='%H:%M'] X tick format, as passed to d3.axis.tickFormat.
+   * @param {string} [config.yTicks=6] Target y tick count, as passed to d3.axis.ticks.
+   * @param {string} [config.axisYFormat='.2'] Y tick format, as passed to d3.axis.format.
+   * @param {string} [config.yAxisTitle] Y axis title.
+   * @param {string} [config.xTitleFormat=d3.utcFormat('%c')] Format of the hovered timestamp close to the x axis.
+   * @param {function} [config.valueFormatter] Formatter for the tooltip value. Receives (data, index) and should return a string.
+   * @param {number} [config.stepRange=3] Only for type:step, band range above and below the line.
+   * @param {boolean} [config.axisOnly=false] A minimal version of the chart only showing the x axis.
+   * @param {number} [config.arrowSkip=3] Only for type:arrow, keeping 1 arrow out of n.
+   * @returns {object} A timeseries instance.
+   * @example
+   * datahub.timeseries({
+   *     parent: document.querySelector('.timeseries-area'),
+   *     chartType: 'area',
+   *     data: datahub.data.generateTimeSeriesSplit()
+   * })
+   */        var timeseries = function(config) {
             var configCache, events = d3.dispatch("hover", "click", "mouseout", "tooltipChange"), chartCache, uid = ~~(Math.random() * 1e4);
             var onResize = dh.utils.throttle(function() {
                 configCache.width = configCache.parent.clientWidth;
                 render();
             }, 200);
-            d3.select(window).on("resize." + uid, onResize);
-            var render = function() {
+            // d3.select(window).on('resize.' + uid, onResize)
+                        var render = function() {
                 chartCache = lineChart(configCache);
             };
             /**
-         * Set the data.
-         * @name setData
-         * @param {object} data A data object.
-         * @returns {object} The timeseries instance.
-         * @memberof timeseries
-         * @instance
-         * @example
-         * datahub.timeseries({
-         *     parent: document.querySelector('.timeseries-area')
-         * })
-         * .setData(datahub.data.generateTimeSeriesSplit())
-         */
-            var setData = function(data) {
+     * Set the data.
+     * @name setData
+     * @param {object} data A data object.
+     * @returns {object} The timeseries instance.
+     * @memberof timeseries
+     * @instance
+     * @example
+     * datahub.timeseries({
+     *     parent: document.querySelector('.timeseries-area')
+     * })
+     * .setData(datahub.data.generateTimeSeriesSplit())
+     */            var setData = function(data) {
                 var d = data ? JSON.parse(JSON.stringify(data)) : {};
                 configCache = dh.utils.mergeAll({}, configCache, {
                     data: d
@@ -2837,22 +2860,21 @@
                 return this;
             };
             /**
-         * Set the config after its instantiation.
-         * @name setConfig
-         * @instance
-         * @param {object} config The same config format as on init.
-         * @returns {object} The timeseries instance.
-         * @memberof timeseries
-         * @instance
-         * @example
-         * datahub.timeseries({
-         *     parent: document.querySelector('.chart'),
-         * })
-         * .setConfig({
-         *     width: 100
-         * })
-         */
-            var setConfig = function(config) {
+     * Set the config after its instantiation.
+     * @name setConfig
+     * @instance
+     * @param {object} config The same config format as on init.
+     * @returns {object} The timeseries instance.
+     * @memberof timeseries
+     * @instance
+     * @example
+     * datahub.timeseries({
+     *     parent: document.querySelector('.chart'),
+     * })
+     * .setConfig({
+     *     width: 100
+     * })
+     */            var setConfig = function(config) {
                 configCache = dh.utils.mergeAll({}, configCache, config);
                 render();
                 return this;
@@ -2863,37 +2885,35 @@
                 }));
             };
             /**
-         * Destroys DOM elements and unbind events.
-         * @name destroy
-         * @memberof timeseries
-         * @instance
-         * @example
-         * var chart = datahub.timeseries({
-         *     parent: document.querySelector('.chart'),
-         * })
-         * chart.destroy()
-         */
-            var destroy = function() {
+     * Destroys DOM elements and unbind events.
+     * @name destroy
+     * @memberof timeseries
+     * @instance
+     * @example
+     * var chart = datahub.timeseries({
+     *     parent: document.querySelector('.chart'),
+     * })
+     * chart.destroy()
+     */            var destroy = function() {
                 d3.select(window).on("resize." + uid, null);
                 configCache.parent.innerHTML = null;
             };
             init(config, events);
             /**
-         * Events binder.
-         * @function on
-         * @param {string} eventName The name of the event: 'hover', 'click', 'mouseout', 'tooltipChange'
-         * @param {function} callback The callback for this event
-         * @memberof timeseries
-         * @instance
-         * @example
-         * datahub.timeseries({
-         *     parent: document.querySelector('.chart'),
-         * })
-         * .on('hover', function(e) {
-         *     console.log(e)
-         * })
-         */
-            return {
+     * Events binder.
+     * @function on
+     * @param {string} eventName The name of the event: 'hover', 'click', 'mouseout', 'tooltipChange'
+     * @param {function} callback The callback for this event
+     * @memberof timeseries
+     * @instance
+     * @example
+     * datahub.timeseries({
+     *     parent: document.querySelector('.chart'),
+     * })
+     * .on('hover', function(e) {
+     *     console.log(e)
+     * })
+     */            return {
                 on: dh.utils.rebind(events),
                 setConfig: setConfig,
                 setData: setData,
@@ -3007,7 +3027,7 @@
             line.exit().remove();
             return {};
         };
-        var multi = dh.utils.pipeline(template, header, number, scaleX, verticalLines, bars);
+        var multi = dh.utils.pipeline(template, header, number, scaleX, verticalLines, bars)
         /**
      * A vertical positive/negative bar chart with reference bar.
      * @namespace verticalChart
@@ -3031,7 +3051,7 @@
      *     referenceBarSize: 100,
      *     unit: '%'
      * })
-     */
+     */;
         var verticalChart = function(config) {
             var configCache, events = d3.dispatch("barHover"), chartCache, uid = ~~(Math.random() * 1e4);
             var onResize = dh.utils.throttle(function() {
@@ -3041,7 +3061,7 @@
             d3.select(window).on("resize." + uid, onResize);
             var render = function() {
                 chartCache = multi(configCache);
-            };
+            }
             /**
          * Set the config after its instantiation.
          * @name setConfig
@@ -3063,7 +3083,7 @@
          *     referenceBarSize: 100,
          *     unit: '%'
          * })
-         */
+         */;
             var setConfig = function(config) {
                 configCache = dh.utils.mergeAll(configCache, config);
                 render();
@@ -3073,7 +3093,7 @@
                 setConfig(dh.utils.mergeAll(config, {
                     events: events
                 }));
-            };
+            }
             /**
          * Destroys DOM elements and unbind events.
          * @name destroy
@@ -3084,7 +3104,7 @@
          *     parent: document.querySelector('.chart'),
          * })
          * chart.destroy()
-         */
+         */;
             var destroy = function() {
                 d3.select(window).on("resize." + uid, null);
                 configCache.parent.innerHTML = null;
@@ -3235,7 +3255,7 @@
             values.exit().remove();
             return {};
         };
-        var multi = dh.utils.pipeline(template, scaleX, scaleY, bars, connectors, number);
+        var multi = dh.utils.pipeline(template, scaleX, scaleY, bars, connectors, number)
         /**
      * A waterfall chart designed for a specific use case.
      * @namespace waterfallChart
@@ -3255,7 +3275,7 @@
      *         {key: 'total', label: 'Total', value: 38}
      *     ]
      * })
-     */
+     */;
         var waterfallChart = function(config) {
             var configCache, events = d3.dispatch("barHover"), chartCache, uid = ~~(Math.random() * 1e4);
             var onResize = dh.utils.throttle(function() {
@@ -3273,7 +3293,7 @@
                 });
                 render();
                 return this;
-            };
+            }
             /**
          * Set the config after its instantiation.
          * @name setConfig
@@ -3294,7 +3314,7 @@
          *         {key: 'total', label: 'Total', value: 38}
          *     ]
          * })
-         */
+         */;
             var setConfig = function(config) {
                 configCache = dh.utils.mergeAll(configCache, config);
                 render();
@@ -3304,7 +3324,7 @@
                 setConfig(dh.utils.mergeAll(config, {
                     events: events
                 }));
-            };
+            }
             /**
          * Destroys DOM elements and unbind events.
          * @name destroy
@@ -3315,7 +3335,7 @@
          *     parent: document.querySelector('.chart'),
          * })
          * chart.destroy()
-         */
+         */;
             var destroy = function() {
                 d3.select(window).on("resize." + uid, null);
                 configCache.parent.innerHTML = null;
@@ -3555,17 +3575,19 @@
                         var groupKey = x;
                         var chartKey = y;
                         return function(d) {
-                            setTooltip(charts, groupKey, chartKey, d[0].timestamp, config);
-                            var data = getDataAtTimestamp(d[0].timestamp, config.dataConverted, groupKey);
-                            config.events.call("tooltipChange", null, {
-                                data: data,
-                                timestamp: d[0].timestamp,
-                                info: d,
-                                config: config
-                            });
+                            if (d[0]) {
+                                setTooltip(charts, groupKey, chartKey, d[0].timestamp, config);
+                                var data = getDataAtTimestamp(d[0].timestamp, config.dataConverted, groupKey);
+                                config.events.call("tooltipChange", null, {
+                                    data: data,
+                                    timestamp: d[0].timestamp,
+                                    info: d,
+                                    config: config
+                                });
+                            }
                         };
                     }()).on("mouseout", function() {
-                        var latestHistoricalTimestamp = new Date(config.dataConverted.historical.wind.data.slice(-1)[0].timestamp);
+                        var latestHistoricalTimestamp = new Date(config.dataConverted ? config.dataConverted.historical.wind.data.slice(-1)[0].timestamp : Date.now());
                         setTooltip(charts, "historical", null, latestHistoricalTimestamp, config);
                         config.events.call("mouseout", null, {});
                         var data = getDataAtTimestamp(latestHistoricalTimestamp, config.dataConverted, "historical");
@@ -3601,55 +3623,53 @@
         };
         var chart = dh.utils.pipeline(template, defaultConfig, data, charts);
         /**
-     * A weather chart built on top of datahub.timeseries.
-     * @namespace weatherChart
-     * @name weatherChart
-     * @param {object} config The initial configuration can be passed on init or later using weatherChart.setConfig.
-     * @param {object} config.parent The parent DOM element.
-     * @param {object} config.data Data can be passed on init or later using weatherChart.setData.
-     * @param {number} [config.width=parent.innerWidth] External width of the chart.
-     * @param {number} [config.height=parent.innerHeight] External height of the chart.
-     * @param {number} [config.historicalXTicks=d3.utcHour.every(12)] Target historical x tick count, as passed to d3.axis.ticks.
-     * @param {string} [config.historicalXFormat='%H:%M'] Historical x tick format, as passed to d3.axis.tickFormat.
-     * @param {number} [config.forecastXTicks=d3.utcHour.every(12)] Target forecast x tick count, as passed to d3.axis.ticks.
-     * @param {string} [config.forecastXFormat='%H:%M'] Forecast x tick format, as passed to d3.axis.tickFormat.
-     * @param {number} [config.historicalArrowSkip=3] Only keeping 1 historical arrow out of n.
-     * @param {number} [config.forecastArrowSkip=6] Only keeping 1 forecast arrow out of n.
-     * @returns {object} A weatherChart instance.
-     * @example
-     * var data = datahub.data.generateWeatherChartData()
-     * var chart = datahub.weatherChart({
-     *     parent: document.querySelector('.weather-chart'),
-     *     data: data
-     * })
-     * .on('tooltipChange', function(e){ console.log(e) })
-     * .setData(data)
-     */
-        var weatherChart = function(config) {
+   * A weather chart built on top of datahub.timeseries.
+   * @namespace weatherChart
+   * @name weatherChart
+   * @param {object} config The initial configuration can be passed on init or later using weatherChart.setConfig.
+   * @param {object} config.parent The parent DOM element.
+   * @param {object} config.data Data can be passed on init or later using weatherChart.setData.
+   * @param {number} [config.width=parent.innerWidth] External width of the chart.
+   * @param {number} [config.height=parent.innerHeight] External height of the chart.
+   * @param {number} [config.historicalXTicks=d3.utcHour.every(12)] Target historical x tick count, as passed to d3.axis.ticks.
+   * @param {string} [config.historicalXFormat='%H:%M'] Historical x tick format, as passed to d3.axis.tickFormat.
+   * @param {number} [config.forecastXTicks=d3.utcHour.every(12)] Target forecast x tick count, as passed to d3.axis.ticks.
+   * @param {string} [config.forecastXFormat='%H:%M'] Forecast x tick format, as passed to d3.axis.tickFormat.
+   * @param {number} [config.historicalArrowSkip=3] Only keeping 1 historical arrow out of n.
+   * @param {number} [config.forecastArrowSkip=6] Only keeping 1 forecast arrow out of n.
+   * @returns {object} A weatherChart instance.
+   * @example
+   * var data = datahub.data.generateWeatherChartData()
+   * var chart = datahub.weatherChart({
+   *     parent: document.querySelector('.weather-chart'),
+   *     data: data
+   * })
+   * .on('tooltipChange', function(e){ console.log(e) })
+   * .setData(data)
+   */        var weatherChart = function(config) {
             var configCache, events = d3.dispatch("hover", "tooltipChange", "mouseout"), chartCache, uid = ~~(Math.random() * 1e4);
             var onResize = dh.utils.throttle(function() {
                 configCache.width = configCache.parent.clientWidth;
                 render();
             }, 200);
-            d3.select(window).on("resize." + uid, onResize);
-            var render = function() {
+            // d3.select(window).on('resize.' + uid, onResize)
+                        var render = function() {
                 chartCache = chart(configCache);
             };
             /**
-         * Set the data.
-         * @name setData
-         * @param {object} data A data object.
-         * @returns {object} The weatherChart instance.
-         * @memberof weatherChart
-         * @instance
-         * @example
-         * var data = datahub.data.generateWeatherChartData()
-         * var chart = datahub.weatherChart({
-         *     parent: document.querySelector('.weather-chart')
-         * })
-         * .setData(data)
-         */
-            var setData = function(data) {
+     * Set the data.
+     * @name setData
+     * @param {object} data A data object.
+     * @returns {object} The weatherChart instance.
+     * @memberof weatherChart
+     * @instance
+     * @example
+     * var data = datahub.data.generateWeatherChartData()
+     * var chart = datahub.weatherChart({
+     *     parent: document.querySelector('.weather-chart')
+     * })
+     * .setData(data)
+     */            var setData = function(data) {
                 var d = data ? JSON.parse(JSON.stringify(data)) : {};
                 configCache = dh.utils.mergeAll({}, configCache, {
                     data: d
@@ -3658,21 +3678,20 @@
                 return this;
             };
             /**
-         * Set the config after its instantiation.
-         * @name setConfig
-         * @instance
-         * @param {object} config The same config format as on init.
-         * @returns {object} The weatherChart instance.
-         * @memberof weatherChart
-         * @example
-         * datahub.multiChart({
-         *     parent: document.querySelector('.chart'),
-         * })
-         * .setConfig({
-         *     width: 100
-         * })
-         */
-            var setConfig = function(config) {
+     * Set the config after its instantiation.
+     * @name setConfig
+     * @instance
+     * @param {object} config The same config format as on init.
+     * @returns {object} The weatherChart instance.
+     * @memberof weatherChart
+     * @example
+     * datahub.multiChart({
+     *     parent: document.querySelector('.chart'),
+     * })
+     * .setConfig({
+     *     width: 100
+     * })
+     */            var setConfig = function(config) {
                 configCache = dh.utils.mergeAll(configCache, config);
                 render();
                 return this;
@@ -3683,17 +3702,16 @@
                 }));
             };
             /**
-         * Destroys DOM elements and unbind events.
-         * @name destroy
-         * @memberof weatherChart
-         * @instance
-         * @example
-         * var chart = datahub.weatherChart({
-         *     parent: document.querySelector('.chart'),
-         * })
-         * chart.destroy()
-         */
-            var destroy = function() {
+     * Destroys DOM elements and unbind events.
+     * @name destroy
+     * @memberof weatherChart
+     * @instance
+     * @example
+     * var chart = datahub.weatherChart({
+     *     parent: document.querySelector('.chart'),
+     * })
+     * chart.destroy()
+     */            var destroy = function() {
                 d3.select(window).on("resize." + uid, null);
                 configCache.parent.innerHTML = null;
             };

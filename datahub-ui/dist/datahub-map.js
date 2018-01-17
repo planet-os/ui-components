@@ -917,7 +917,7 @@
                 var mapSize = map.getSize();
                 var mapSizeY = mapSize.y;
                 // when map is smaller than viewport
-                if (map._zoom < mapSize.y / 512) {
+                                if (map._zoom < mapSize.y / 512) {
                     mapSizeY = worldBounds.max.y - worldBounds.min.y;
                 }
                 console.log("Start rendering...");
@@ -969,7 +969,8 @@
                                         colorRGB[2] << 16 | // blue
                                         colorRGB[1] << 8 | // green
                                         colorRGB[0];
-                                    }
+ // red
+                                                                        }
                                 }
                             }
                         }
@@ -1019,7 +1020,7 @@
                 return api;
             };
             return api;
-        };
+        }
         /**
      * An extension of rasterMap for vectors and interactive selection. See {@link #rasterMap}.
      * @namespace selectorMap
@@ -1031,7 +1032,7 @@
      * datahub.map.selectorMap({
      *     parent: document.querySelector('.map')
      * })
-     */
+     */;
         var selectorMap = function(config) {
             var selectionMap = rasterMap(config).init();
             var events = d3.dispatch("mapCloseClick", "rectangleDraw", "rectangleClick", "markerClick", "markerDraw", "geojsonClick");
@@ -1109,8 +1110,7 @@
          * @name removeAllPolygons
          * @memberof selectorMap
          * @instance
-         */
-            function removeAllPolygons() {
+         */            function removeAllPolygons() {
                 drawnItems.clearLayers();
                 drawControl._toolbars.draw._modes.rectangle.handler.disable();
                 drawControl._toolbars.draw._modes.marker.handler.disable();
@@ -1152,8 +1152,7 @@
          * @name addRectangle
          * @memberof selectorMap
          * @instance
-         */
-            selectionMap.addRectangle = function(coords) {
+         */            selectionMap.addRectangle = function(coords) {
                 removeAllPolygons();
                 var poly = getFeatureFromCoordinates(coords);
                 addGeojson(poly, function() {
@@ -1161,14 +1160,14 @@
                 });
                 zoomToBoundingBox();
                 return this;
-            };
+            }
             /**
          * Add multiple polygons.
          * @name addPolygons
          * @param {Array.<object>} data An array of geojson.
          * @memberof selectorMap
          * @instance
-         */
+         */;
             selectionMap.addPolygons = function(data) {
                 removeAllPolygons();
                 data.forEach(function(geojson) {
@@ -1180,13 +1179,13 @@
                 });
                 zoomToBoundingBox();
                 return this;
-            };
+            }
             /**
          * Zoom to vectors bbox.
          * @name zoomToBoundingBox
          * @memberof selectorMap
          * @instance
-         */
+         */;
             function zoomToBoundingBox() {
                 if (config.disableAutoZoom) {
                     return this;
@@ -1201,7 +1200,7 @@
             }
             selectionMap.removeAllPolygons = removeAllPolygons;
             selectionMap.zoomToBoundingBox = zoomToBoundingBox;
-            selectionMap.addMarker = addMarker;
+            selectionMap.addMarker = addMarker
             /**
          * Events binder.
          * @function on
@@ -1210,10 +1209,10 @@
          * @param {function} callback The callback for this event
          * @memberof selectorMap
          * @instance
-         */
+         */;
             selectionMap.on = dh.utils.rebind(events);
             return selectionMap;
-        };
+        }
         /**
      * A map with a raster layer.
      * @namespace rasterMap
@@ -1237,7 +1236,7 @@
      *     }
      * })
      * .init()
-     */
+     */;
         var rasterMap = function(_config) {
             var containerNode = L.DomUtil.create("div", "datahub-map");
             var container = _config.parent.appendChild(containerNode);
@@ -1269,7 +1268,7 @@
             var states = {
                 isVisible: true
             };
-            var map, gridLayer, geojsonLayer, tooltipLayer, marker, gridData, cachedBBoxPolygon;
+            var map, gridLayer, geojsonLayer, tooltipLayer, marker, gridData, cachedBBoxPolygon
             /**
          * Initialize the map.
          * @name init
@@ -1280,7 +1279,7 @@
          *     parent: document.querySelector('.map')
          * })
          * .init()
-         */
+         */;
             function init() {
                 L.Icon.Default.imagePath = config.imagePath;
                 map = L.map(config.container, mapConfig).on("click", function(e) {
@@ -1297,7 +1296,7 @@
                         var latIndex = dh.utils.bisectionReversed(gridData.lat, e.latlng.lat);
                         var lonIndex = dh.utils.bisection(gridData.lon, e.latlng.lng);
                         // take into account that rectangles are centered around raster point
-                        var previousLatIndex = Math.max(latIndex - 1, 0);
+                                                var previousLatIndex = Math.max(latIndex - 1, 0);
                         var deltaLat = gridData.lat[previousLatIndex] - gridData.lat[latIndex];
                         if (e.latlng.lat > gridData.lat[latIndex] + deltaLat / 2) {
                             latIndex = previousLatIndex;
@@ -1308,7 +1307,7 @@
                             lonIndex = previousLonIndex;
                         }
                         // check if lat-lon are in data bounds
-                        var value = null;
+                                                var value = null;
                         if (e.latlng.lat <= gridData.lat[0] && e.latlng.lat >= gridData.lat[gridData.lat.length - 1] && e.latlng.lng >= gridData.lon[0] && e.latlng.lng <= gridData.lon[gridData.lon.length - 1]) {
                             value = gridData.values[latIndex][lonIndex];
                         }
@@ -1372,8 +1371,7 @@
          * .init()
          * .renderImage('https://upload.wikimedia.org/wikipedia/commons/a/af/Tux.png',
          *      {bbox: {latMin: 0, latMax: 10, lonMin: 0, lonMax: 10}})
-         */
-            function renderImage(image, metadata) {
+         */            function renderImage(image, metadata) {
                 var bbox = metadata.bbox;
                 var imageBounds = [ [ bbox.latMax, bbox.lonMin ], [ bbox.latMin, bbox.lonMax ] ];
                 L.imageOverlay(image, imageBounds).addTo(map);
@@ -1390,8 +1388,7 @@
          * })
          * .init()
          * .show()
-         */
-            function show() {
+         */            function show() {
                 config.container.style.display = "block";
                 states.isVisible = true;
                 return this;
@@ -1407,8 +1404,7 @@
          * })
          * .init()
          * .hide()
-         */
-            function hide() {
+         */            function hide() {
                 config.container.style.display = "none";
                 states.isVisible = false;
                 return this;
@@ -1424,8 +1420,7 @@
          * })
          * .init()
          * .resize()
-         */
-            function resize() {
+         */            function resize() {
                 map.invalidateSize();
                 if (cachedBBoxPolygon) {
                     zoomToPolygonBoundingBox(cachedBBoxPolygon);
@@ -1440,8 +1435,7 @@
          * @param {object} polygon A valid geojson.
          * @memberof rasterMap
          * @instance
-         */
-            function zoomToPolygonBoundingBox(polygon) {
+         */            function zoomToPolygonBoundingBox(polygon) {
                 var bboxGeojsonLayer = L.geoJson(polygon);
                 map.fitBounds(bboxGeojsonLayer.getBounds());
                 cachedBBoxPolygon = polygon;
@@ -1453,8 +1447,7 @@
          * @param {object} polygon A valid geojson.
          * @memberof rasterMap
          * @instance
-         */
-            function renderPolygon(polygon) {
+         */            function renderPolygon(polygon) {
                 var onEachFeature = function(feature, layer) {
                     layer.on({
                         click: function(e) {
@@ -1509,8 +1502,7 @@
          * @param {object} coordinates Marker coordinates.
          * @memberof rasterMap
          * @instance
-         */
-            function addMarker(coordinates) {
+         */            function addMarker(coordinates) {
                 removeMarker();
                 marker = L.marker(coordinates, {
                     interactive: true,
@@ -1526,8 +1518,7 @@
          * @name addMarker
          * @memberof rasterMap
          * @instance
-         */
-            function removeMarker() {
+         */            function removeMarker() {
                 if (marker) {
                     marker.remove();
                 }
@@ -1539,8 +1530,7 @@
          * @param {object} data The grid data.
          * @memberof rasterMap
          * @instance
-         */
-            function renderRaster(data) {
+         */            function renderRaster(data) {
                 gridData = data;
                 var dataSorted = data.uniqueValues.sort(function(a, b) {
                     return a - b;
@@ -1555,8 +1545,7 @@
          * @param {boolean=true} showIt Show the controls or not.
          * @memberof rasterMap
          * @instance
-         */
-            function hideZoomControl(showIt) {
+         */            function hideZoomControl(showIt) {
                 if (showIt) {
                     map.addControl(map.zoomControl);
                     map.doubleClickZoom.enable();
@@ -1575,8 +1564,7 @@
          * @name renderVectorMap
          * @memberof rasterMap
          * @instance
-         */
-            function renderVectorMap() {
+         */            function renderVectorMap() {
                 datahub.data.getWorldVector(function(geojson) {
                     renderPolygon(geojson);
                 });
@@ -1598,8 +1586,7 @@
          * .on('markerClick', function(e) {
          *     console.log(e)
          * })
-         */
-            return {
+         */            return {
                 init: init,
                 show: show,
                 hide: hide,

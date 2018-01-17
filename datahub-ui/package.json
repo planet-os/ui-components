@@ -40,7 +40,9 @@
     "d3-scale-chromatic": "^1.1.0"
   },
   "devDependencies": {
-    "npm-watch": "^0.1.8"
+    "documentation": "^5.3.5",
+    "npm-watch": "^0.1.8",
+    "uglify-js": "^3.3.5"
   },
   "watch": {
     "build": "src/*.js",
