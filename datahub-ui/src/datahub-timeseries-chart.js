@@ -520,14 +520,13 @@
   };
 
   function setTooltip(config, d) {
-    var x = config.margin.left;
-    var firstDataset = config.dataConverted[0].data;
-    var lastTimestamp = firstDataset[firstDataset.length - 1].timestamp;
-    if (d[0].timestamp === lastTimestamp && d[1]) {
-      x += d[1].posX;
-    } else {
-      x += d[0].posX;
+    config.datasetIndex = getDatasetIndex();
+    function getDatasetIndex() {
+      var firstDataset = config.dataConverted[0].data;
+      var lastTimestamp = firstDataset[firstDataset.length - 1].timestamp;
+      return d[0].timestamp === lastTimestamp && d[1] ? 1 : 0;
     }
+    var x = config.margin.left + d[config.datasetIndex].posX;
     config.container
       .select(".tooltip line")
       .attr("y1", 0)
@@ -671,7 +670,7 @@
     var title = titleContainer.select("text");
 
     config.events.on("hover.title", function(d) {
-      var timestamp = d[0].timestamp;
+      var timestamp = d[config.datasetIndex].timestamp;
 
       titleContainer.attr(
         "transform",
