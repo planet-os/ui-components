@@ -76,7 +76,13 @@
       chartType: config.chartType || "line"
     };
   };
-
+  var normalizeTime = function(d) {
+    d = typeof d === "object" ? d.toString() : d;
+    var i = d.indexOf("+");
+    if (!i) return d;
+    var offset = d.slice(i);
+    return d.slice(0, i) + offset.slice(0, 3) + ":" + offset.slice(3);
+  };
   var data = function(config) {
     var dataConverted = config.data || [];
 
@@ -84,7 +90,7 @@
     var timestamps = [];
     dataConverted.forEach(function(d) {
       d.data.forEach(function(dB, iB, arr) {
-        arr[iB].timestamp = new Date(dB.timestamp);
+        arr[iB].timestamp = new Date(normalizeTime(dB.timestamp));
         values.push(dB.value);
         timestamps.push(arr[iB].timestamp);
       });
