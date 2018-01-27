@@ -1,35 +1,42 @@
 {
   "name": "datahub-ui",
-  "version": "0.8.21",
+  "version": "0.8.22",
   "description": "Reusable components for Planet OS Datahub",
   "main": "index.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/planet-os/ui-components.git"
   },
-  "keywords": [
-    "map",
-    "leaflet"
-  ],
+  "keywords": ["map", "leaflet"],
   "author": "Christophe Viau",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/planet-os/ui-components/issues"
   },
-  "src": "src/start.js src/*utils.js src/*common.js src/*data.js src/*widget.js src/*legend.js src/*palette.js src/*map.js src/*chart.js src/end.js",
-  "srcChart": "src/start-chart.js src/*utils.js src/*common.js src/*data.js src/*widget.js src/*chart.js src/end.js",
-  "srcMap": "src/start.js src/*utils.js src/*data.js src/*palette.js src/*legend.js src/*map.js src/end.js",
+  "src":
+    "src/start.js src/*utils.js src/*common.js src/*data.js src/*widget.js src/*legend.js src/*palette.js src/*map.js src/*chart.js src/end.js",
+  "srcChart":
+    "src/start-chart.js src/*utils.js src/*common.js src/*data.js src/*widget.js src/*chart.js src/end.js",
+  "srcMap":
+    "src/start.js src/*utils.js src/*data.js src/*palette.js src/*legend.js src/*map.js src/end.js",
   "scripts": {
-    "build": "uglifyjs $npm_package_src -b --comments all --wrap datahub -o dist/datahub.js",
-    "build-min": "uglifyjs $npm_package_src -c -m --wrap datahub -o dist/datahub-min.js",
-    "build-chart": "uglifyjs $npm_package_srcChart -b --comments all --wrap datahub -o dist/datahub-chart.js",
-    "build-chart-min": "uglifyjs $npm_package_srcChart -c -m --wrap datahub -o dist/datahub-chart-min.js",
-    "build-map": "uglifyjs $npm_package_srcMap -b --comments all --wrap datahub -o dist/datahub-map.js",
-    "build-map-min": "uglifyjs $npm_package_srcMap -c -m --wrap datahub -o dist/datahub-map-min.js",
+    "build":
+      "uglifyjs $npm_package_src -b --comments all --wrap datahub -o dist/datahub.js",
+    "build-min":
+      "uglifyjs $npm_package_src -c -m --wrap datahub -o dist/datahub-min.js",
+    "build-chart":
+      "uglifyjs $npm_package_srcChart -b --comments all --wrap datahub -o dist/datahub-chart.js",
+    "build-chart-min":
+      "uglifyjs $npm_package_srcChart -c -m --wrap datahub -o dist/datahub-chart-min.js",
+    "build-map":
+      "uglifyjs $npm_package_srcMap -b --comments all --wrap datahub -o dist/datahub-map.js",
+    "build-map-min":
+      "uglifyjs $npm_package_srcMap -c -m --wrap datahub -o dist/datahub-map-min.js",
     "build-doc-watch": "documentation serve -w true dist/datahub.js",
     "build-doc-html": "documentation build -f \"html\" dist/datahub.js -o doc",
     "build-watch": "npm-watch",
-    "build-all": "npm run build; npm run build-min; npm run build-chart; npm run build-chart-min; npm run build-map; npm run build-map-min; npm run build-doc-html"
+    "build-all":
+      "npm run build; npm run build-min; npm run build-chart; npm run build-chart-min; npm run build-map; npm run build-map-min; npm run build-doc-html"
   },
   "homepage": "https://github.com/planet-os/ui-components#readme",
   "dependencies": {
