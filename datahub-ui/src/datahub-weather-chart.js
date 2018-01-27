@@ -260,7 +260,8 @@
       for (var y in charts[x]) {
         charts[x][y] = datahub
           .timeseries({
-            parent: config.container.select("." + y + " ." + x).node()
+            parent: config.container.select("." + y + " ." + x).node(),
+            resizeOff: config.resizeOff || false
           })
           .setConfig(config.chartConfig[x][y])
           .on(
@@ -370,6 +371,7 @@
    * @param {string} [config.forecastXFormat='%H:%M'] Forecast x tick format, as passed to d3.axis.tickFormat.
    * @param {number} [config.historicalArrowSkip=3] Only keeping 1 historical arrow out of n.
    * @param {number} [config.forecastArrowSkip=6] Only keeping 1 forecast arrow out of n.
+   * @param {boolean} config.resizeOff Turn off auto resize.
    * @returns {object} A weatherChart instance.
    * @example
    * var data = datahub.data.generateWeatherChartData()
@@ -390,8 +392,9 @@
       configCache.width = configCache.parent.clientWidth;
       render();
     }, 200);
-
-    // d3.select(window).on('resize.' + uid, onResize)
+    if (!config.resizeOff) {
+      d3.select(window).on("resize." + uid, onResize);
+    }
 
     var render = function() {
       chartCache = chart(configCache);

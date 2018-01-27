@@ -2873,36 +2873,35 @@
         // chart.axesFormatAutoconfig,
         dh.common.axisX, dh.common.axisY, stripes, active, areaShapes, referenceBarShapes, stackedBarShapes, stackedAreaShapes, barShapes, estimateBarShapes, lineShapes, dotShapes, thresholdLineShape, dh.common.axisComponentY, dh.common.labelsRewriterY, dh.common.message, dh.common.axisComponentX, dh.common.axisTitleComponentX, 
         // dh.common.axisXFormatterRotate30,
-        dh.common.axisTitleComponentY, dh.common.chartTitleComponent)
+        dh.common.axisTitleComponentY, dh.common.chartTitleComponent);
         /**
-     * A configurable line/bar/area chart.
-     * @namespace multiChart
-     * @name multiChart
-     * @param {object} config The initial configuration can be passed on init or later using multiChart.setConfig.
-     * @param {object} config.parent The parent DOM element.
-     * @param {object} [config.data] Data can be passed on init or later using multichart.setData.
-     * @param {number} [config.width=parent.innerWidth] External width of the chart.
-     * @param {number} [config.height=parent.innerHeight] External height of the chart.
-     * @param {object} [config.margin={top:50, right:50, bottom:100, left:50}] Margins around the chart panel.
-     * @param {string} [config.axisXFormat='%b'] Label x labels format, as passed to d3.utcFormat.
-     * @param {string} [config.axisTitleX] X axis title.
-     * @param {string} [config.axisTitleY] Y axis title.
-     * @param {string} [config.chartTitle] Chart title.
-     * @param {boolean} [config.reverseY] Reverse the Y axis so higher values are on the bottom.
-     * @param {boolean} [config.autoScaleY] Auto range the scale from y data instead of clamping min to zero or negative.
-     * @param {Array.<number>} [config.domain] [min, max] domain of the y scale, defaults to data extent.
-     * @param {function} [config.labelsRewriterY] Y axis label rewriting function. Receives (label, index) and has to return a string or a DOM string.
-     * @returns {object} A multichart instance.
-     * @example
-     * datahub.multiChart({
-     *     parent: document.querySelector('.chart'),
-     *     data: {
-     *         timestamp: datahub.data.generateTimestamps(),
-     *         barData: datahub.data.generateTimeSeries()
-     *     }
-     * })
-     */;
-        var multiChart = function(config) {
+   * A configurable line/bar/area chart.
+   * @namespace multiChart
+   * @name multiChart
+   * @param {object} config The initial configuration can be passed on init or later using multiChart.setConfig.
+   * @param {object} config.parent The parent DOM element.
+   * @param {object} [config.data] Data can be passed on init or later using multichart.setData.
+   * @param {number} [config.width=parent.innerWidth] External width of the chart.
+   * @param {number} [config.height=parent.innerHeight] External height of the chart.
+   * @param {object} [config.margin={top:50, right:50, bottom:100, left:50}] Margins around the chart panel.
+   * @param {string} [config.axisXFormat='%b'] Label x labels format, as passed to d3.utcFormat.
+   * @param {string} [config.axisTitleX] X axis title.
+   * @param {string} [config.axisTitleY] Y axis title.
+   * @param {string} [config.chartTitle] Chart title.
+   * @param {boolean} [config.reverseY] Reverse the Y axis so higher values are on the bottom.
+   * @param {boolean} [config.autoScaleY] Auto range the scale from y data instead of clamping min to zero or negative.
+   * @param {Array.<number>} [config.domain] [min, max] domain of the y scale, defaults to data extent.
+   * @param {function} [config.labelsRewriterY] Y axis label rewriting function. Receives (label, index) and has to return a string or a DOM string.
+   * @returns {object} A multichart instance.
+   * @example
+   * datahub.multiChart({
+   *     parent: document.querySelector('.chart'),
+   *     data: {
+   *         timestamp: datahub.data.generateTimestamps(),
+   *         barData: datahub.data.generateTimeSeries()
+   *     }
+   * })
+   */        var multiChart = function(config) {
             var configCache, events = d3.dispatch("hover", "click", "mouseout", "active"), chartCache, uid = ~~(Math.random() * 1e4);
             var onResize = dh.utils.throttle(function() {
                 configCache.width = configCache.parent.clientWidth;
@@ -2911,46 +2910,44 @@
             d3.select(window).on("resize." + uid, onResize);
             var render = function() {
                 chartCache = multi(configCache);
-            }
+            };
             /**
-         * Set the data.
-         * @name setData
-         * @param {object} data A data object.
-         * @returns {object} The multiChart instance.
-         * @memberof multiChart
-         * @instance
-         * @example
-         * datahub.multiChart({
-         *     parent: document.querySelector('.chart'),
-         * })
-         * .setData({
-         *     timestamp: datahub.data.generateTimestamps(),
-         *     barData: datahub.data.generateTimeSeries()
-         * })
-         */;
-            var setData = function(data) {
+     * Set the data.
+     * @name setData
+     * @param {object} data A data object.
+     * @returns {object} The multiChart instance.
+     * @memberof multiChart
+     * @instance
+     * @example
+     * datahub.multiChart({
+     *     parent: document.querySelector('.chart'),
+     * })
+     * .setData({
+     *     timestamp: datahub.data.generateTimestamps(),
+     *     barData: datahub.data.generateTimeSeries()
+     * })
+     */            var setData = function(data) {
                 var d = data ? JSON.parse(JSON.stringify(data)) : {};
                 configCache = dh.utils.mergeAll({}, configCache);
                 configCache.data = d;
                 render();
                 return this;
-            }
+            };
             /**
-         * Set the config after its instantiation.
-         * @name setConfig
-         * @param {object} config The same config format as on init.
-         * @returns {object} The multiChart instance.
-         * @memberof multiChart
-         * @instance
-         * @example
-         * datahub.multiChart({
-         *     parent: document.querySelector('.chart'),
-         * })
-         * .setConfig({
-         *     width: 100
-         * })
-         */;
-            var setConfig = function(config) {
+     * Set the config after its instantiation.
+     * @name setConfig
+     * @param {object} config The same config format as on init.
+     * @returns {object} The multiChart instance.
+     * @memberof multiChart
+     * @instance
+     * @example
+     * datahub.multiChart({
+     *     parent: document.querySelector('.chart'),
+     * })
+     * .setConfig({
+     *     width: 100
+     * })
+     */            var setConfig = function(config) {
                 configCache = dh.utils.mergeAll(configCache, config);
                 render();
                 return this;
@@ -2959,39 +2956,37 @@
                 setConfig(dh.utils.mergeAll(config, {
                     events: events
                 }));
-            }
+            };
             /**
-         * Destroys DOM elements and unbind events.
-         * @name destroy
-         * @memberof multiChart
-         * @instance
-         * @example
-         * var chart = datahub.multiChart({
-         *     parent: document.querySelector('.chart'),
-         * })
-         * chart.destroy()
-         */;
-            var destroy = function() {
+     * Destroys DOM elements and unbind events.
+     * @name destroy
+     * @memberof multiChart
+     * @instance
+     * @example
+     * var chart = datahub.multiChart({
+     *     parent: document.querySelector('.chart'),
+     * })
+     * chart.destroy()
+     */            var destroy = function() {
                 d3.select(window).on("resize." + uid, null);
                 configCache.parent.innerHTML = null;
             };
-            init(config, events)
+            init(config, events);
             /**
-         * Events binder.
-         * @function on
-         * @param {string} eventName The name of the event: 'hover', 'click', 'mouseout', 'active'
-         * @param {function} callback The callback for this event
-         * @memberof multiChart
-         * @instance
-         * @example
-         * datahub.multiChart({
-         *     parent: document.querySelector('.chart'),
-         * })
-         * .on('hover', function(e) {
-         *     console.log(e.index, e.timestamp, e.data, e.config, e.event)
-         * })
-         */;
-            return {
+     * Events binder.
+     * @function on
+     * @param {string} eventName The name of the event: 'hover', 'click', 'mouseout', 'active'
+     * @param {function} callback The callback for this event
+     * @memberof multiChart
+     * @instance
+     * @example
+     * datahub.multiChart({
+     *     parent: document.querySelector('.chart'),
+     * })
+     * .on('hover', function(e) {
+     *     console.log(e.index, e.timestamp, e.data, e.config, e.event)
+     * })
+     */            return {
                 on: dh.utils.rebind(events),
                 setConfig: setConfig,
                 setData: setData,
@@ -3333,13 +3328,20 @@
                 chartType: config.chartType || "line"
             };
         };
+        var normalizeTime = function(d) {
+            d = typeof d === "object" ? d.toString() : d;
+            var i = d.indexOf("+");
+            if (i === -1) return d;
+            var offset = d.slice(i);
+            return d.slice(0, i) + offset.slice(0, 3) + ":" + offset.slice(3);
+        };
         var data = function(config) {
             var dataConverted = config.data || [];
             var values = [];
             var timestamps = [];
             dataConverted.forEach(function(d) {
                 d.data.forEach(function(dB, iB, arr) {
-                    arr[iB].timestamp = new Date(dB.timestamp);
+                    arr[iB].timestamp = new Date(normalizeTime(dB.timestamp));
                     values.push(dB.value);
                     timestamps.push(arr[iB].timestamp);
                 });
@@ -3738,6 +3740,7 @@
    * @param {number} [config.stepRange=3] Only for type:step, band range above and below the line.
    * @param {boolean} [config.axisOnly=false] A minimal version of the chart only showing the x axis.
    * @param {number} [config.arrowSkip=3] Only for type:arrow, keeping 1 arrow out of n.
+   * @param {boolean} config.resizeOff Turn off auto resize.
    * @returns {object} A timeseries instance.
    * @example
    * datahub.timeseries({
@@ -3751,8 +3754,10 @@
                 configCache.width = configCache.parent.clientWidth;
                 render();
             }, 200);
-            // d3.select(window).on('resize.' + uid, onResize)
-                        var render = function() {
+            if (!config.resizeOff) {
+                d3.select(window).on("resize." + uid, onResize);
+            }
+            var render = function() {
                 chartCache = lineChart(configCache);
             };
             /**
@@ -4171,34 +4176,35 @@
             values.exit().remove();
             return {};
         };
-        var multi = dh.utils.pipeline(template, scaleX, scaleY, bars, connectors, number)
+        var multi = dh.utils.pipeline(template, scaleX, scaleY, bars, connectors, number);
         /**
-     * A waterfall chart designed for a specific use case.
-     * @namespace waterfallChart
-     * @name waterfallChart
-     * @param {object} config The initial configuration can be passed on init or later using waterfallChart.setConfig.
-     * @param {object} config.parent The parent DOM element.
-     * @param {Array.<object>} config.elements Data in the form {key, label, value}.
-     * @returns {object} A waterfallChart instance.
-     * @example
-     * var waterfall = datahub.waterfallChart({
-     *     parent: document.querySelector('.waterfall-chart')
-     *     elements:[
-     *         {key: 'initial', label: 'Initial', value: 53},
-     *         {key: 'closed', label: 'Closed', value: -30},
-     *         {key: 'open', label: 'Open', value: 23},
-     *         {key: 'new', label: 'New', value: 15},
-     *         {key: 'total', label: 'Total', value: 38}
-     *     ]
-     * })
-     */;
-        var waterfallChart = function(config) {
+   * A waterfall chart designed for a specific use case.
+   * @namespace waterfallChart
+   * @name waterfallChart
+   * @param {object} config The initial configuration can be passed on init or later using waterfallChart.setConfig.
+   * @param {object} config.parent The parent DOM element.
+   * @param {Array.<object>} config.elements Data in the form {key, label, value}.
+   * @returns {object} A waterfallChart instance.
+   * @example
+   * var waterfall = datahub.waterfallChart({
+   *     parent: document.querySelector('.waterfall-chart')
+   *     elements:[
+   *         {key: 'initial', label: 'Initial', value: 53},
+   *         {key: 'closed', label: 'Closed', value: -30},
+   *         {key: 'open', label: 'Open', value: 23},
+   *         {key: 'new', label: 'New', value: 15},
+   *         {key: 'total', label: 'Total', value: 38}
+   *     ]
+   * })
+   */        var waterfallChart = function(config) {
             var configCache, events = d3.dispatch("barHover"), chartCache, uid = ~~(Math.random() * 1e4);
             var onResize = dh.utils.throttle(function() {
                 configCache.width = configCache.parent.clientWidth;
                 render();
             }, 200);
-            d3.select(window).on("resize." + uid, onResize);
+            if (!config.resizeOff) {
+                d3.select(window).on("resize." + uid, onResize);
+            }
             var render = function() {
                 chartCache = multi(configCache);
             };
@@ -4209,29 +4215,28 @@
                 });
                 render();
                 return this;
-            }
+            };
             /**
-         * Set the config after its instantiation.
-         * @name setConfig
-         * @param {object} config The same config format as on init.
-         * @returns {object} The waterfallChart instance.
-         * @memberof waterfallChart
-         * @instance
-         * @example
-         * datahub.waterfallChart({
-         *     parent: document.querySelector('.waterfall-chart')
-         * })
-         * .setConfig({
-         *     elements:[
-         *         {key: 'initial', label: 'Initial', value: 53},
-         *         {key: 'closed', label: 'Closed', value: -30},
-         *         {key: 'open', label: 'Open', value: 23},
-         *         {key: 'new', label: 'New', value: 15},
-         *         {key: 'total', label: 'Total', value: 38}
-         *     ]
-         * })
-         */;
-            var setConfig = function(config) {
+     * Set the config after its instantiation.
+     * @name setConfig
+     * @param {object} config The same config format as on init.
+     * @returns {object} The waterfallChart instance.
+     * @memberof waterfallChart
+     * @instance
+     * @example
+     * datahub.waterfallChart({
+     *     parent: document.querySelector('.waterfall-chart')
+     * })
+     * .setConfig({
+     *     elements:[
+     *         {key: 'initial', label: 'Initial', value: 53},
+     *         {key: 'closed', label: 'Closed', value: -30},
+     *         {key: 'open', label: 'Open', value: 23},
+     *         {key: 'new', label: 'New', value: 15},
+     *         {key: 'total', label: 'Total', value: 38}
+     *     ]
+     * })
+     */            var setConfig = function(config) {
                 configCache = dh.utils.mergeAll(configCache, config);
                 render();
                 return this;
@@ -4240,19 +4245,18 @@
                 setConfig(dh.utils.mergeAll(config, {
                     events: events
                 }));
-            }
+            };
             /**
-         * Destroys DOM elements and unbind events.
-         * @name destroy
-         * @memberof waterfallChart
-         * @instance
-         * @example
-         * var chart = datahub.waterfallChart({
-         *     parent: document.querySelector('.chart'),
-         * })
-         * chart.destroy()
-         */;
-            var destroy = function() {
+     * Destroys DOM elements and unbind events.
+     * @name destroy
+     * @memberof waterfallChart
+     * @instance
+     * @example
+     * var chart = datahub.waterfallChart({
+     *     parent: document.querySelector('.chart'),
+     * })
+     * chart.destroy()
+     */            var destroy = function() {
                 d3.select(window).on("resize." + uid, null);
                 configCache.parent.innerHTML = null;
             };
@@ -4486,7 +4490,8 @@
             for (var x in charts) {
                 for (var y in charts[x]) {
                     charts[x][y] = datahub.timeseries({
-                        parent: config.container.select("." + y + " ." + x).node()
+                        parent: config.container.select("." + y + " ." + x).node(),
+                        resizeOff: config.resizeOff || false
                     }).setConfig(config.chartConfig[x][y]).on("hover", function() {
                         var groupKey = x;
                         var chartKey = y;
@@ -4553,6 +4558,7 @@
    * @param {string} [config.forecastXFormat='%H:%M'] Forecast x tick format, as passed to d3.axis.tickFormat.
    * @param {number} [config.historicalArrowSkip=3] Only keeping 1 historical arrow out of n.
    * @param {number} [config.forecastArrowSkip=6] Only keeping 1 forecast arrow out of n.
+   * @param {boolean} config.resizeOff Turn off auto resize.
    * @returns {object} A weatherChart instance.
    * @example
    * var data = datahub.data.generateWeatherChartData()
@@ -4568,8 +4574,10 @@
                 configCache.width = configCache.parent.clientWidth;
                 render();
             }, 200);
-            // d3.select(window).on('resize.' + uid, onResize)
-                        var render = function() {
+            if (!config.resizeOff) {
+                d3.select(window).on("resize." + uid, onResize);
+            }
+            var render = function() {
                 chartCache = chart(configCache);
             };
             /**

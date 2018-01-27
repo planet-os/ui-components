@@ -79,7 +79,7 @@
   var normalizeTime = function(d) {
     d = typeof d === "object" ? d.toString() : d;
     var i = d.indexOf("+");
-    if (!i) return d;
+    if (i === -1) return d;
     var offset = d.slice(i);
     return d.slice(0, i) + offset.slice(0, 3) + ":" + offset.slice(3);
   };
@@ -770,6 +770,7 @@
    * @param {number} [config.stepRange=3] Only for type:step, band range above and below the line.
    * @param {boolean} [config.axisOnly=false] A minimal version of the chart only showing the x axis.
    * @param {number} [config.arrowSkip=3] Only for type:arrow, keeping 1 arrow out of n.
+   * @param {boolean} config.resizeOff Turn off auto resize.
    * @returns {object} A timeseries instance.
    * @example
    * datahub.timeseries({
@@ -789,7 +790,9 @@
       render();
     }, 200);
 
-    // d3.select(window).on('resize.' + uid, onResize)
+    if (!config.resizeOff) {
+      d3.select(window).on("resize." + uid, onResize);
+    }
 
     var render = function() {
       chartCache = lineChart(configCache);

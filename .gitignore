@@ -1,3 +1,4 @@
 *node_modules
 datahub-ui/example/browserify-example/bundle.js
 *.log
+.DS_Store
