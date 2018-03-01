@@ -2687,11 +2687,11 @@
                 eventPanel: eventPanel
             };
         };
-        function setTooltip(config, d) {
+        function setTooltip(config, d, hover) {
             if (!config.dataConverted[0].data.length) {
                 return config.datasetIndex = 0;
             }
-            config.datasetIndex = getDatasetIndex();
+            config.datasetIndex = hover ? getDatasetIndex() : 0;
             function getDatasetIndex() {
                 var firstDataset = config.dataConverted[0].data;
                 var lastTimestamp = firstDataset[firstDataset.length - 1].timestamp;
@@ -2771,7 +2771,7 @@
                 return {};
             }
             config.events.on("hover.tooltip", function(d) {
-                setTooltip(config, d);
+                setTooltip(config, d, "hover");
             });
         };
         var xAxisTitle = function(config) {
