@@ -1,5 +1,5 @@
-!(function(dh, d3) {
-  var template = function(config) {
+!(function (dh, d3) {
+  var template = function (config) {
     var containerNode = config.parent.querySelector(
       ".datahub-timeseries-chart"
     );
@@ -62,7 +62,7 @@
     };
   };
 
-  var defaultConfig = function(config) {
+  var defaultConfig = function (config) {
     var defaultMargin = {
       top: 0,
       right: 0,
@@ -76,20 +76,20 @@
       chartType: config.chartType || "line"
     };
   };
-  var normalizeTime = function(d) {
+  var normalizeTime = function (d) {
     d = typeof d === "object" ? d.toString() : d;
     var i = d.indexOf("+");
     if (i === -1) return d;
     var offset = d.slice(i);
     return d.slice(0, i) + offset.slice(0, 3) + ":" + offset.slice(3);
   };
-  var data = function(config) {
+  var data = function (config) {
     var dataConverted = config.data || [];
 
     var values = [];
     var timestamps = [];
-    dataConverted.forEach(function(d) {
-      d.data.forEach(function(dB, iB, arr) {
+    dataConverted.forEach(function (d) {
+      d.data.forEach(function (dB, iB, arr) {
         arr[iB].timestamp = new Date(normalizeTime(dB.timestamp));
         values.push(dB.value);
         timestamps.push(arr[iB].timestamp);
@@ -98,7 +98,7 @@
 
     var dataIsAllNulls =
       !!values.length &&
-      !values.filter(function(d) {
+      !values.filter(function (d) {
         return d !== null;
       }).length;
 
@@ -111,7 +111,7 @@
     };
   };
 
-  var scaleX = function(config) {
+  var scaleX = function (config) {
     if (config.dataIsEmpty) {
       return {};
     }
@@ -126,7 +126,7 @@
     };
   };
 
-  var scaleY = function(config) {
+  var scaleY = function (config) {
     if (config.dataIsEmpty) {
       return {};
     }
@@ -159,7 +159,7 @@
     };
   };
 
-  var axisX = function(config) {
+  var axisX = function (config) {
     if (config.dataIsEmpty) {
       return {};
     }
@@ -175,7 +175,7 @@
     };
   };
 
-  var axisY = function(config) {
+  var axisY = function (config) {
     if (config.dataIsEmpty) {
       return {};
     }
@@ -184,7 +184,7 @@
       .axisLeft()
       .scale(config.scaleY)
       .ticks(config.yTicks || 6)
-      .tickFormat(function(d) {
+      .tickFormat(function (d) {
         if (config.axisYFormat) {
           return d3.format(config.axisYFormat)(d);
         } else if (d < 1) {
@@ -200,7 +200,7 @@
     };
   };
 
-  var axisComponentX = function(config) {
+  var axisComponentX = function (config) {
     if (config.dataIsEmpty || config.hide.indexOf("xAxis") > -1) {
       return {};
     }
@@ -213,7 +213,7 @@
     return {};
   };
 
-  var axisComponentY = function(config) {
+  var axisComponentY = function (config) {
     if (
       config.dataIsEmpty ||
       config.hide.indexOf("yAxis") > -1 ||
@@ -227,7 +227,7 @@
     return {};
   };
 
-  var gridX = function(config) {
+  var gridX = function (config) {
     if (
       config.dataIsEmpty ||
       config.hide.indexOf("xGrid") > -1 ||
@@ -244,7 +244,7 @@
     return {};
   };
 
-  var lineShapes = function(config) {
+  var lineShapes = function (config) {
     if (
       config.dataIsEmpty ||
       config.axisOnly ||
@@ -263,28 +263,28 @@
     if (chartType === "area") {
       lineGenerator = d3
         .area()
-        .defined(function(d) {
+        .defined(function (d) {
           return d.value != null;
         })
-        .x(function(d) {
+        .x(function (d) {
           return config.scaleX(d.timestamp);
         })
-        .y0(function(d) {
+        .y0(function (d) {
           return config.scaleY(0);
         })
-        .y1(function(d) {
+        .y1(function (d) {
           return config.scaleY(d.value);
         });
     } else {
       lineGenerator = d3
         .line()
-        .defined(function(d) {
+        .defined(function (d) {
           return d.value != null;
         })
-        .x(function(d) {
+        .x(function (d) {
           return config.scaleX(d.timestamp);
         })
-        .y(function(d) {
+        .y(function (d) {
           return config.scaleY(d.value);
         });
     }
@@ -299,7 +299,7 @@
       .attr("class", "shape-group")
       .merge(shapeGroups)
       .selectAll("path.shape")
-      .data(function(d, i) {
+      .data(function (d, i) {
         d.layer = i;
         return [d];
       });
@@ -307,10 +307,10 @@
       .enter()
       .append("path")
       .merge(shapes)
-      .attr("class", function(d, i, a, b) {
+      .attr("class", function (d, i, a, b) {
         return ["shape", d.metadata.id, "layer" + d.layer, chartType].join(" ");
       })
-      .attr("d", function(d) {
+      .attr("d", function (d) {
         return lineGenerator(d.data);
       });
     shapes.exit().remove();
@@ -319,7 +319,7 @@
     return {};
   };
 
-  var stepShapes = function(config) {
+  var stepShapes = function (config) {
     if (config.dataIsEmpty || config.axisOnly || config.chartType !== "step") {
       config.container
         .select(".step-group")
@@ -333,7 +333,7 @@
 
     var line = [];
     var lineData = config.dataConverted[0].data;
-    lineData.forEach(function(d, i) {
+    lineData.forEach(function (d, i) {
       var prevIdx = Math.max(i - 1, 0);
       line.push([
         config.scaleX(d.timestamp),
@@ -344,7 +344,7 @@
     var areaHigh = [];
     var areaLow = [];
     var areaData = config.dataConverted[0].data;
-    areaData.forEach(function(d, i) {
+    areaData.forEach(function (d, i) {
       var prevIdx = Math.max(i - 1, 0);
       areaHigh.push([
         config.scaleX(d.timestamp),
@@ -368,13 +368,13 @@
 
     var lineGenerator = d3
       .line()
-      .defined(function(d) {
+      .defined(function (d) {
         return d.value != null;
       })
-      .x(function(d) {
+      .x(function (d) {
         return config.scaleX(d.timestamp);
       })
-      .y(function(d) {
+      .y(function (d) {
         return config.scaleY(d.value);
       });
 
@@ -388,7 +388,7 @@
       .attr("class", "step-group")
       .merge(shapeGroups)
       .selectAll("path.shape")
-      .data(function(d, i) {
+      .data(function (d, i) {
         d.layer = i;
         return [d];
       });
@@ -396,10 +396,10 @@
       .enter()
       .append("path")
       .merge(shapes)
-      .attr("class", function(d, i, a, b) {
+      .attr("class", function (d, i, a, b) {
         return ["shape", id, "layer" + d.layer, config.chartType].join(" ");
       })
-      .attr("d", function(d, i) {
+      .attr("d", function (d, i) {
         // return 'M' + d.join() + (d.layer === 1 ? 'Z' : '')
         return "M" + d.join();
       });
@@ -409,7 +409,7 @@
     return {};
   };
 
-  var arrowShapes = function(config) {
+  var arrowShapes = function (config) {
     if (config.dataIsEmpty || config.axisOnly || config.chartType !== "arrow") {
       config.container
         .select(".shapes")
@@ -423,7 +423,7 @@
       .select(".shapes")
       .selectAll("path.arrow")
       .data(
-        config.dataConverted[0].data.filter(function(d, i) {
+        config.dataConverted[0].data.filter(function (d, i) {
           var skip = config.arrowSkip || 3;
           return i % skip === 0;
         })
@@ -432,12 +432,12 @@
     arrows
       .enter()
       .append("path")
-      .attr("class", function(d) {
+      .attr("class", function (d) {
         return "arrow";
       })
       .merge(arrows)
       .attr("d", arrowPath)
-      .attr("transform", function(d) {
+      .attr("transform", function (d) {
         // console.log(d.value)
         return (
           "translate(" +
@@ -453,7 +453,7 @@
     return {};
   };
 
-  var reference = function(config) {
+  var reference = function (config) {
     if (config.dataIsEmpty || typeof config.reference !== "number") {
       config.container.selectAll("path.reference").remove();
       return {};
@@ -481,8 +481,8 @@
   function getHoverInfo(config, timestamp) {
     var dataUnderCursor = [];
     if (config.dataConverted[0].data.length) {
-      config.dataConverted.forEach(function(d, i) {
-        var bisector = d3.bisector(function(dB, x) {
+      config.dataConverted.forEach(function (d, i) {
+        var bisector = d3.bisector(function (dB, x) {
           return dB.timestamp.getTime() - x.getTime();
         }).left;
         var found = bisector(d.data, timestamp);
@@ -502,10 +502,10 @@
     return dataUnderCursor;
   }
 
-  var eventsPanel = function(config) {
+  var eventsPanel = function (config) {
     var eventPanel = config.container
       .select(".events .event-panel")
-      .on("mousemove touchstart", function(d) {
+      .on("mousemove touchstart", function (d) {
         if (config.dataIsEmpty) {
           return;
         }
@@ -515,12 +515,12 @@
 
         config.events.call("hover", null, dataUnderCursor);
       })
-      .on("mouseout", function(d) {
+      .on("mouseout", function (d) {
         hideTooltip(config);
         config.container.selectAll(".axis-title.x text").text(null);
         config.events.call("mouseout", null, {});
       })
-      .on("click", function(d) {
+      .on("click", function (d) {
         config.events.call("click", null, { event: d3.event });
       });
 
@@ -559,6 +559,12 @@
         .select(".tooltip")
         .selectAll("text.tooltip-label")
         .remove();
+
+      config.container
+        .select('.tooltip')
+        .selectAll('.tooltip-rect')
+        .remove();
+
       return;
     }
 
@@ -577,13 +583,13 @@
         .append("circle")
         .merge(circles)
         .attr("display", "block")
-        .attr("class", function(dB, dI) {
+        .attr("class", function (dB, dI) {
           return ["dot", dB.id, "layer" + dI].join(" ");
         })
-        .attr("cx", function(dB) {
+        .attr("cx", function (dB) {
           return dB.posX + config.margin.left;
         })
-        .attr("cy", function(dB) {
+        .attr("cy", function (dB) {
           return dB.posY + config.margin.top;
         })
         .attr("r", 2);
@@ -595,20 +601,31 @@
         .select(".tooltip")
         .selectAll("text.tooltip-label")
         .remove();
+
+      config.container
+        .select('.tooltip')
+        .selectAll('.tooltip-rect')
+        .remove();
     } else {
+      var rects = config.container
+        .select('.tooltip')
+        .selectAll('.tooltip-rect')
+        .data(d);
+
       var labels = config.container
         .select(".tooltip")
         .selectAll("text.tooltip-label")
         .data(d);
+
       labels
         .enter()
         .append("text")
         .merge(labels)
         .attr("display", "block")
-        .attr("class", function(dB, dI) {
+        .attr("class", function (dB, dI) {
           return ["tooltip-label", dB.id, "layer" + dI].join(" ");
         })
-        .attr("transform", function(dB, dI) {
+        .attr("transform", function (dB, dI) {
           var x = dB.posX + config.margin.left;
           var y = dB.posY + config.margin.top;
           if (config.chartType === "arrow") {
@@ -618,12 +635,69 @@
         })
         .attr("dx", -4)
         .attr("text-anchor", "end")
-        .text(function(dB, dI) {
+        .text(function (dB, dI) {
           return config.valueFormatter
             ? config.valueFormatter(dB, dI)
             : dB.value;
         });
+
+      // Assign tooltip text BBox, so rect can get its width and height from it
+      config.container
+        .select('.tooltip')
+        .selectAll('text.tooltip-label')
+        .each(function (item, i) {
+          d[i].bb = this.getBBox(); // get bounding box of text field and store it in texts array
+        });
+
+      // Add tooltip rects
+      var paddingLeftRight = 4;
+      var paddingTopBottom = 2;
+      rects
+        .enter()
+        .insert('rect')
+        .merge(rects)
+        .attr('display', 'block')
+        .attr('width', function (d2) {
+          if (d2.bb.width) {
+            return d2.bb.width + paddingLeftRight;
+          }
+          return 0
+        })
+        .attr('height', function (d2) {
+          if (d2.bb.height) {
+            return d2.bb.height + paddingTopBottom;
+          }
+          return 0
+        })
+
+        .attr('class', function (d2, dI) {
+          return ['tooltip-rect', d2.id, 'layer' + dI].join(' ');
+        })
+        .attr(
+          'style',
+          'fill:black;stroke:#575f6d;stroke-width:1;fill-opacity:0.8;stroke-opacity:0.8'
+        )
+        .attr('transform', function (dB, dI) {
+          var x = dB.posX + config.margin.left - dB.bb.width - paddingLeftRight * 1.5;
+          var y = dB.posY + config.margin.top - dB.bb.height + paddingTopBottom / 1.5;
+          if (config.chartType === 'arrow') {
+            y = 0;
+          }
+          return 'translate(' + [x, y] + ')';
+        })
+        .attr('rx', 2);
+
+      // Make so that text is not overlayed with rect
+      config.container.selectAll('.tooltip *').each(function (item, i) {
+        var firstChild = this.parentNode.firstChild;
+        if (this.localName === 'rect') {
+          this.parentNode.insertBefore(this, firstChild);
+        }
+      });
+
+
       labels.exit().remove();
+      rects.exit().remove();
     }
 
     function removeInactiveLayerinfo() {
@@ -642,9 +716,11 @@
     config.container
       .selectAll(".tooltip .tooltip-label")
       .attr("display", "none");
+
+    config.container.selectAll('.tooltip .tooltip-rect').attr('display', 'none');
   }
 
-  var tooltipComponent = function(config) {
+  var tooltipComponent = function (config) {
     if (typeof config.tooltipTimestamp !== "undefined") {
       if (config.tooltipTimestamp === null) {
         hideTooltip(config);
@@ -674,12 +750,12 @@
       return {};
     }
 
-    config.events.on("hover.tooltip", function(d) {
+    config.events.on("hover.tooltip", function (d) {
       setTooltip(config, d, "hover");
     });
   };
 
-  var xAxisTitle = function(config) {
+  var xAxisTitle = function (config) {
     if (
       config.dataIsEmpty ||
       config.axisOnly ||
@@ -691,7 +767,7 @@
     var titleContainer = config.container.select(".axis-title.x");
     var title = titleContainer.select("text");
 
-    config.events.on("hover.title", function(d) {
+    config.events.on("hover.title", function (d) {
       var timestamp = d[config.datasetIndex].timestamp;
 
       titleContainer.attr(
@@ -708,7 +784,7 @@
     return {};
   };
 
-  var yAxisTitle = function(config) {
+  var yAxisTitle = function (config) {
     if (config.axisOnly || config.hide.indexOf("yTitle") > -1) {
       return {};
     }
@@ -779,13 +855,13 @@
    *     data: datahub.data.generateTimeSeriesSplit()
    * })
    */
-  var timeseries = function(config) {
+  var timeseries = function (config) {
     var configCache,
       events = d3.dispatch("hover", "click", "mouseout", "tooltipChange"),
       chartCache,
       uid = ~~(Math.random() * 10000);
 
-    var onResize = dh.utils.throttle(function() {
+    var onResize = dh.utils.throttle(function () {
       configCache.width = configCache.parent.clientWidth;
       render();
     }, 200);
@@ -794,7 +870,7 @@
       d3.select(window).on("resize." + uid, onResize);
     }
 
-    var render = function() {
+    var render = function () {
       chartCache = lineChart(configCache);
     };
 
@@ -811,7 +887,7 @@
      * })
      * .setData(datahub.data.generateTimeSeriesSplit())
      */
-    var setData = function(data) {
+    var setData = function (data) {
       var d = data ? JSON.parse(JSON.stringify(data)) : {};
       configCache = dh.utils.mergeAll({}, configCache, { data: d });
       render();
@@ -834,13 +910,13 @@
      *     width: 100
      * })
      */
-    var setConfig = function(config) {
+    var setConfig = function (config) {
       configCache = dh.utils.mergeAll({}, configCache, config);
       render();
       return this;
     };
 
-    var init = function(config, events) {
+    var init = function (config, events) {
       setConfig(dh.utils.mergeAll({}, config, { events: events }));
     };
 
@@ -855,7 +931,7 @@
      * })
      * chart.destroy()
      */
-    var destroy = function() {
+    var destroy = function () {
       d3.select(window).on("resize." + uid, null);
       configCache.parent.innerHTML = null;
     };
