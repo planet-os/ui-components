@@ -2701,6 +2701,7 @@
             config.container.select(".tooltip line").attr("y1", 0).attr("y2", config.height).attr("x1", x).attr("x2", x).attr("display", "block");
             if (!d || !d[0] || typeof d[0].value === "undefined" || d[0].value === null || config.hide.indexOf("tooltip") > -1) {
                 config.container.select(".tooltip").selectAll("text.tooltip-label").remove();
+                config.container.select(".tooltip").selectAll(".tooltip-rect").remove();
                 return;
             }
             if (config.hide.indexOf("tooltipDot") > -1) {
@@ -2718,7 +2719,9 @@
             }
             if (config.hide.indexOf("tooltipLabel") > -1) {
                 config.container.select(".tooltip").selectAll("text.tooltip-label").remove();
+                config.container.select(".tooltip").selectAll(".tooltip-rect").remove();
             } else {
+                var rects = config.container.select(".tooltip").selectAll(".tooltip-rect").data(d);
                 var labels = config.container.select(".tooltip").selectAll("text.tooltip-label").data(d);
                 labels.enter().append("text").merge(labels).attr("display", "block").attr("class", function(dB, dI) {
                     return [ "tooltip-label", dB.id, "layer" + dI ].join(" ");
@@ -2732,7 +2735,43 @@
                 }).attr("dx", -4).attr("text-anchor", "end").text(function(dB, dI) {
                     return config.valueFormatter ? config.valueFormatter(dB, dI) : dB.value;
                 });
+                // Assign tooltip text BBox, so rect can get its width and height from it
+                                config.container.select(".tooltip").selectAll("text.tooltip-label").each(function(item, i) {
+                    d[i].bb = this.getBBox();
+ // get bounding box of text field and store it in texts array
+                                });
+                // Add tooltip rects
+                                var paddingLeftRight = 4;
+                var paddingTopBottom = 2;
+                rects.enter().insert("rect").merge(rects).attr("display", "block").attr("width", function(d2) {
+                    if (d2.bb.width) {
+                        return d2.bb.width + paddingLeftRight;
+                    }
+                    return 0;
+                }).attr("height", function(d2) {
+                    if (d2.bb.height) {
+                        return d2.bb.height + paddingTopBottom;
+                    }
+                    return 0;
+                }).attr("class", function(d2, dI) {
+                    return [ "tooltip-rect", d2.id, "layer" + dI ].join(" ");
+                }).attr("style", "fill:black;stroke:#575f6d;stroke-width:1;fill-opacity:0.8;stroke-opacity:0.8").attr("transform", function(dB, dI) {
+                    var x = dB.posX + config.margin.left - dB.bb.width - paddingLeftRight * 1.5;
+                    var y = dB.posY + config.margin.top - dB.bb.height + paddingTopBottom / 1.5;
+                    if (config.chartType === "arrow") {
+                        y = 0;
+                    }
+                    return "translate(" + [ x, y ] + ")";
+                }).attr("rx", 2);
+                // Make so that text is not overlayed with rect
+                                config.container.selectAll(".tooltip *").each(function(item, i) {
+                    var firstChild = this.parentNode.firstChild;
+                    if (this.localName === "rect") {
+                        this.parentNode.insertBefore(this, firstChild);
+                    }
+                });
                 labels.exit().remove();
+                rects.exit().remove();
             }
             function removeInactiveLayerinfo() {
                 var inactive = config.datasetIndex === 1 ? 0 : 1;
@@ -2744,6 +2783,7 @@
             config.container.select(".tooltip line").attr("display", "none");
             config.container.selectAll(".tooltip circle").attr("display", "none");
             config.container.selectAll(".tooltip .tooltip-label").attr("display", "none");
+            config.container.selectAll(".tooltip .tooltip-rect").attr("display", "none");
         }
         var tooltipComponent = function(config) {
             if (typeof config.tooltipTimestamp !== "undefined") {
