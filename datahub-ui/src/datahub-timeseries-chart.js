@@ -10,8 +10,8 @@
         '<div class="chart-group">' +
         "<svg>" +
         '<g class="panel">' +
-        '<g class="shapes"></g>' +
         '<g class="grid x"></g>' +
+        '<g class="shapes"></g>' +
         '<g class="axis x"></g>' +
         '<g class="axis y"></g>' +
         '<g class="axis-title x"><text></text></g>' +
