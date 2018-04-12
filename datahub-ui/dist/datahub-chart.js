@@ -2380,7 +2380,7 @@
         var template = function(config) {
             var containerNode = config.parent.querySelector(".datahub-timeseries-chart");
             if (!containerNode) {
-                var template = '<div class="datahub-timeseries-chart">' + '<div class="number-group"></div>' + '<div class="chart-group">' + "<svg>" + '<g class="panel">' + '<g class="shapes"></g>' + '<g class="grid x"></g>' + '<g class="axis x"></g>' + '<g class="axis y"></g>' + '<g class="axis-title x"><text></text></g>' + '<g class="axis-title y"><text></text></g>' + '<g class="reference"></g>' + "</g>" + '<g class="tooltip"><line></line></g>' + '<g class="message-group"></g>' + '<g class="events"><rect class="event-panel"></rect></g>' + "</svg>" + "</div>" + "</div>";
+                var template = '<div class="datahub-timeseries-chart">' + '<div class="number-group"></div>' + '<div class="chart-group">' + "<svg>" + '<g class="panel">' + '<g class="grid x"></g>' + '<g class="shapes"></g>' + '<g class="axis x"></g>' + '<g class="axis y"></g>' + '<g class="axis-title x"><text></text></g>' + '<g class="axis-title y"><text></text></g>' + '<g class="reference"></g>' + "</g>" + '<g class="tooltip"><line></line></g>' + '<g class="message-group"></g>' + '<g class="events"><rect class="event-panel"></rect></g>' + "</svg>" + "</div>" + "</div>";
                 containerNode = dh.utils.appendHtmlToNode(template, config.parent);
             }
             var container = d3.select(containerNode);
