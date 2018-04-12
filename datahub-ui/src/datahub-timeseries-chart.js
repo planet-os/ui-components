@@ -163,12 +163,18 @@
     if (config.dataIsEmpty) {
       return {};
     }
+    var axisXFormat
+    if (config.axisXFormat instanceof Function) {
+      axisXFormat = config.axisXFormat;
+    } else {
+      axisXFormat = d3.utcFormat(config.axisXFormat || "%H:%M")
+    }
 
     var axisFunc = config.xAxisOnTop ? "axisTop" : "axisBottom";
     var axisX = d3[axisFunc]()
       .scale(config.scaleX)
       .ticks(config.xTicks || null)
-      .tickFormat(d3.utcFormat(config.axisXFormat || "%H:%M"));
+      .tickFormat(axisXFormat);
 
     return {
       axisX: axisX
