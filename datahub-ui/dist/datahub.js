@@ -1972,6 +1972,7 @@
      * @param {object} config.parent The parent DOM element.
      * @param {object} config.colorScale The colorScale to use for raster, one of datahub.palette.
      * @param {string} config.basemapName The name of the basemap: 'basemapDark', 'basemapLight'.
+     * @param {boolean} config.clusterMarkers Should markers be clustered
      * @param {boolean} [config.showLabels=true] Show the map label layer.
      * @param {boolean} [config.showTooltip=true] Show tooltips when hovering raster.
      * @param {function} [config.polygonTooltipFunc] The function to format vector tooltip, has passed to L.geoJson.bindTooltip().
@@ -1994,6 +1995,7 @@
             var config = {
                 container: container,
                 colorScale: _config.colorScale,
+                clusterMarkers: _config.clusterMarkers,
                 basemapName: _config.basemapName || "basemapDark",
                 imagePath: _config.imagePath || "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.2/images/",
                 showLabels: !(_config.showLabels === false),
@@ -2241,9 +2243,18 @@
                             fillOpacity: .4
                         });
                     }
-                }).addTo(map);
+                });
                 if (config.polygonTooltipFunc) {
                     geojsonLayer.bindTooltip(config.polygonTooltipFunc);
+                }
+                if (config.clusterMarkers) {
+                    var markers = L.markerClusterGroup({
+                        chunkedLoading: true
+                    });
+                    markers.addLayer(geojsonLayer);
+                    map.addLayer(markers);
+                } else {
+                    map.addLayer(geojsonLayer);
                 }
                 return this;
             }
