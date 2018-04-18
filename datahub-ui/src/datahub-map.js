@@ -1,5 +1,5 @@
-!(function(dh, d3, L) {
-    var dataGridLayer = function() {
+!(function (dh, d3, L) {
+    var dataGridLayer = function () {
 
         var colorScale = null
         var map = null
@@ -14,7 +14,7 @@
 
         var api = {}
 
-        api.render = function(_data) {
+        api.render = function (_data) {
             var data = _data || dataCache
             dataCache = data
 
@@ -29,7 +29,7 @@
             var mapSizeY = mapSize.y
 
             // when map is smaller than viewport
-            if(map._zoom < mapSize.y/512) {
+            if (map._zoom < mapSize.y / 512) {
                 mapSizeY = worldBounds.max.y - worldBounds.min.y
             }
 
@@ -79,7 +79,7 @@
                         lonIndex = Math.max(j, 0)
                         point = map.latLngToContainerPoint([lat[latIndex], lon[lonIndex]])
 
-                        if(map._zoom < mapSize.y/512) {
+                        if (map._zoom < mapSize.y / 512) {
                             point.y = point.y + pixelOrigin.y - map._getMapPanePos().y
                         }
 
@@ -125,20 +125,20 @@
             return api
         }
 
-        api.setColorScale = function(_colorScale) {
+        api.setColorScale = function (_colorScale) {
             colorScale = _colorScale
             return api
         }
 
-        api.setData = function(data) {
+        api.setData = function (data) {
             api.render(data)
             return api
         }
 
-        api.addTo = function(_map) {
+        api.addTo = function (_map) {
             map = _map
 
-            map.on('moveend', function(d) {
+            map.on('moveend', function (d) {
                 // hack for removing antialisaing on img
                 var imgNode = d.target._panes.overlayPane.querySelector('img')
                 if (imgNode) {
@@ -181,12 +181,12 @@
      *     parent: document.querySelector('.map')
      * })
      */
-    var selectorMap = function(config) {
+    var selectorMap = function (config) {
 
         var selectionMap = rasterMap(config)
             .init()
 
-        var events = d3.dispatch('mapCloseClick', 'rectangleDraw', 'rectangleClick', 'markerClick', 
+        var events = d3.dispatch('mapCloseClick', 'rectangleDraw', 'rectangleClick', 'markerClick',
             'markerDraw', 'geojsonClick')
 
         var internalMap = selectionMap._getMap()
@@ -194,10 +194,10 @@
 
         var closeControl = L.Control.extend({
             position: 'topright',
-            onAdd: function(map) {
+            onAdd: function (map) {
                 var container = L.DomUtil.create('a', 'map-close leaflet-bar leaflet-control leaflet-control-custom')
 
-                container.onclick = (function(e) {
+                container.onclick = (function (e) {
                     events.call('mapCloseClick', this, e)
                 })
                 return container
@@ -235,13 +235,13 @@
         })
         internalMap.addControl(drawControl)
 
-        internalMap.on('draw:created', function(e) {
+        internalMap.on('draw:created', function (e) {
             var layer = e.layer
             removeAllPolygons()
 
             if (e.layerType === 'rectangle') {
                 layer.addTo(drawnItems)
-                    .on('click', function(e) {
+                    .on('click', function (e) {
                         removeAllPolygons()
                         zoomToBoundingBox()
                         events.call('rectangleClick', this, e)
@@ -263,9 +263,9 @@
 
         function addMarker(latLng) {
             L.marker(latLng, {
-                    interactive: true
-                })
-                .on('click', function(e) {
+                interactive: true
+            })
+                .on('click', function (e) {
                     removeAllPolygons()
                     zoomToBoundingBox()
                     events.call('markerClick', this, e)
@@ -312,7 +312,7 @@
 
         function addGeojson(poly, cb) {
             var geojsonLayer = L.GeoJSON.geometryToLayer(poly)
-                .on('click', function(e) {
+                .on('click', function (e) {
                     drawnItems.removeLayer(this)
                     if (cb) {
                         cb(this)
@@ -332,12 +332,12 @@
          * @memberof selectorMap
          * @instance
          */
-        selectionMap.addRectangle = function(coords) {
+        selectionMap.addRectangle = function (coords) {
             removeAllPolygons()
 
             var poly = getFeatureFromCoordinates(coords)
 
-            addGeojson(poly, function(){
+            addGeojson(poly, function () {
                 events.call('rectangleClick', this, arguments)
             })
 
@@ -352,14 +352,14 @@
          * @memberof selectorMap
          * @instance
          */
-        selectionMap.addPolygons = function(data) {
+        selectionMap.addPolygons = function (data) {
             removeAllPolygons()
 
-            data.forEach(function(geojson) {
+            data.forEach(function (geojson) {
                 geojson[1].id = geojson[0]
                 var poly = getPolyFeatureFromPoly(geojson[1])
 
-                addGeojson(poly, function(){
+                addGeojson(poly, function () {
                     events.call('geojsonClick', this, geojson)
                 })
             })
@@ -375,7 +375,7 @@
          * @instance
          */
         function zoomToBoundingBox() {
-            if(config.disableAutoZoom){
+            if (config.disableAutoZoom) {
                 return this
             }
             var bounds = drawnItems.getBounds()
@@ -413,6 +413,7 @@
      * @param {object} config.parent The parent DOM element.
      * @param {object} config.colorScale The colorScale to use for raster, one of datahub.palette.
      * @param {string} config.basemapName The name of the basemap: 'basemapDark', 'basemapLight'.
+     * @param {boolean} config.clusterMarkers Should markers be clustered
      * @param {boolean} [config.showLabels=true] Show the map label layer.
      * @param {boolean} [config.showTooltip=true] Show tooltips when hovering raster.
      * @param {function} [config.polygonTooltipFunc] The function to format vector tooltip, has passed to L.geoJson.bindTooltip().
@@ -429,7 +430,7 @@
      * })
      * .init()
      */
-    var rasterMap = function(_config) {
+    var rasterMap = function (_config) {
 
         var containerNode = L.DomUtil.create('div', 'datahub-map')
         var container = _config.parent.appendChild(containerNode)
@@ -437,6 +438,7 @@
         var config = {
             container: container,
             colorScale: _config.colorScale,
+            clusterMarkers: _config.clusterMarkers,
             basemapName: _config.basemapName || 'basemapDark',
             imagePath: _config.imagePath || 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.2/images/',
             showLabels: !(_config.showLabels === false),
@@ -464,7 +466,7 @@
 
         dh.utils.merge(mapConfig, _config.mapConfig)
 
-        var events = d3.dispatch('click', 'mousemove', 'mouseenter', 'mouseleave', 
+        var events = d3.dispatch('click', 'mousemove', 'mouseenter', 'mouseleave',
             'featureClick', 'featureMousEnter', 'featureMousLeave', 'markerClick')
 
         var states = {
@@ -488,10 +490,10 @@
             L.Icon.Default.imagePath = config.imagePath
 
             map = L.map(config.container, mapConfig)
-                .on('click', function(e) { events.call('click', this, { lat: e.latlng.lat, lon: e.latlng.lng }) })
-                .on('mousedown', function(e) { config.container.classList.add('grab') })
-                .on('mouseup', function(e) { config.container.classList.remove('grab') })
-                .on('mousemove', function(e) {
+                .on('click', function (e) { events.call('click', this, { lat: e.latlng.lat, lon: e.latlng.lng }) })
+                .on('mousedown', function (e) { config.container.classList.add('grab') })
+                .on('mouseup', function (e) { config.container.classList.remove('grab') })
+                .on('mousemove', function (e) {
                     if (gridData) {
                         var latIndex = dh.utils.bisectionReversed(gridData.lat, e.latlng.lat)
                         var lonIndex = dh.utils.bisection(gridData.lon, e.latlng.lng)
@@ -534,10 +536,10 @@
                         })
                     }
                 })
-                .on('mouseover', function(e){
+                .on('mouseover', function (e) {
                     events.call('mouseenter', this, arguments)
                 })
-                .on('mouseout', function(e){
+                .on('mouseout', function (e) {
                     events.call('mouseleave', this, arguments)
                 })
 
@@ -686,9 +688,9 @@
          * @instance
          */
         function renderPolygon(polygon) {
-            var onEachFeature = function(feature, layer) {
+            var onEachFeature = function (feature, layer) {
                 layer.on({
-                    click: function(e) {
+                    click: function (e) {
                         events.call('featureClick', this, {
                             id: e.target.feature.properties.id,
                             lat: e.target._latlng ? e.target._latlng.lat : e.latlng.lat,
@@ -696,7 +698,7 @@
                             layer: e
                         })
                     },
-                    mouseover: function(e, a, b) {
+                    mouseover: function (e, a, b) {
                         events.call('featureMousEnter', this, {
                             x: e.containerPoint.x,
                             y: e.containerPoint.y,
@@ -705,7 +707,7 @@
                             value: e.target.feature.properties.id
                         })
                     },
-                    mouseout: function(e) {
+                    mouseout: function (e) {
                         events.call('featureMousLeave', this, {
                             x: e.containerPoint.x,
                             y: e.containerPoint.y,
@@ -718,22 +720,29 @@
             }
 
             geojsonLayer = L.geoJson(polygon, {
-                    onEachFeature: onEachFeature,
-                    pointToLayer: function(feature, latlng) {
-                        return new L.CircleMarker(latlng, {
-                            radius: 4,
-                            fillColor: '#05A5DE',
-                            color: '#1E1E1E',
-                            weight: 1,
-                            opacity: 0.5,
-                            fillOpacity: 0.4
-                        })
-                    }
-                })
-                .addTo(map)
+                onEachFeature: onEachFeature,
+                pointToLayer: function (feature, latlng) {
+                    return new L.CircleMarker(latlng, {
+                        radius: 4,
+                        fillColor: '#05A5DE',
+                        color: '#1E1E1E',
+                        weight: 1,
+                        opacity: 0.5,
+                        fillOpacity: 0.4
+                    })
+                }
+            });
 
-            if(config.polygonTooltipFunc) {
-                geojsonLayer.bindTooltip(config.polygonTooltipFunc)
+            if (config.polygonTooltipFunc) {
+                geojsonLayer.bindTooltip(config.polygonTooltipFunc);
+            }
+
+            if (config.clusterMarkers) {
+                var markers = L.markerClusterGroup({ chunkedLoading: true });
+                markers.addLayer(geojsonLayer);
+                map.addLayer(markers);
+            } else {
+                map.addLayer(geojsonLayer);
             }
 
             return this
@@ -750,11 +759,11 @@
             removeMarker()
 
             marker = L.marker(coordinates, {
-                    interactive: true,
-                    draggable: true,
-                    opacity: 1
-                })
-                .on('click', function(e){
+                interactive: true,
+                draggable: true,
+                opacity: 1
+            })
+                .on('click', function (e) {
                     events.call('markerClick', this, arguments)
                 })
                 .addTo(map)
@@ -785,7 +794,7 @@
          */
         function renderRaster(data) {
             gridData = data
-            var dataSorted = data.uniqueValues.sort(function(a, b) {
+            var dataSorted = data.uniqueValues.sort(function (a, b) {
                 return a - b
             })
             var colorScale = config.colorScale(dataSorted)
@@ -825,7 +834,7 @@
          * @instance
          */
         function renderVectorMap() {
-            datahub.data.getWorldVector(function(geojson) {
+            datahub.data.getWorldVector(function (geojson) {
                 renderPolygon(geojson)
             })
 
@@ -864,7 +873,7 @@
             isVisible: states.isVisible,
             hideZoomControl: hideZoomControl,
             on: dh.utils.rebind(events),
-            _getMap: function() {
+            _getMap: function () {
                 return map
             }
         }
