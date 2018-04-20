@@ -2249,7 +2249,8 @@
                 }
                 if (config.clusterMarkers) {
                     var markers = L.markerClusterGroup({
-                        chunkedLoading: true
+                        chunkedLoading: true,
+                        showCoverageOnHover: false
                     });
                     markers.addLayer(geojsonLayer);
                     map.addLayer(markers);
