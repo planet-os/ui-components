@@ -738,7 +738,7 @@
             }
 
             if (config.clusterMarkers) {
-                var markers = L.markerClusterGroup({ chunkedLoading: true });
+                var markers = L.markerClusterGroup({ chunkedLoading: true, showCoverageOnHover: false });
                 markers.addLayer(geojsonLayer);
                 map.addLayer(markers);
             } else {
