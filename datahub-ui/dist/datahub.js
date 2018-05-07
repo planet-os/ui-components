@@ -428,12 +428,12 @@
                 message = "Values are all null";
             }
             var text = config.container.select(".message-group").selectAll("text").data([ message ]);
-            text.enter().append("text").merge(text).attr("x", config.chartWidth / 2).attr("y", function() {
-                return config.height / 2 - this.getBBox().height / 2;
+            text.enter().append("text").merge(text).attr("x", function() {
+                return config.width / 2 - this.getBBox().width / 2;
+            }).attr("y", function() {
+                return config.height / 2 - this.getBBox().height / 2 - 30;
             }).text(function(d) {
                 return d;
-            }).attr("dx", function(d) {
-                return -this.getBBox().width / 2;
             });
             text.exit().remove();
             return {};
