@@ -475,6 +475,20 @@
 
         var map, gridLayer, geojsonLayer, tooltipLayer, marker, gridData, cachedBBoxPolygon
 
+
+        function intelligentRound(value, sigDigits) {
+
+            var absVal = Math.abs(value);
+
+            if (absVal === 0) {
+                return 0;
+            } else if (absVal < 1) {
+                return Number.parseFloat(value).toPrecision(sigDigits)
+            } else {
+                return L.Util.formatNum(value, sigDigits);
+            }
+        }
+
         /**
          * Initialize the map.
          * @name init
@@ -518,7 +532,7 @@
                         }
 
                         if (value !== null && value !== -999 && config.showTooltip) {
-                            var formattedValue = L.Util.formatNum(value, 2)
+                            var formattedValue = intelligentRound(value, 2);
 
                             tooltipLayer
                                 .setTooltipContent(formattedValue + '')
