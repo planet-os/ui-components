@@ -296,8 +296,8 @@
           )
           .on("mouseout", function () {
             var hasData = config.dataConverted
-              && dataConverted.historical.wind.data
-              && dataConverted.historical.wind.data.length > 0
+              && config.dataConverted.historical.wind.data
+              && config.dataConverted.historical.wind.data.length > 0
 
             var latestHistoricalTimestamp = new Date(
               hasData
