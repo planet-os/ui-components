@@ -2802,11 +2802,17 @@
                     config.events.call("tooltipChange", null, {});
                 } else {
                     var dataUnderCursor = getHoverInfo(config, config.tooltipTimestamp);
-                    setTooltip(config, dataUnderCursor);
-                    config.events.call("tooltipChange", null, {
-                        timestamp: dataUnderCursor[0].timestamp,
-                        data: dataUnderCursor
-                    });
+                    if (dataUnderCursor && dataUnderCursor.length > 0) {
+                        setTooltip(config, dataUnderCursor);
+                        config.events.call("tooltipChange", null, {
+                            timestamp: dataUnderCursor[0].timestamp,
+                            data: dataUnderCursor
+                        });
+                    } else {
+                        console.error("No data under cursor. Hiding tooltip tooltip");
+                        hideTooltip(config);
+                        config.events.call("tooltipChange", null, {});
+                    }
                 }
             }
             // else if(!config.dataIsEmpty) {
