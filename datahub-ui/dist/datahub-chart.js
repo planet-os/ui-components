@@ -2682,6 +2682,8 @@
                 var mouseTimestamp = config.scaleX.invert(mouseX);
                 var dataUnderCursor = getHoverInfo(config, mouseTimestamp);
                 config.events.call("hover", null, dataUnderCursor);
+            }, {
+                passive: true
             }).on("mouseout", function(d) {
                 hideTooltip(config);
                 config.container.selectAll(".axis-title.x text").text(null);
