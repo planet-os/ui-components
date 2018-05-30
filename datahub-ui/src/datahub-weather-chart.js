@@ -1,5 +1,5 @@
-!(function(dh, d3) {
-  var template = function(config) {
+!(function (dh, d3) {
+  var template = function (config) {
     var containerNode = config.parent.querySelector(".datahub-weather-chart");
     if (!containerNode) {
       var template =
@@ -47,7 +47,7 @@
     };
   };
 
-  var defaultConfig = function(config) {
+  var defaultConfig = function (config) {
     var leftMargin = 26;
     var historicalChartConfig = {
       xTicks: config.historicalXTicks || d3.utcHour.every(12),
@@ -59,7 +59,7 @@
       yTicks: 3,
       height: 80,
       width: config.chartWidth / 2,
-      valueFormatter: function(d, i) {
+      valueFormatter: function (d, i) {
         return Math.round(d.value * 100) / 100;
       },
       hide: ["xTitle", "yTitle", "xAxis", "tooltipLabel"],
@@ -173,7 +173,7 @@
     };
   };
 
-  var data = function(config) {
+  var data = function (config) {
     var dataConverted = config.data;
 
     return {
@@ -189,7 +189,7 @@
 
   function getDataAtTimestamp(timestamp, data, groupKey) {
     var epoch = new Date(timestamp).getTime();
-    var bisector = d3.bisector(function(d, x) {
+    var bisector = d3.bisector(function (d, x) {
       return new Date(d.timestamp).getTime() - new Date(x).getTime();
     }).left;
 
@@ -236,7 +236,7 @@
     setTimeInfo(timestamp, config);
   }
 
-  var charts = function(config) {
+  var charts = function (config) {
     var charts = {
       historical: {
         wind: null,
@@ -266,10 +266,10 @@
           .setConfig(config.chartConfig[x][y])
           .on(
             "hover",
-            (function() {
+            (function () {
               var groupKey = x;
               var chartKey = y;
-              return function(d) {
+              return function (d) {
                 if (d[0]) {
                   setTooltip(
                     charts,
@@ -294,11 +294,15 @@
               };
             })()
           )
-          .on("mouseout", function() {
+          .on("mouseout", function () {
+            var hasData = config.dataConverted
+              && dataConverted.historical.wind.data
+              && dataConverted.historical.wind.data.length > 0
+
             var latestHistoricalTimestamp = new Date(
-              config.dataConverted
+              hasData
                 ? config.dataConverted.historical.wind.data.slice(-1)[0]
-                    .timestamp
+                  .timestamp
                 : Date.now()
             );
             setTooltip(
@@ -382,13 +386,13 @@
    * .on('tooltipChange', function(e){ console.log(e) })
    * .setData(data)
    */
-  var weatherChart = function(config) {
+  var weatherChart = function (config) {
     var configCache,
       events = d3.dispatch("hover", "tooltipChange", "mouseout"),
       chartCache,
       uid = ~~(Math.random() * 10000);
 
-    var onResize = dh.utils.throttle(function() {
+    var onResize = dh.utils.throttle(function () {
       configCache.width = configCache.parent.clientWidth;
       render();
     }, 200);
@@ -396,7 +400,7 @@
       d3.select(window).on("resize." + uid, onResize);
     }
 
-    var render = function() {
+    var render = function () {
       chartCache = chart(configCache);
     };
 
@@ -414,7 +418,7 @@
      * })
      * .setData(data)
      */
-    var setData = function(data) {
+    var setData = function (data) {
       var d = data ? JSON.parse(JSON.stringify(data)) : {};
       configCache = dh.utils.mergeAll({}, configCache, { data: d });
       render();
@@ -436,13 +440,13 @@
      *     width: 100
      * })
      */
-    var setConfig = function(config) {
+    var setConfig = function (config) {
       configCache = dh.utils.mergeAll(configCache, config);
       render();
       return this;
     };
 
-    var init = function(config, events) {
+    var init = function (config, events) {
       setConfig(dh.utils.mergeAll(config, { events: events }));
     };
 
@@ -457,7 +461,7 @@
      * })
      * chart.destroy()
      */
-    var destroy = function() {
+    var destroy = function () {
       d3.select(window).on("resize." + uid, null);
       configCache.parent.innerHTML = null;
     };
