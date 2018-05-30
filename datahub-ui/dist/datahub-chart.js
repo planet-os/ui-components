@@ -3642,7 +3642,7 @@
                             }
                         };
                     }()).on("mouseout", function() {
-                        var hasData = config.dataConverted && dataConverted.historical.wind.data && dataConverted.historical.wind.data.length > 0;
+                        var hasData = config.dataConverted && config.dataConverted.historical.wind.data && config.dataConverted.historical.wind.data.length > 0;
                         var latestHistoricalTimestamp = new Date(hasData ? config.dataConverted.historical.wind.data.slice(-1)[0].timestamp : Date.now());
                         setTooltip(charts, "historical", null, latestHistoricalTimestamp, config);
                         config.events.call("mouseout", null, {});
