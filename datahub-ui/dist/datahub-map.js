@@ -1270,7 +1270,17 @@
             var states = {
                 isVisible: true
             };
-            var map, gridLayer, geojsonLayer, tooltipLayer, marker, gridData, cachedBBoxPolygon
+            var map, gridLayer, geojsonLayer, tooltipLayer, marker, gridData, cachedBBoxPolygon;
+            function intelligentRound(value, sigDigits) {
+                var absVal = Math.abs(value);
+                if (absVal === 0) {
+                    return 0;
+                } else if (absVal < 1) {
+                    return Number.parseFloat(value).toPrecision(sigDigits);
+                } else {
+                    return L.Util.formatNum(value, sigDigits);
+                }
+            }
             /**
          * Initialize the map.
          * @name init
@@ -1281,8 +1291,7 @@
          *     parent: document.querySelector('.map')
          * })
          * .init()
-         */;
-            function init() {
+         */            function init() {
                 L.Icon.Default.imagePath = config.imagePath;
                 map = L.map(config.container, mapConfig).on("click", function(e) {
                     events.call("click", this, {
@@ -1314,7 +1323,7 @@
                             value = gridData.values[latIndex][lonIndex];
                         }
                         if (value !== null && value !== -999 && config.showTooltip) {
-                            var formattedValue = L.Util.formatNum(value, 2);
+                            var formattedValue = intelligentRound(value, 2);
                             tooltipLayer.setTooltipContent(formattedValue + "").openTooltip([ e.latlng.lat, e.latlng.lng ]);
                         } else {
                             tooltipLayer.closeTooltip();

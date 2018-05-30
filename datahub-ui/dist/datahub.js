@@ -2547,6 +2547,8 @@
                     config: config,
                     event: d3.event
                 });
+            }, {
+                passive: true
             }).on("mouseout", function(d) {
                 config.events.call("mouseout", null, {});
             }).on("click", function(d) {
@@ -4575,7 +4577,8 @@
                             }
                         };
                     }()).on("mouseout", function() {
-                        var latestHistoricalTimestamp = new Date(config.dataConverted ? config.dataConverted.historical.wind.data.slice(-1)[0].timestamp : Date.now());
+                        var hasData = config.dataConverted && dataConverted.historical.wind.data && dataConverted.historical.wind.data.length > 0;
+                        var latestHistoricalTimestamp = new Date(hasData ? config.dataConverted.historical.wind.data.slice(-1)[0].timestamp : Date.now());
                         setTooltip(charts, "historical", null, latestHistoricalTimestamp, config);
                         config.events.call("mouseout", null, {});
                         var data = getDataAtTimestamp(latestHistoricalTimestamp, config.dataConverted, "historical");
