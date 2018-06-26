@@ -740,7 +740,7 @@
             data: dataUnderCursor
           });
         } else {
-          console.error("No data under cursor. Hiding tooltip tooltip");
+          console.info("No data under cursor. Hiding tooltip tooltip");
           hideTooltip(config);
           config.events.call("tooltipChange", null, {});
         }
