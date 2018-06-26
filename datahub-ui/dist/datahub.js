@@ -3746,7 +3746,7 @@
                             data: dataUnderCursor
                         });
                     } else {
-                        console.error("No data under cursor. Hiding tooltip tooltip");
+                        console.info("No data under cursor. Hiding tooltip tooltip");
                         hideTooltip(config);
                         config.events.call("tooltipChange", null, {});
                     }
@@ -4523,7 +4523,7 @@
                         foundData.metadata = data[x][y].metadata;
                         info[x][y] = foundData;
                     } else {
-                        console.error("No data found for metadata.");
+                        console.info("No data found for metadata.");
                     }
                 }
             }

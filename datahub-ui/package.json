@@ -1,6 +1,6 @@
 {
   "name": "datahub-ui",
-  "version": "0.8.37",
+  "version": "0.8.38",
   "description": "Reusable components for Planet OS Datahub",
   "main": "index.js",
   "repository": {
