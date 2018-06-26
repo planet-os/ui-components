@@ -3674,7 +3674,13 @@
                 }
             }
             if (config.dataConverted) {
-                var latestHistoricalTimestamp = new Date(config.dataConverted.historical.wind.data.slice(-1)[0].timestamp);
+                var hasData = config.dataConverted.historical.wind.data && config.dataConverted.historical.wind.data.length > 0;
+                var latestHistoricalTimestamp = Date.now();
+                if (hasData) {
+                    latestHistoricalTimestamp = new Date(config.dataConverted.historical.wind.data.slice(-1)[0].timestamp);
+                } else {
+                    console.info("No historical data for setTooltip, using now.");
+                }
                 setTooltip(charts, "historical", null, latestHistoricalTimestamp, config);
                 var data = getDataAtTimestamp(latestHistoricalTimestamp, config.dataConverted, "historical");
                 config.events.call("tooltipChange", null, {
