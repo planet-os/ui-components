@@ -652,7 +652,13 @@
         .select('.tooltip')
         .selectAll('text.tooltip-label')
         .each(function (item, i) {
-          d[i].bb = this.getBBox(); // get bounding box of text field and store it in texts array
+          // get bounding box of text field and store it in texts array
+          try {
+            d[i].bb = this.getBBox();
+          } catch (e) {
+            console.error('Firefox specific error-getting getBBox when it display=none. Using default object.');
+            d[i].bb = { height: 0, width: 0, x: 0, y: 0 };
+          }
         });
 
       // Add tooltip rects
