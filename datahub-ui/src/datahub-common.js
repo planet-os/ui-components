@@ -1,9 +1,9 @@
-!(function(dh, d3) {
-    var axesFormatAutoconfig = function(config) {
+!(function (dh, d3) {
+    var axesFormatAutoconfig = function (config) {
         var timeFormat = d3.utcFormat('%b %e, %Y at %H:%M UTC')
         var axisXFormat = ''
         if (!config.dataIsEmpty) {
-            var fixedFloat = function(d) {
+            var fixedFloat = function (d) {
                 return (d % 1) ? ~~(d * 100) / 100 : d
             }
             var formatString = []
@@ -24,16 +24,16 @@
 
         return {
             axisXFormat: axisXFormat,
-            axisTitleXFormat: function(d) {
+            axisTitleXFormat: function (d) {
                 return timeFormat(d.data.x)
             },
-            tooltipFormat: function(d) {
+            tooltipFormat: function (d) {
                 return fixedFloat(d.data.y)
             }
         }
     }
 
-    var defaultConfig = function(config) {
+    var defaultConfig = function (config) {
         var defaultMargin = {
             top: 50,
             right: 50,
@@ -48,8 +48,8 @@
         }
     }
 
-    var sortData = function(config) {
-        config.dataConverted.sort(function(_a, _b) {
+    var sortData = function (config) {
+        config.dataConverted.sort(function (_a, _b) {
             var a = _a.x.getTime()
             var b = _b.x.getTime()
             if (a < b) {
@@ -64,10 +64,10 @@
         return {}
     }
 
-    var detectDataAllNulls = function(config) {
-        var allNulls = !config.flattenedData.filter(function(d) {
-                return d.y != null
-            })
+    var detectDataAllNulls = function (config) {
+        var allNulls = !config.flattenedData.filter(function (d) {
+            return d.y != null
+        })
             .length
 
         return {
@@ -75,9 +75,9 @@
         }
     }
 
-    var axisX = function(config) {
+    var axisX = function (config) {
         var format = config.axisXFormat || '%b'
-        var axisXFormat = d3.utcFormat(format) || function(d) {
+        var axisXFormat = d3.utcFormat(format) || function (d) {
             return d.toString()
         }
         var axisX = d3.axisBottom().scale(config.scaleX)
@@ -88,7 +88,7 @@
         }
     }
 
-    var axisY = function(config) {
+    var axisY = function (config) {
         var format = config.axisYFormat || '.2s'
         var axisYFormat = d3.format(format)
         var height = config.scaleY.range()[0]
@@ -103,37 +103,37 @@
         }
     }
 
-    var axisComponentX = function(config) {
+    var axisComponentX = function (config) {
         var axisX = config.container.selectAll('g.axis.x')
             .data([0])
         var axis = axisX.enter().append('g')
             .attr('class', 'x axis')
             .attr('transform', 'translate(' + [0, config.chartHeight] + ')')
             .merge(axisX)
-            .attr('display', function(d) {
+            .attr('display', function (d) {
                 return config.dataIsEmpty ? 'none' : null
             })
             .attr('transform', 'translate(' + [0, config.chartHeight] + ')')
-        
+
         axis.call(config.axisX)
-            
+
         axisX.exit().remove()
 
         var labelsW = []
         var texts = axis.selectAll('.tick')
             .select('text')
-            .each(function(d, i) {
+            .each(function (d, i) {
                 var w = this.getBBox().width
-                if(w) {
+                if (w) {
                     labelsW.push(w)
                 }
             })
 
         var skipCount = Math.floor(d3.max(labelsW) / config.stripeScaleX.bandwidth())
 
-        if(skipCount) {
+        if (skipCount) {
             axis.selectAll('.tick text')
-                .attr('display', function(d, i) {
+                .attr('display', function (d, i) {
                     return !!(i % (skipCount + 1)) ? 'none' : 'block'
                 })
         }
@@ -141,7 +141,7 @@
         return {}
     }
 
-    var axisComponentY = function(config) {
+    var axisComponentY = function (config) {
         var padding = config.axisYPadding || 0
         var axisY = config.container.selectAll('g.axis.y')
             .data([0])
@@ -159,7 +159,7 @@
         return {}
     }
 
-    var axisTitleComponentX = function(config) {
+    var axisTitleComponentX = function (config) {
         var axisTitleXComponent = config.container.selectAll('text.axis-title.x')
             .data([0])
         axisTitleXComponent.enter().append('text')
@@ -175,7 +175,7 @@
         }
     }
 
-    var axisTitleComponentY = function(config) {
+    var axisTitleComponentY = function (config) {
         var axisTitleY = config.container.selectAll('text.axis-title.y')
             .data([0])
         var axisY = axisTitleY.enter().append('text')
@@ -190,16 +190,16 @@
         return {}
     }
 
-    var chartTitleComponent = function(config) {
+    var chartTitleComponent = function (config) {
         var axisTitleX = config.container.selectAll('text.chart-title')
             .data([config.chartTitle || ''])
         axisTitleX.enter().append('text')
             .attr('class', 'chart-title')
             .merge(axisTitleX)
-            .html(function(d) {
+            .html(function (d) {
                 return d
             })
-            .attr('x', function(d) {
+            .attr('x', function (d) {
                 return (config.chartWidth - d.length * 5) / 2
             })
             .attr('y', -5)
@@ -208,7 +208,7 @@
         return {}
     }
 
-    var shapePanel = function(config) {
+    var shapePanel = function (config) {
         var shapePanel = config.container.selectAll('g.shapes')
             .data([0])
         var panel = shapePanel.enter().append('g')
@@ -221,7 +221,7 @@
         }
     }
 
-    var container = function(config) {
+    var container = function (config) {
         var container = d3.select(config.parent)
             .selectAll('div.widget-container')
             .data([0])
@@ -237,7 +237,7 @@
         }
     }
 
-    var svgContainer = function(config) {
+    var svgContainer = function (config) {
         var widgetContainer = container(config).container
 
         var root = widgetContainer.selectAll('svg')
@@ -259,7 +259,7 @@
         }
     }
 
-    var message = function(config) {
+    var message = function (config) {
         var message = ''
         if (config.dataIsEmpty) {
             message = '(Data Unavailable)'
@@ -272,40 +272,39 @@
             .data([message])
         text.enter().append('text')
             .merge(text)
-            .attr('x', config.chartWidth / 2)
-            .attr('y', function() {
-                return config.height / 2 - this.getBBox().height / 2
+            .attr("x", function () {
+                return config.width / 2 - this.getBBox().width / 2;
             })
-            .text(function(d) {
+            .attr("y", function () {
+                return config.height / 2 - this.getBBox().height / 2 - 30;
+            })
+            .text(function (d) {
                 return d
-            })
-            .attr('dx', function(d) {
-                return -this.getBBox().width / 2
             })
         text.exit().remove()
 
         return {}
     }
 
-    var axisXFormatterTime = function(config) {
+    var axisXFormatterTime = function (config) {
         config.container.select('g.axis.x').selectAll('.tick text')
-            .text(function(d) {
+            .text(function (d) {
                 return d3.timeFormat('%a')(d)
             })
 
         return {}
     }
 
-    var axisXFormatterTimeHour = function(config) {
+    var axisXFormatterTimeHour = function (config) {
         config.container.select('g.axis.x').selectAll('.tick text')
-            .text(function(d) {
+            .text(function (d) {
                 return d3.timeFormat('%x')(d)
             })
 
         return {}
     }
 
-    var axisXFormatterRotate30 = function(config) {
+    var axisXFormatterRotate30 = function (config) {
         config.container.select('g.axis.x').selectAll('.tick text')
             .style('transform', 'rotate(30deg)')
             .style('text-anchor', 'start')
@@ -313,30 +312,30 @@
         return {}
     }
 
-    var axisYFormatSI = function(_config) {
+    var axisYFormatSI = function (_config) {
         config.axisY.tickFormat(d3.format('.2s'))
 
         return {}
     }
 
-    var labelsRewriterY = function(config) {
-        if(!config.labelsRewriterY) {
+    var labelsRewriterY = function (config) {
+        if (!config.labelsRewriterY) {
             return {}
         }
         config.container.selectAll('g.axis.y')
             .selectAll('text')
-            .each(function(d, i) {
+            .each(function (d, i) {
                 datahub.utils.svgToNode(config.labelsRewriterY(d, i, config), this)
             })
 
         return {}
     }
 
-    var printer = function(config) {
+    var printer = function (config) {
         console.warn(config);
     }
 
-    dh.common =  {
+    dh.common = {
         axesFormatAutoconfig: axesFormatAutoconfig,
         defaultConfig: defaultConfig,
         sortData: sortData,

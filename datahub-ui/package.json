@@ -1,6 +1,6 @@
 {
   "name": "datahub-ui",
-  "version": "0.8.23",
+  "version": "0.8.39",
   "description": "Reusable components for Planet OS Datahub",
   "main": "index.js",
   "repository": {
@@ -40,7 +40,7 @@
     "d3-scale-chromatic": "^1.1.0"
   },
   "devDependencies": {
-    "documentation": "^5.3.5",
+    "documentation": "^8.1.2",
     "npm-watch": "^0.1.8",
     "uglify-js": "^3.3.5"
   },

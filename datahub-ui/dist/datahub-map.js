@@ -1221,6 +1221,7 @@
      * @param {object} config.parent The parent DOM element.
      * @param {object} config.colorScale The colorScale to use for raster, one of datahub.palette.
      * @param {string} config.basemapName The name of the basemap: 'basemapDark', 'basemapLight'.
+     * @param {boolean} config.clusterMarkers Should markers be clustered
      * @param {boolean} [config.showLabels=true] Show the map label layer.
      * @param {boolean} [config.showTooltip=true] Show tooltips when hovering raster.
      * @param {function} [config.polygonTooltipFunc] The function to format vector tooltip, has passed to L.geoJson.bindTooltip().
@@ -1243,6 +1244,7 @@
             var config = {
                 container: container,
                 colorScale: _config.colorScale,
+                clusterMarkers: _config.clusterMarkers,
                 basemapName: _config.basemapName || "basemapDark",
                 imagePath: _config.imagePath || "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.2/images/",
                 showLabels: !(_config.showLabels === false),
@@ -1268,7 +1270,17 @@
             var states = {
                 isVisible: true
             };
-            var map, gridLayer, geojsonLayer, tooltipLayer, marker, gridData, cachedBBoxPolygon
+            var map, gridLayer, geojsonLayer, tooltipLayer, marker, gridData, cachedBBoxPolygon;
+            function intelligentRound(value, sigDigits) {
+                var absVal = Math.abs(value);
+                if (absVal === 0) {
+                    return 0;
+                } else if (absVal < 1) {
+                    return Number.parseFloat(value).toPrecision(sigDigits);
+                } else {
+                    return L.Util.formatNum(value, sigDigits);
+                }
+            }
             /**
          * Initialize the map.
          * @name init
@@ -1279,8 +1291,7 @@
          *     parent: document.querySelector('.map')
          * })
          * .init()
-         */;
-            function init() {
+         */            function init() {
                 L.Icon.Default.imagePath = config.imagePath;
                 map = L.map(config.container, mapConfig).on("click", function(e) {
                     events.call("click", this, {
@@ -1312,7 +1323,7 @@
                             value = gridData.values[latIndex][lonIndex];
                         }
                         if (value !== null && value !== -999 && config.showTooltip) {
-                            var formattedValue = L.Util.formatNum(value, 2);
+                            var formattedValue = intelligentRound(value, 2);
                             tooltipLayer.setTooltipContent(formattedValue + "").openTooltip([ e.latlng.lat, e.latlng.lng ]);
                         } else {
                             tooltipLayer.closeTooltip();
@@ -1490,9 +1501,19 @@
                             fillOpacity: .4
                         });
                     }
-                }).addTo(map);
+                });
                 if (config.polygonTooltipFunc) {
                     geojsonLayer.bindTooltip(config.polygonTooltipFunc);
+                }
+                if (config.clusterMarkers) {
+                    var markers = L.markerClusterGroup({
+                        chunkedLoading: true,
+                        showCoverageOnHover: false
+                    });
+                    markers.addLayer(geojsonLayer);
+                    map.addLayer(markers);
+                } else {
+                    map.addLayer(geojsonLayer);
                 }
                 return this;
             }

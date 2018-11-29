@@ -1,5 +1,5 @@
-!(function(dh, d3) {
-  var template = function(config) {
+!(function (dh, d3) {
+  var template = function (config) {
     var containerNode = config.parent.querySelector(".widget-container");
     if (!containerNode) {
       var template =
@@ -63,26 +63,26 @@
     };
   };
 
-  var validateData = function(d, key, is2D) {
+  var validateData = function (d, key, is2D) {
     return d[key]
-      ? d[key].map(function(d) {
-          d.timestamp = new Date(d.timestamp);
-          d.value = Array.isArray(d.value) && !is2D ? d.value[0] : d.value;
+      ? d[key].map(function (d) {
+        d.timestamp = new Date(d.timestamp);
+        d.value = Array.isArray(d.value) && !is2D ? d.value[0] : d.value;
 
-          return d;
-        })
+        return d;
+      })
       : [];
   };
 
-  var validateTimestamp = function(d) {
+  var validateTimestamp = function (d) {
     return d.timestamp
-      ? d.timestamp.map(function(d) {
-          return new Date(d);
-        })
+      ? d.timestamp.map(function (d) {
+        return new Date(d);
+      })
       : [];
   };
 
-  var dataAdapter = function(config) {
+  var dataAdapter = function (config) {
     var d = config.data || {};
 
     return {
@@ -101,7 +101,7 @@
     };
   };
 
-  var scaleX = function(config) {
+  var scaleX = function (config) {
     var dataX = config.dataIsEmpty ? 0 : config.data.timestamp;
     var scaleX = d3
       .scaleBand()
@@ -130,7 +130,7 @@
     };
   };
 
-  var scaleY = function(config) {
+  var scaleY = function (config) {
     var maxs = [];
     maxs.push(dh.utils.getExtent(config.data.barData));
     maxs.push(dh.utils.getExtent(config.data.referenceData));
@@ -184,12 +184,12 @@
     };
   };
 
-  var findData = function(data, key, timestamp) {
+  var findData = function (data, key, timestamp) {
     if (!timestamp) {
       return null;
     }
     var index = data[key]
-      .map(function(d) {
+      .map(function (d) {
         return d.timestamp && d.timestamp.getTime();
       })
       .indexOf(timestamp.getTime());
@@ -203,7 +203,7 @@
     }
   };
 
-  var findThresholdData = function(data, key, timestamp) {
+  var findThresholdData = function (data, key, timestamp) {
     if (data[key][0]) {
       var datum = dh.utils.mergeAll({}, data[key][0]);
       datum.value = [].concat(data[key][0].value);
@@ -214,7 +214,7 @@
     }
   };
 
-  var getValuesAtTimestamp = function(timestamp, data) {
+  var getValuesAtTimestamp = function (timestamp, data) {
     var values = {
       referenceData: findData(data, "referenceData", timestamp),
       estimateData: findData(data, "estimateData", timestamp),
@@ -229,10 +229,10 @@
     return values;
   };
 
-  var eventsPanel = function(config) {
+  var eventsPanel = function (config) {
     var eventPanel = config.container
       .select(".events .event-panel")
-      .on("mousemove touchstart", function(d) {
+      .on("mousemove touchstart", function (d) {
         if (config.dataIsEmpty) {
           return;
         }
@@ -251,11 +251,11 @@
           config: config,
           event: d3.event
         });
-      })
-      .on("mouseout", function(d) {
+      }, { passive: true })
+      .on("mouseout", function (d) {
         config.events.call("mouseout", null, {});
       })
-      .on("click", function(d) {
+      .on("click", function (d) {
         config.events.call("click", null, { event: d3.event });
       });
 
@@ -264,7 +264,7 @@
     };
   };
 
-  var barShapes = function(config) {
+  var barShapes = function (config) {
     var shapes = config.container
       .select(".bar-group")
       .selectAll("rect.bar")
@@ -273,13 +273,13 @@
       .enter()
       .append("rect")
       .merge(shapes)
-      .attr("class", function(d) {
+      .attr("class", function (d) {
         return ["bar", d.id, d.className].join(" ");
       })
-      .attr("x", function(d, i) {
+      .attr("x", function (d, i) {
         return config.scaleX(d.timestamp) || 0;
       })
-      .attr("y", function(d) {
+      .attr("y", function (d) {
         if (config.autoScaleY) {
           return (
             config.chartHeight -
@@ -295,10 +295,10 @@
           return config.scaleY(0);
         }
       })
-      .attr("width", function(d) {
+      .attr("width", function (d) {
         return config.scaleX.bandwidth();
       })
-      .attr("height", function(d) {
+      .attr("height", function (d) {
         if (config.autoScaleY) {
           return config.chartHeight - Math.abs(config.scaleY(d.value));
         }
@@ -309,7 +309,7 @@
     return {};
   };
 
-  var estimateBarShapes = function(config) {
+  var estimateBarShapes = function (config) {
     var shapes = config.container
       .select(".estimate-bar-group")
       .selectAll("rect.estimate-bar")
@@ -318,19 +318,19 @@
       .enter()
       .append("rect")
       .merge(shapes)
-      .attr("class", function(d) {
+      .attr("class", function (d) {
         return ["estimate-bar", d.id, d.className].join(" ");
       })
-      .attr("x", function(d, i) {
+      .attr("x", function (d, i) {
         return config.scaleX(d.timestamp) || 0;
       })
-      .attr("y", function(d) {
+      .attr("y", function (d) {
         return config.scaleY(d.value) || 0;
       })
-      .attr("width", function(d) {
+      .attr("width", function (d) {
         return config.scaleX.bandwidth();
       })
-      .attr("height", function(d) {
+      .attr("height", function (d) {
         return config.chartHeight - config.scaleY(d.value) || 0;
       });
     shapes.exit().remove();
@@ -338,7 +338,7 @@
     return {};
   };
 
-  var referenceBarShapes = function(config) {
+  var referenceBarShapes = function (config) {
     var shapes = config.container
       .select(".reference-bar-group")
       .selectAll("rect.reference-bar")
@@ -347,13 +347,13 @@
       .enter()
       .append("rect")
       .merge(shapes)
-      .attr("class", function(d) {
+      .attr("class", function (d) {
         return ["reference-bar", d.id, d.className].join(" ");
       })
-      .attr("x", function(d, i) {
+      .attr("x", function (d, i) {
         return config.referenceScaleX(d.timestamp) || 0;
       })
-      .attr("y", function(d) {
+      .attr("y", function (d) {
         if (config.autoScaleY) {
           return (
             config.chartHeight -
@@ -369,10 +369,10 @@
           return config.scaleY(0);
         }
       })
-      .attr("width", function(d) {
+      .attr("width", function (d) {
         return config.referenceScaleX.bandwidth();
       })
-      .attr("height", function(d) {
+      .attr("height", function (d) {
         if (config.autoScaleY) {
           return config.chartHeight - Math.abs(config.scaleY(d.value));
         }
@@ -389,7 +389,7 @@
       .append("path")
       .attr("class", "reference-top")
       .merge(lines)
-      .attr("d", function(d, i) {
+      .attr("d", function (d, i) {
         var x = config.referenceScaleX(d.timestamp) || 0;
         var y = 0;
         if (d.value >= 0 || config.reverseY) {
@@ -410,7 +410,7 @@
     return {};
   };
 
-  var stackedBarShapes = function(config) {
+  var stackedBarShapes = function (config) {
     if (!config.data.stackedBarData || !config.data.stackedBarData.length) {
       config.container
         .select(".stacked-bar-group")
@@ -419,15 +419,15 @@
       return {};
     }
 
-    var keys = config.data.stackedBarData[0].value.map(function(d, i) {
+    var keys = config.data.stackedBarData[0].value.map(function (d, i) {
       return "y" + i;
     });
 
     var data = [];
-    config.data.stackedBarData.forEach(function(d, i) {
+    config.data.stackedBarData.forEach(function (d, i) {
       var datum = dh.utils.mergeAll({}, d);
       if (d.value && d.value.length) {
-        d.value.forEach(function(dB, iB) {
+        d.value.forEach(function (dB, iB) {
           datum["y" + iB] = dB;
         });
         data.push(datum);
@@ -444,8 +444,8 @@
       .attr("class", "stack")
       .merge(stackedBar)
       .selectAll("rect.stacked-bar")
-      .data(function(d, i) {
-        d.forEach(function(dB) {
+      .data(function (d, i) {
+        d.forEach(function (dB) {
           dB.index = d.index;
           // dB.id = dB.data.id && dB.data.id.length ? dB.data.id[d.index] : null
         });
@@ -456,21 +456,21 @@
       .append("rect")
       .attr("class", "stacked-bar")
       .merge(bar)
-      .attr("class", function(d, a, b) {
+      .attr("class", function (d, a, b) {
         var id = d.data.id ? d.data.id[d.index] : null;
         var className = d.data.className ? d.data.className[d.index] : null;
         return ["stacked-bar", "layer" + d.index, id, className].join(" ");
       })
-      .filter(function(d) {
+      .filter(function (d) {
         return !Number.isNaN(d[0]) && !Number.isNaN(d[1]);
       })
-      .attr("x", function(d) {
+      .attr("x", function (d) {
         return config.scaleX(d.data.timestamp);
       })
-      .attr("y", function(d) {
+      .attr("y", function (d) {
         return config.scaleY(d[1]);
       })
-      .attr("height", function(d) {
+      .attr("height", function (d) {
         return config.scaleY(d[0]) - config.scaleY(d[1]);
       })
       .attr("width", config.scaleX.bandwidth());
@@ -480,7 +480,7 @@
     return {};
   };
 
-  var lineShapes = function(config) {
+  var lineShapes = function (config) {
     if (!config.data.lineData.length) {
       config.container
         .select(".line-group")
@@ -491,13 +491,13 @@
 
     var line = d3
       .line()
-      .defined(function(d) {
+      .defined(function (d) {
         return d.value != null;
       })
-      .x(function(d) {
+      .x(function (d) {
         return config.lineScaleX(d.timestamp);
       })
-      .y(function(d) {
+      .y(function (d) {
         return config.scaleY(d.value);
       });
 
@@ -507,7 +507,7 @@
       data.push(config.data.lineData);
     } else {
       for (var i = 0; i < valueLength; i++) {
-        var layer = config.data.lineData.map(function(dB) {
+        var layer = config.data.lineData.map(function (dB) {
           return {
             timestamp: dB.timestamp,
             value: dB.value[i],
@@ -528,7 +528,7 @@
       .append("path")
       .style("fill", "none")
       .merge(shapes)
-      .attr("class", function(d, i) {
+      .attr("class", function (d, i) {
         return ["line", "layer" + i, d[0].id, d[0].className].join(" ");
       })
       .attr("d", line);
@@ -537,7 +537,7 @@
     return {};
   };
 
-  var dotShapes = function(config) {
+  var dotShapes = function (config) {
     if (!config.data.lineData.length) {
       config.container
         .select(".dot-group")
@@ -551,7 +551,7 @@
     var valueLength = data[0].value.length;
     for (var i = 0; i < valueLength; i++) {
       var layer = [];
-      data.forEach(function(dB, iB) {
+      data.forEach(function (dB, iB) {
         var prevIdx = Math.max(0, iB - 1);
         var nextIdx = Math.min(data.length - 1, iB + 1);
         var currentIdx = iB;
@@ -584,21 +584,21 @@
       .attr("class", "dot-layer");
     dotLayers.exit().remove();
 
-    var shapes = dotLayersUpdate.selectAll(".dot").data(function(d, i) {
+    var shapes = dotLayersUpdate.selectAll(".dot").data(function (d, i) {
       return d;
     });
     shapes
       .enter()
       .append("circle")
       .merge(shapes)
-      .attr("class", function(d, i, a) {
+      .attr("class", function (d, i, a) {
         // return ['dot', 'layer' + i, d[0].id, d[0].className].join(' ')
         return ["dot", "layer" + d.layer].join(" ");
       })
-      .attr("cx", function(d) {
+      .attr("cx", function (d) {
         return config.lineScaleX(d.timestamp);
       })
-      .attr("cy", function(d) {
+      .attr("cy", function (d) {
         return config.scaleY(d.value);
       })
       .attr("r", 2);
@@ -607,7 +607,7 @@
     return {};
   };
 
-  var thresholdLineShape = function(config) {
+  var thresholdLineShape = function (config) {
     var line = config.container
       .select(".threshold-line-group")
       .selectAll("line.threshold-line")
@@ -616,18 +616,18 @@
       .enter()
       .append("line")
       .merge(line)
-      .attr("class", function(d) {
+      .attr("class", function (d) {
         return ["threshold-line", d.id, d.className].join(" ");
       })
       .attr("x1", 0)
-      .attr("y1", function(d) {
+      .attr("y1", function (d) {
         return config.scaleY(d.value) || 0;
       })
       .attr("x2", config.chartWidth)
-      .attr("y2", function(d) {
+      .attr("y2", function (d) {
         return config.scaleY(d.value) || 0;
       })
-      .attr("display", function(d) {
+      .attr("display", function (d) {
         return d ? null : "none";
       });
     line.exit().remove();
@@ -635,7 +635,7 @@
     return {};
   };
 
-  var areaShapes = function(config) {
+  var areaShapes = function (config) {
     if (!config.data.areaData || !config.data.areaData.length) {
       config.container
         .select(".area-group")
@@ -646,14 +646,14 @@
 
     var areaGenerator = d3
       .area()
-      .defined(function(d) {
+      .defined(function (d) {
         return d.value != null;
       })
-      .x(function(d) {
+      .x(function (d) {
         return config.lineScaleX(d.timestamp);
       })
       .y0(config.chartHeight)
-      .y1(function(d) {
+      .y1(function (d) {
         return config.scaleY(d.value);
       });
 
@@ -664,7 +664,7 @@
     shapes
       .enter()
       .append("path")
-      .attr("class", function(d, i) {
+      .attr("class", function (d, i) {
         return ["area", "layer" + i, d[0].id, d[0].className].join(" ");
       })
       .merge(shapes)
@@ -674,7 +674,7 @@
     return {};
   };
 
-  var stackedAreaShapes = function(config) {
+  var stackedAreaShapes = function (config) {
     if (!config.data.stackedAreaData || !config.data.stackedAreaData.length) {
       config.container
         .select(".stacked-area-group")
@@ -682,30 +682,30 @@
         .remove();
       return {};
     }
-    var keys = config.data.stackedAreaData[0].value.map(function(d, i) {
+    var keys = config.data.stackedAreaData[0].value.map(function (d, i) {
       return "y" + i;
     });
 
     var areaGenerator = d3
       .area()
-      .defined(function(d) {
+      .defined(function (d) {
         return !Number.isNaN(d[0]) && !Number.isNaN(d[1]);
       })
-      .x(function(d) {
+      .x(function (d) {
         return config.lineScaleX(d.data.timestamp);
       })
-      .y0(function(d) {
+      .y0(function (d) {
         return config.scaleY(d[0]);
       })
-      .y1(function(d) {
+      .y1(function (d) {
         return config.scaleY(d[1]);
       });
 
     var data = [];
-    config.data.stackedAreaData.forEach(function(d, i) {
+    config.data.stackedAreaData.forEach(function (d, i) {
       var datum = dh.utils.mergeAll({}, d);
       if (d.value && d.value.length) {
-        d.value.forEach(function(dB, iB) {
+        d.value.forEach(function (dB, iB) {
           datum["y" + iB] = dB;
         });
         data.push(datum);
@@ -722,8 +722,8 @@
       .attr("class", "stack-area")
       .merge(stackedArea)
       .selectAll("path.stacked-area")
-      .data(function(d, i) {
-        d.forEach(function(dB) {
+      .data(function (d, i) {
+        d.forEach(function (dB) {
           dB.index = d.index;
         });
         return [d];
@@ -732,7 +732,7 @@
       .enter()
       .append("path")
       .merge(area)
-      .attr("class", function(d) {
+      .attr("class", function (d) {
         var id = d[0].data.id ? d[0].data.id[d.index] : null;
         var className = d[0].data.className
           ? d[0].data.className[d.index]
@@ -746,7 +746,7 @@
     return {};
   };
 
-  var stripes = function(config) {
+  var stripes = function (config) {
     if (config.showStripes === false) {
       config.container
         .select(".stripe-group")
@@ -763,19 +763,19 @@
       .append("rect")
       .attr("class", "stripe")
       .merge(shapes)
-      .classed("even", function(d, i) {
+      .classed("even", function (d, i) {
         return i % 2;
       })
-      .attr("x", function(d, i) {
+      .attr("x", function (d, i) {
         return config.stripeScaleX(d) || 0;
       })
-      .attr("y", function(d) {
+      .attr("y", function (d) {
         return 0;
       })
-      .attr("width", function(d) {
+      .attr("width", function (d) {
         return config.stripeScaleX.bandwidth();
       })
-      .attr("height", function(d) {
+      .attr("height", function (d) {
         return config.chartHeight;
       });
     shapes.exit().remove();
@@ -783,14 +783,14 @@
     return {};
   };
 
-  var active = function(config) {
+  var active = function (config) {
     // if config.activeDate is the date Object use it straight, if it's text convert to date object
     var activeTs =
       !config.activeDate || config.activeDate.getTime === undefined
         ? new Date(config.activeDate).getTime()
         : config.activeDate.getTime();
 
-    var selectedTimestamp = config.data.timestamp.filter(function(d) {
+    var selectedTimestamp = config.data.timestamp.filter(function (d) {
       return d.getTime() === activeTs;
     });
 
@@ -803,7 +803,7 @@
       .append("rect")
       .attr("class", "active")
       .merge(shapes)
-      .each(function(d) {
+      .each(function (d) {
         if (config.dataIsEmpty) {
           return;
         }
@@ -816,16 +816,16 @@
           event: d3.event
         });
       })
-      .attr("x", function(d, i) {
+      .attr("x", function (d, i) {
         return config.stripeScaleX(d) || 0;
       })
-      .attr("y", function(d) {
+      .attr("y", function (d) {
         return 0;
       })
-      .attr("width", function(d) {
+      .attr("width", function (d) {
         return config.stripeScaleX.bandwidth();
       })
-      .attr("height", function(d) {
+      .attr("height", function (d) {
         return config.chartHeight;
       });
     shapes.exit().remove();
@@ -894,20 +894,20 @@
    * })
    */
 
-  var multiChart = function(config) {
+  var multiChart = function (config) {
     var configCache,
       events = d3.dispatch("hover", "click", "mouseout", "active"),
       chartCache,
       uid = ~~(Math.random() * 10000);
 
-    var onResize = dh.utils.throttle(function() {
+    var onResize = dh.utils.throttle(function () {
       configCache.width = configCache.parent.clientWidth;
       render();
     }, 200);
 
     d3.select(window).on("resize." + uid, onResize);
 
-    var render = function() {
+    var render = function () {
       chartCache = multi(configCache);
     };
 
@@ -927,7 +927,7 @@
      *     barData: datahub.data.generateTimeSeries()
      * })
      */
-    var setData = function(data) {
+    var setData = function (data) {
       var d = data ? JSON.parse(JSON.stringify(data)) : {};
       configCache = dh.utils.mergeAll({}, configCache);
       configCache.data = d;
@@ -950,13 +950,13 @@
      *     width: 100
      * })
      */
-    var setConfig = function(config) {
+    var setConfig = function (config) {
       configCache = dh.utils.mergeAll(configCache, config);
       render();
       return this;
     };
 
-    var init = function(config, events) {
+    var init = function (config, events) {
       setConfig(dh.utils.mergeAll(config, { events: events }));
     };
 
@@ -971,7 +971,7 @@
      * })
      * chart.destroy()
      */
-    var destroy = function() {
+    var destroy = function () {
       d3.select(window).on("resize." + uid, null);
       configCache.parent.innerHTML = null;
     };

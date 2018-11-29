@@ -428,12 +428,12 @@
                 message = "Values are all null";
             }
             var text = config.container.select(".message-group").selectAll("text").data([ message ]);
-            text.enter().append("text").merge(text).attr("x", config.chartWidth / 2).attr("y", function() {
-                return config.height / 2 - this.getBBox().height / 2;
+            text.enter().append("text").merge(text).attr("x", function() {
+                return config.width / 2 - this.getBBox().width / 2;
+            }).attr("y", function() {
+                return config.height / 2 - this.getBBox().height / 2 - 30;
             }).text(function(d) {
                 return d;
-            }).attr("dx", function(d) {
-                return -this.getBBox().width / 2;
             });
             text.exit().remove();
             return {};
@@ -1972,6 +1972,7 @@
      * @param {object} config.parent The parent DOM element.
      * @param {object} config.colorScale The colorScale to use for raster, one of datahub.palette.
      * @param {string} config.basemapName The name of the basemap: 'basemapDark', 'basemapLight'.
+     * @param {boolean} config.clusterMarkers Should markers be clustered
      * @param {boolean} [config.showLabels=true] Show the map label layer.
      * @param {boolean} [config.showTooltip=true] Show tooltips when hovering raster.
      * @param {function} [config.polygonTooltipFunc] The function to format vector tooltip, has passed to L.geoJson.bindTooltip().
@@ -1994,6 +1995,7 @@
             var config = {
                 container: container,
                 colorScale: _config.colorScale,
+                clusterMarkers: _config.clusterMarkers,
                 basemapName: _config.basemapName || "basemapDark",
                 imagePath: _config.imagePath || "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.2/images/",
                 showLabels: !(_config.showLabels === false),
@@ -2019,7 +2021,17 @@
             var states = {
                 isVisible: true
             };
-            var map, gridLayer, geojsonLayer, tooltipLayer, marker, gridData, cachedBBoxPolygon
+            var map, gridLayer, geojsonLayer, tooltipLayer, marker, gridData, cachedBBoxPolygon;
+            function intelligentRound(value, sigDigits) {
+                var absVal = Math.abs(value);
+                if (absVal === 0) {
+                    return 0;
+                } else if (absVal < 1) {
+                    return Number.parseFloat(value).toPrecision(sigDigits);
+                } else {
+                    return L.Util.formatNum(value, sigDigits);
+                }
+            }
             /**
          * Initialize the map.
          * @name init
@@ -2030,8 +2042,7 @@
          *     parent: document.querySelector('.map')
          * })
          * .init()
-         */;
-            function init() {
+         */            function init() {
                 L.Icon.Default.imagePath = config.imagePath;
                 map = L.map(config.container, mapConfig).on("click", function(e) {
                     events.call("click", this, {
@@ -2063,7 +2074,7 @@
                             value = gridData.values[latIndex][lonIndex];
                         }
                         if (value !== null && value !== -999 && config.showTooltip) {
-                            var formattedValue = L.Util.formatNum(value, 2);
+                            var formattedValue = intelligentRound(value, 2);
                             tooltipLayer.setTooltipContent(formattedValue + "").openTooltip([ e.latlng.lat, e.latlng.lng ]);
                         } else {
                             tooltipLayer.closeTooltip();
@@ -2241,9 +2252,19 @@
                             fillOpacity: .4
                         });
                     }
-                }).addTo(map);
+                });
                 if (config.polygonTooltipFunc) {
                     geojsonLayer.bindTooltip(config.polygonTooltipFunc);
+                }
+                if (config.clusterMarkers) {
+                    var markers = L.markerClusterGroup({
+                        chunkedLoading: true,
+                        showCoverageOnHover: false
+                    });
+                    markers.addLayer(geojsonLayer);
+                    map.addLayer(markers);
+                } else {
+                    map.addLayer(geojsonLayer);
                 }
                 return this;
             }
@@ -2526,6 +2547,8 @@
                     config: config,
                     event: d3.event
                 });
+            }, {
+                passive: true
             }).on("mouseout", function(d) {
                 config.events.call("mouseout", null, {});
             }).on("click", function(d) {
@@ -3296,7 +3319,7 @@
         var template = function(config) {
             var containerNode = config.parent.querySelector(".datahub-timeseries-chart");
             if (!containerNode) {
-                var template = '<div class="datahub-timeseries-chart">' + '<div class="number-group"></div>' + '<div class="chart-group">' + "<svg>" + '<g class="panel">' + '<g class="shapes"></g>' + '<g class="grid x"></g>' + '<g class="axis x"></g>' + '<g class="axis y"></g>' + '<g class="axis-title x"><text></text></g>' + '<g class="axis-title y"><text></text></g>' + '<g class="reference"></g>' + "</g>" + '<g class="tooltip"><line></line></g>' + '<g class="message-group"></g>' + '<g class="events"><rect class="event-panel"></rect></g>' + "</svg>" + "</div>" + "</div>";
+                var template = '<div class="datahub-timeseries-chart">' + '<div class="number-group"></div>' + '<div class="chart-group">' + "<svg>" + '<g class="panel">' + '<g class="grid x"></g>' + '<g class="shapes"></g>' + '<g class="axis x"></g>' + '<g class="axis y"></g>' + '<g class="axis-title x"><text></text></g>' + '<g class="axis-title y"><text></text></g>' + '<g class="reference"></g>' + "</g>" + '<g class="tooltip"><line></line></g>' + '<g class="message-group"></g>' + '<g class="events"><rect class="event-panel"></rect></g>' + "</svg>" + "</div>" + "</div>";
                 containerNode = dh.utils.appendHtmlToNode(template, config.parent);
             }
             var container = d3.select(containerNode);
@@ -3395,8 +3418,14 @@
             if (config.dataIsEmpty) {
                 return {};
             }
+            var axisXFormat;
+            if (config.axisXFormat instanceof Function) {
+                axisXFormat = config.axisXFormat;
+            } else {
+                axisXFormat = d3.utcFormat(config.axisXFormat || "%H:%M");
+            }
             var axisFunc = config.xAxisOnTop ? "axisTop" : "axisBottom";
-            var axisX = d3[axisFunc]().scale(config.scaleX).ticks(config.xTicks || null).tickFormat(d3.utcFormat(config.axisXFormat || "%H:%M"));
+            var axisX = d3[axisFunc]().scale(config.scaleX).ticks(config.xTicks || null).tickFormat(axisXFormat);
             return {
                 axisX: axisX
             };
@@ -3590,6 +3619,8 @@
                 var mouseTimestamp = config.scaleX.invert(mouseX);
                 var dataUnderCursor = getHoverInfo(config, mouseTimestamp);
                 config.events.call("hover", null, dataUnderCursor);
+            }, {
+                passive: true
             }).on("mouseout", function(d) {
                 hideTooltip(config);
                 config.container.selectAll(".axis-title.x text").text(null);
@@ -3617,6 +3648,7 @@
             config.container.select(".tooltip line").attr("y1", 0).attr("y2", config.height).attr("x1", x).attr("x2", x).attr("display", "block");
             if (!d || !d[0] || typeof d[0].value === "undefined" || d[0].value === null || config.hide.indexOf("tooltip") > -1) {
                 config.container.select(".tooltip").selectAll("text.tooltip-label").remove();
+                config.container.select(".tooltip").selectAll(".tooltip-rect").remove();
                 return;
             }
             if (config.hide.indexOf("tooltipDot") > -1) {
@@ -3634,7 +3666,9 @@
             }
             if (config.hide.indexOf("tooltipLabel") > -1) {
                 config.container.select(".tooltip").selectAll("text.tooltip-label").remove();
+                config.container.select(".tooltip").selectAll(".tooltip-rect").remove();
             } else {
+                var rects = config.container.select(".tooltip").selectAll(".tooltip-rect").data(d);
                 var labels = config.container.select(".tooltip").selectAll("text.tooltip-label").data(d);
                 labels.enter().append("text").merge(labels).attr("display", "block").attr("class", function(dB, dI) {
                     return [ "tooltip-label", dB.id, "layer" + dI ].join(" ");
@@ -3648,7 +3682,53 @@
                 }).attr("dx", -4).attr("text-anchor", "end").text(function(dB, dI) {
                     return config.valueFormatter ? config.valueFormatter(dB, dI) : dB.value;
                 });
+                // Assign tooltip text BBox, so rect can get its width and height from it
+                                config.container.select(".tooltip").selectAll("text.tooltip-label").each(function(item, i) {
+                    // get bounding box of text field and store it in texts array
+                    try {
+                        d[i].bb = this.getBBox();
+                    } catch (e) {
+                        console.error("Firefox specific error-getting getBBox when it display=none. Using default object.");
+                        d[i].bb = {
+                            height: 0,
+                            width: 0,
+                            x: 0,
+                            y: 0
+                        };
+                    }
+                });
+                // Add tooltip rects
+                                var paddingLeftRight = 4;
+                var paddingTopBottom = 2;
+                rects.enter().insert("rect").merge(rects).attr("display", "block").attr("width", function(d2) {
+                    if (d2.bb.width) {
+                        return d2.bb.width + paddingLeftRight;
+                    }
+                    return 0;
+                }).attr("height", function(d2) {
+                    if (d2.bb.height) {
+                        return d2.bb.height + paddingTopBottom;
+                    }
+                    return 0;
+                }).attr("class", function(d2, dI) {
+                    return [ "tooltip-rect", d2.id, "layer" + dI ].join(" ");
+                }).attr("style", "fill:black;stroke:#575f6d;stroke-width:1;fill-opacity:0.8;stroke-opacity:0.8").attr("transform", function(dB, dI) {
+                    var x = dB.posX + config.margin.left - dB.bb.width - paddingLeftRight * 1.5;
+                    var y = dB.posY + config.margin.top - dB.bb.height + paddingTopBottom / 1.5;
+                    if (config.chartType === "arrow") {
+                        y = 0;
+                    }
+                    return "translate(" + [ x, y ] + ")";
+                }).attr("rx", 2);
+                // Make so that text is not overlayed with rect
+                                config.container.selectAll(".tooltip *").each(function(item, i) {
+                    var firstChild = this.parentNode.firstChild;
+                    if (this.localName === "rect") {
+                        this.parentNode.insertBefore(this, firstChild);
+                    }
+                });
                 labels.exit().remove();
+                rects.exit().remove();
             }
             function removeInactiveLayerinfo() {
                 var inactive = config.datasetIndex === 1 ? 0 : 1;
@@ -3660,6 +3740,7 @@
             config.container.select(".tooltip line").attr("display", "none");
             config.container.selectAll(".tooltip circle").attr("display", "none");
             config.container.selectAll(".tooltip .tooltip-label").attr("display", "none");
+            config.container.selectAll(".tooltip .tooltip-rect").attr("display", "none");
         }
         var tooltipComponent = function(config) {
             if (typeof config.tooltipTimestamp !== "undefined") {
@@ -3668,11 +3749,17 @@
                     config.events.call("tooltipChange", null, {});
                 } else {
                     var dataUnderCursor = getHoverInfo(config, config.tooltipTimestamp);
-                    setTooltip(config, dataUnderCursor);
-                    config.events.call("tooltipChange", null, {
-                        timestamp: dataUnderCursor[0].timestamp,
-                        data: dataUnderCursor
-                    });
+                    if (dataUnderCursor && dataUnderCursor.length > 0) {
+                        setTooltip(config, dataUnderCursor);
+                        config.events.call("tooltipChange", null, {
+                            timestamp: dataUnderCursor[0].timestamp,
+                            data: dataUnderCursor
+                        });
+                    } else {
+                        console.info("No data under cursor. Hiding tooltip tooltip");
+                        hideTooltip(config);
+                        config.events.call("tooltipChange", null, {});
+                    }
                 }
             }
             // else if(!config.dataIsEmpty) {
@@ -4442,8 +4529,12 @@
                         info[x] = {};
                     }
                     foundData = d[idx];
-                    foundData.metadata = data[x][y].metadata;
-                    info[x][y] = foundData;
+                    if (foundData) {
+                        foundData.metadata = data[x][y].metadata;
+                        info[x][y] = foundData;
+                    } else {
+                        console.info("No data found for metadata.");
+                    }
                 }
             }
             return info;
@@ -4508,7 +4599,8 @@
                             }
                         };
                     }()).on("mouseout", function() {
-                        var latestHistoricalTimestamp = new Date(config.dataConverted ? config.dataConverted.historical.wind.data.slice(-1)[0].timestamp : Date.now());
+                        var hasData = config.dataConverted && config.dataConverted.historical.wind.data && config.dataConverted.historical.wind.data.length > 0;
+                        var latestHistoricalTimestamp = new Date(hasData ? config.dataConverted.historical.wind.data.slice(-1)[0].timestamp : Date.now());
                         setTooltip(charts, "historical", null, latestHistoricalTimestamp, config);
                         config.events.call("mouseout", null, {});
                         var data = getDataAtTimestamp(latestHistoricalTimestamp, config.dataConverted, "historical");
@@ -4529,7 +4621,13 @@
                 }
             }
             if (config.dataConverted) {
-                var latestHistoricalTimestamp = new Date(config.dataConverted.historical.wind.data.slice(-1)[0].timestamp);
+                var hasData = config.dataConverted.historical.wind.data && config.dataConverted.historical.wind.data.length > 0;
+                var latestHistoricalTimestamp = Date.now();
+                if (hasData) {
+                    latestHistoricalTimestamp = new Date(config.dataConverted.historical.wind.data.slice(-1)[0].timestamp);
+                } else {
+                    console.info("No historical data for setTooltip, using now.");
+                }
                 setTooltip(charts, "historical", null, latestHistoricalTimestamp, config);
                 var data = getDataAtTimestamp(latestHistoricalTimestamp, config.dataConverted, "historical");
                 config.events.call("tooltipChange", null, {
